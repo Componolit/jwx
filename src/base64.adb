@@ -1,4 +1,5 @@
 with Ada.Unchecked_Conversion;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body Base64
     with SPARK_Mode
@@ -41,17 +42,21 @@ is
        'w', 'x', 'y', 'z', '0', '1', '2', '3',
        '4', '5', '6', '7', '8', '9', '+', '/');
 
-   -- pragma Assert (for all I in UInt6 range  0.. 7 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
-   -- pragma Assert (for all I in UInt6 range  8..15 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
-   -- pragma Assert (for all I in UInt6 range 16..23 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
-   -- pragma Assert (for all I in UInt6 range 24..31 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
-   -- pragma Assert (for all I in UInt6 range 32..39 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
-   -- pragma Assert (for all I in UInt6 range 40..47 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
-   -- pragma Assert (for all I in UInt6 range 48..55 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
-   -- pragma Assert (for all I in UInt6 range 56..63 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
-   -- pragma Assert (for all I in UInt6 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
+   pragma Assert (for all I in UInt6 range  0.. 7 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
+   pragma Assert (for all I in UInt6 range  8..15 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
+   pragma Assert (for all I in UInt6 range 16..23 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
+   pragma Assert (for all I in UInt6 range 24..31 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
+   pragma Assert (for all I in UInt6 range 32..39 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
+   pragma Assert (for all I in UInt6 range 40..47 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
+   pragma Assert (for all I in UInt6 range 48..55 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
+   pragma Assert (for all I in UInt6 range 56..63 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
+   pragma Assert (for all I in UInt6 => UInt6 (Alpha_To_Value (Value_To_Alpha (I))) = I);
 
-   -- pragma Assert (for all I in Character range 'A'..'Z' => Value_To_Alpha (UInt6 (Alpha_To_Value (I))) = I);
+   pragma Assert (for all I in Character range 'A'..'Z' => Value_To_Alpha (UInt6 (Alpha_To_Value (I))) = I);
+   pragma Assert (for all I in Character range 'a'..'z' => Value_To_Alpha (UInt6 (Alpha_To_Value (I))) = I);
+   pragma Assert (for all I in Character range '0'..'9' => Value_To_Alpha (UInt6 (Alpha_To_Value (I))) = I);
+   pragma Assert (Value_To_Alpha (UInt6 (Alpha_To_Value ('+'))) = '+');
+   pragma Assert (Value_To_Alpha (UInt6 (Alpha_To_Value ('/'))) = '/');
 
    type UInt6_Block is array (Natural range 1..4) of UInt6
       with Pack, Size => 24;
@@ -118,16 +123,19 @@ is
 
    procedure Decode
      (Encoded :        String;
-      Valid   :    out Boolean;
+      Length  :    out Natural;
       Result  : in out Byte_Array)
    is
       B0, B1, B2, B3 : UInt6;
-      Last_Input_Block : constant Integer := Encoded'Length/4-1;
+      Last_Input_Block_Offset  : constant Integer := Encoded'Length/4-1;
+      Last_Output_Block_Start  : constant Integer := Result'First + (3 * Last_Input_Block_Offset);
+      Num_Last_Block_Bytes     : Integer := 1;
+      Last_Block               : Byte_Array_Block;
    begin
-      Valid := False;
+      Length := 0;
 
       -- Loop over all but the last block
-      for I in Integer range 0 .. Last_Input_Block - 1
+      for I in Integer range 0 .. Last_Input_Block_Offset - 1
       loop
          if not Is_Valid (Encoded (Encoded'First + 4*I + 0)) or
             not Is_Valid (Encoded (Encoded'First + 4*I + 1)) or
@@ -154,31 +162,36 @@ is
       B0 := UInt6 (Alpha_To_Value (Encoded (Encoded'Last - 3)));
       B1 := UInt6 (Alpha_To_Value (Encoded (Encoded'Last - 2)));
 
-      --  FIXME: Reduce output size if padding!
       if Encoded (Encoded'Last - 1) = '=' then
          B2 := 0;
       elsif Is_Valid (Encoded (Encoded'Last - 1)) then
          B2 := UInt6 (Alpha_To_Value ((Encoded (Encoded'Last - 1))));
+         Num_Last_Block_Bytes := 2;
       else
          return;
       end if;
 
-      --  FIXME: Reduce output size if padding!
       if Encoded (Encoded'Last - 0) = '=' then
          B3 := 0;
       elsif Is_Valid (Encoded (Encoded'Last - 0)) then
          B3 := UInt6 (Alpha_To_Value ((Encoded (Encoded'Last - 0))));
+         Num_Last_Block_Bytes := 3;
       else
          return;
       end if;
 
-      declare
-         Off : Integer := Result'First + (3 * Last_Input_Block);
-      begin
-         Result (Off .. Off + 2) := UInt6_To_Bytes ((B0, B1, B2, B3));
-      end;
+      pragma Assert (Num_Last_Block_Bytes < 4);
+      pragma Assert (Result'Length >= 3);
 
-      Valid := True;
+      Last_Block := UInt6_To_Bytes ((B0, B1, B2, B3));
+
+      Put_Line ("LB 1: " & Last_Block(1)'Img);
+      Put_Line ("LB 2: " & Last_Block(2)'Img);
+      Put_Line ("LB 3: " & Last_Block(3)'Img);
+
+      Result (Last_Output_Block_Start .. Last_Output_Block_Start + (Num_Last_Block_Bytes - 1)) :=
+         Last_Block (1 .. Num_Last_Block_Bytes);
+      Length := (3 * Last_Input_Block_Offset) + Num_Last_Block_Bytes;
    end Decode;
 
 end Base64;

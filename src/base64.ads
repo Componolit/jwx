@@ -4,8 +4,11 @@ package Base64
     with SPARK_Mode
 is
 
-type Byte is mod 2**8;
-type Byte_Array is array (Natural range <>) of Byte;
+type Byte is mod 2**8
+   with Size => 8;
+
+type Byte_Array is array (Natural range <>) of Byte
+   with Pack;
 
    procedure To_Byte_Array
       (Data   :        String;
@@ -32,7 +35,7 @@ type Byte_Array is array (Natural range <>) of Byte;
 
    procedure Decode
        (Encoded :        String;
-        Valid   :    out Boolean;
+        Length  :    out Natural;
         Result  : in out Byte_Array)
    with
       Pre => Encoded'Length >= 4 and

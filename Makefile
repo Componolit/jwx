@@ -1,6 +1,6 @@
 all:
 	@gprbuild -F -Pbase64 -p
-	@gnatprove -Pbase64 --warnings=error --timeout=120
+	@gnatprove -Pbase64 --warnings=error --timeout=0
 
 
 clean:

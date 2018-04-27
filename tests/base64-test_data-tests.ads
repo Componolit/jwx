@@ -10,16 +10,16 @@ package Base64.Test_Data.Tests is
    with null record;
 
    procedure Test_To_Byte_Array_16b0dc (Gnattest_T : in out Test);
-   --  base64.ads:10:4:To_Byte_Array
+   --  base64.ads:13:4:To_Byte_Array
 
    procedure Test_To_String_8ef20e (Gnattest_T : in out Test);
-   --  base64.ads:19:4:To_String
+   --  base64.ads:22:4:To_String
 
    procedure Test_Encode_139c8c (Gnattest_T : in out Test);
-   --  base64.ads:28:4:Encode
+   --  base64.ads:31:4:Encode
 
-   procedure Test_Decode_b2b1e9 (Gnattest_T : in out Test);
-   --  base64.ads:33:4:Decode
+   procedure Test_Decode_9d8f81 (Gnattest_T : in out Test);
+   --  base64.ads:36:4:Decode
 
 end Base64.Test_Data.Tests;
 --  end read only
