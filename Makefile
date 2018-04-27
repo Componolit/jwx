@@ -1,15 +1,15 @@
 all:
-	@gprbuild -P base64 -p
-	@gnatprove -P base64 --warnings=error
+	@gprbuild -F -Pbase64 -p
+	@gnatprove -Pbase64 --warnings=error --timeout=120
 
 
 clean:
-	@gprclean -P base64
-	@gnatprove -P base64 --clean
+	@gprclean -Pbase64
+	@gnatprove -Pbase64 --clean
 	@rm -rf obj adalib
 
 test:
-	@gnattest -P base64
+	@gnattest -Pbase64
 	@gprbuild -P obj/gnattest/harness/test_driver.gpr
 	@obj/gnattest/harness/test_runner
 
