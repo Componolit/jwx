@@ -1,11 +1,10 @@
 with Ada.Unchecked_Conversion;
-with Ada.Text_IO; use Ada.Text_IO;
 
 package body Base64
     with SPARK_Mode
 is
 
-   type UInt6 is range 0 .. 63
+   type UInt6 is mod 2**6
       with Size => 6;
 
    function Alpha_To_Value (Alpha : Character) return Natural is
@@ -67,9 +66,18 @@ is
       new Ada.Unchecked_Conversion (Source => Byte_Array_Block,
                                     Target => UInt6_Block);
 
-   function UInt6_To_Bytes is
-      new Ada.Unchecked_Conversion (Source => UInt6_Block,
-                                    Target => Byte_Array_Block);
+   --------------------
+   -- UInt6_To_Bytes --
+   --------------------
+
+   function UInt6_To_Bytes (Data : UInt6_Block) return Byte_Array_Block
+   is
+   begin
+      return
+         (0 => ((Byte (Data (1)) and Byte'(16#3f#)) *  4) or ((Byte (Data (2)) and Byte'(16#30#)) / 16),
+          1 => ((Byte (Data (2)) and Byte'(16#0f#)) * 16) or ((Byte (Data (3)) and Byte'(16#3C#)) /  4),
+          2 => ((Byte (Data (3)) and Byte'(16#03#)) * 64) or ((Byte (Data (4)))));
+   end UInt6_To_Bytes;
 
    -------------------
    -- To_Byte_Array --
@@ -184,10 +192,6 @@ is
       pragma Assert (Result'Length >= 3);
 
       Last_Block := UInt6_To_Bytes ((B0, B1, B2, B3));
-
-      Put_Line ("LB 1: " & Last_Block(1)'Img);
-      Put_Line ("LB 2: " & Last_Block(2)'Img);
-      Put_Line ("LB 3: " & Last_Block(3)'Img);
 
       Result (Last_Output_Block_Start .. Last_Output_Block_Start + (Num_Last_Block_Bytes - 1)) :=
          Last_Block (1 .. Num_Last_Block_Bytes);

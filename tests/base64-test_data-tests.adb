@@ -104,8 +104,8 @@ package body Base64.Test_Data.Tests is
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
-      subtype Result_Type is Byte_Array (1..3);
-      subtype String_Type is String (1..3);
+      subtype Result_Type is Byte_Array (1..10);
+      subtype String_Type is String (1..10);
 
       L : Natural;
       R : Result_Type;
@@ -113,8 +113,28 @@ package body Base64.Test_Data.Tests is
    begin
 
       Decode (Encoded => "Zg==", Length => L, Result => R);
-      --  To_String (R, S);
-      AUnit.Assertions.Assert (L > 0 and R(1) = Character'Pos('f'), "Test vector #1 (len=" & L'Img & " value=" & R(1)'Img & ")");
+      To_String (R, S);
+      AUnit.Assertions.Assert (L > 0 and S(1..L) = "f", "RFC4648 - Test vector #1");
+
+      Decode (Encoded => "Zm8=", Length => L, Result => R);
+      To_String (R, S);
+      AUnit.Assertions.Assert (L > 0 and S(1..L) = "fo", "RFC4648 - Test vector #2");
+
+      Decode (Encoded => "Zm9v", Length => L, Result => R);
+      To_String (R, S);
+      AUnit.Assertions.Assert (L > 0 and S(1..L) = "foo", "RFC4648 - Test vector #3");
+
+      Decode (Encoded => "Zm9vYg==", Length => L, Result => R);
+      To_String (R, S);
+      AUnit.Assertions.Assert (L > 0 and S(1..L) = "foob", "RFC4648 - Test vector #4");
+
+      Decode (Encoded => "Zm9vYmE=", Length => L, Result => R);
+      To_String (R, S);
+      AUnit.Assertions.Assert (L > 0 and S(1..L) = "fooba", "RFC4648 - Test vector #5");
+
+      Decode (Encoded => "Zm9vYmFy", Length => L, Result => R);
+      To_String (R, S);
+      AUnit.Assertions.Assert (L > 0 and S(1..L) = "foobar", "RFC4648 - Test vector #6");
 
 --  begin read only
    end Test_Decode;
