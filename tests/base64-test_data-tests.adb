@@ -104,8 +104,8 @@ package body Base64.Test_Data.Tests is
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
-      subtype Result_Type is Byte_Array (1..10);
-      subtype String_Type is String (1..10);
+      subtype Result_Type is Byte_Array (1..50);
+      subtype String_Type is String (1..50);
 
       L : Natural;
       R : Result_Type;
@@ -135,6 +135,26 @@ package body Base64.Test_Data.Tests is
       Decode (Encoded => "Zm9vYmFy", Length => L, Result => R);
       To_String (R, S);
       AUnit.Assertions.Assert (L > 0 and S(1..L) = "foobar", "RFC4648 - Test vector #6");
+
+      Decode (Encoded => "YW55IGNhcm5hbCBwbGVhc3VyZS4=", Length => L, Result => R);
+      To_String (R, S);
+      AUnit.Assertions.Assert (L > 0 and S(1..L) = "any carnal pleasure.", "Wikipedia - Test vector #1");
+
+      Decode (Encoded => "YW55IGNhcm5hbCBwbGVhc3VyZQ==", Length => L, Result => R);
+      To_String (R, S);
+      AUnit.Assertions.Assert (L > 0 and S(1..L) = "any carnal pleasure", "Wikipedia - Test vector #2");
+
+      Decode (Encoded => "YW55IGNhcm5hbCBwbGVhc3Vy", Length => L, Result => R);
+      To_String (R, S);
+      AUnit.Assertions.Assert (L > 0 and S(1..L) = "any carnal pleasur", "Wikipedia - Test vector #3");
+
+      Decode (Encoded => "YW55IGNhcm5hbCBwbGVhc3U=", Length => L, Result => R);
+      To_String (R, S);
+      AUnit.Assertions.Assert (L > 0 and S(1..L) = "any carnal pleasu", "Wikipedia - Test vector #4");
+
+      Decode (Encoded => "YW55IGNhcm5hbCBwbGVhcw==", Length => L, Result => R);
+      To_String (R, S);
+      AUnit.Assertions.Assert (L > 0 and S(1..L) = "any carnal pleas", "Wikipedia - Test vector #5");
 
 --  begin read only
    end Test_Decode;
