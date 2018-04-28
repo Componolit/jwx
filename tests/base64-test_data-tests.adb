@@ -75,27 +75,6 @@ package body Base64.Test_Data.Tests is
 
 
 --  begin read only
-   procedure Test_Encode (Gnattest_T : in out Test);
-   procedure Test_Encode_139c8c (Gnattest_T : in out Test) renames Test_Encode;
---  id:2.2/139c8c615858bc41/Encode/1/0/
-   procedure Test_Encode (Gnattest_T : in out Test) is
-   --  base64.ads:31:4:Encode
---  end read only
-
-      pragma Unreferenced (Gnattest_T);
-
-   begin
-
-      AUnit.Assertions.Assert
-        (Gnattest_Generated.Default_Assert_Value,
-         "Test not implemented.");
-
---  begin read only
-   end Test_Encode;
---  end read only
-
-
---  begin read only
    procedure Test_Decode (Gnattest_T : in out Test);
    procedure Test_Decode_9d8f81 (Gnattest_T : in out Test) renames Test_Decode;
 --  id:2.2/9d8f8119fdf6d82a/Decode/1/0/

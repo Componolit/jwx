@@ -110,22 +110,6 @@ is
    end To_String;
 
    ------------
-   -- Encode --
-   ------------
-
-   procedure Encode
-     (Raw    :        Byte_Array;
-      Result : in out String)
-   is
-      pragma Unreferenced (Raw);
-   begin
-      for I in Result'Range
-      loop
-         Result (I) := Character'Val(0);
-      end loop;
-   end Encode;
-
-   ------------
    -- Decode --
    ------------
 

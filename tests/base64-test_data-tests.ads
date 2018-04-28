@@ -15,9 +15,6 @@ package Base64.Test_Data.Tests is
    procedure Test_To_String_8ef20e (Gnattest_T : in out Test);
    --  base64.ads:22:4:To_String
 
-   procedure Test_Encode_139c8c (Gnattest_T : in out Test);
-   --  base64.ads:31:4:Encode
-
    procedure Test_Decode_9d8f81 (Gnattest_T : in out Test);
    --  base64.ads:36:4:Decode
 

@@ -28,11 +28,6 @@ type Byte_Array is array (Natural range <>) of Byte
          Result'Length >= Data'Length;
    -- Convert a Byte_Array to a String
 
-   procedure Encode
-       (Raw    :        Byte_Array;
-        Result : in out String);
-   -- Encode raw byte array into Base64 string
-
    procedure Decode
        (Encoded :        String;
         Length  :    out Natural;
