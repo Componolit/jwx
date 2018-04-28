@@ -1,4 +1,4 @@
--- RFC4648 encoding and decoding
+-- RFC4648 decoding
 
 package Base64
     with SPARK_Mode

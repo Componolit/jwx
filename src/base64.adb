@@ -1,5 +1,3 @@
-with Ada.Unchecked_Conversion;
-
 package body Base64
     with SPARK_Mode
 is
