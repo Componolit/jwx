@@ -169,6 +169,16 @@ is
 
       Last_Block := UInt6_To_Bytes ((B0, B1, B2, B3));
 
+      -- Padding bits shall be 0
+      if Num_Last_Block_Bytes < 3 and Last_Block (3) /= 0 then
+         return;
+      end if;
+
+      -- Padding bits shall be 0
+      if Num_Last_Block_Bytes < 2 and Last_Block (2) /= 0 then
+         return;
+      end if;
+
       Result (Last_Output_Block_Start .. Last_Output_Block_Start + (Num_Last_Block_Bytes - 1)) :=
          Last_Block (1 .. Num_Last_Block_Bytes);
       Length := (3 * Last_Input_Block_Offset) + Num_Last_Block_Bytes;
