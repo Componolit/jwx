@@ -10,24 +10,6 @@ type Byte is mod 2**8
 type Byte_Array is array (Natural range <>) of Byte
    with Pack;
 
-   procedure To_Byte_Array
-      (Data   :        String;
-       Result : in out Byte_Array)
-   with
-      Pre =>
-         Data'Length > 0 and
-         Result'Length >= Data'Length;
-   -- Convert a String to a byte array
-
-   procedure To_String
-      (Data   :        Byte_Array;
-       Result : in out String)
-   with
-      Pre =>
-         Data'Length > 0 and
-         Result'Length >= Data'Length;
-   -- Convert a Byte_Array to a String
-
    procedure Decode
        (Encoded :        String;
         Length  :    out Natural;

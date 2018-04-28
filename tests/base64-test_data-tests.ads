@@ -9,12 +9,6 @@ package Base64.Test_Data.Tests is
    type Test is new GNATtest_Generated.GNATtest_Standard.Base64.Test_Data.Test
    with null record;
 
-   procedure Test_To_Byte_Array_16b0dc (Gnattest_T : in out Test);
-   --  base64.ads:13:4:To_Byte_Array
-
-   procedure Test_To_String_8ef20e (Gnattest_T : in out Test);
-   --  base64.ads:22:4:To_String
-
    procedure Test_Decode_9d8f81 (Gnattest_T : in out Test);
    --  base64.ads:36:4:Decode
 

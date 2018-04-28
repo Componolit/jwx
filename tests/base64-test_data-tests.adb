@@ -26,60 +26,63 @@ package body Base64.Test_Data.Tests is
 --
 --  end read only
 
---  begin read only
---  end read only
+   procedure To_Byte_Array
+      (Data   :        String;
+       Result : in out Byte_Array)
+   with
+      Pre =>
+         Data'Length > 0 and
+         Result'Length >= Data'Length;
+   -- Convert a String to a byte array
 
---  begin read only
-   procedure Test_To_Byte_Array (Gnattest_T : in out Test);
-   procedure Test_To_Byte_Array_16b0dc (Gnattest_T : in out Test) renames Test_To_Byte_Array;
---  id:2.2/16b0dc56c3d0b60c/To_Byte_Array/1/0/
-   procedure Test_To_Byte_Array (Gnattest_T : in out Test) is
-   --  base64.ads:13:4:To_Byte_Array
---  end read only
+   procedure To_String
+      (Data   :        Byte_Array;
+       Result : in out String)
+   with
+      Pre =>
+         Data'Length > 0 and
+         Result'Length >= Data'Length;
+   -- Convert a Byte_Array to a String
 
-      pragma Unreferenced (Gnattest_T);
+   -------------------
+   -- To_Byte_Array --
+   -------------------
 
-      subtype BA is Byte_Array (1..3);
-      b : BA;
-
+   procedure To_Byte_Array
+      (Data   :        String;
+       Result : in out Byte_Array)
+   is
    begin
+      for I in 0 .. Data'Length - 1
+      loop
+         Result (Result'First + I) := Character'Pos (Data (Data'First + I));
+      end loop;
+   end To_Byte_Array;
 
-      Base64.To_Byte_Array ("Foo", b);
-      AUnit.Assertions.Assert
-        (b = (Character'Pos('F'), Character'Pos('o'), Character'Pos('o')),
-         "Conversion failed.");
+   ---------------
+   -- To_String --
+   ---------------
 
---  begin read only
-   end Test_To_Byte_Array;
---  end read only
-
-
---  begin read only
-   procedure Test_To_String (Gnattest_T : in out Test);
-   procedure Test_To_String_8ef20e (Gnattest_T : in out Test) renames Test_To_String;
---  id:2.2/8ef20ee1bec5ccff/To_String/1/0/
-   procedure Test_To_String (Gnattest_T : in out Test) is
-   --  base64.ads:22:4:To_String
---  end read only
-
-      pragma Unreferenced (Gnattest_T);
-      S : String := "xxx";
-
+   procedure To_String
+      (Data   :        Byte_Array;
+       Result : in out String)
+   is
    begin
-      Base64.To_String ((Character'Pos('F'), Character'Pos('o'), Character'Pos('o')), S);
-      AUnit.Assertions.Assert (S = "Foo", S);
+      for I in 0 .. Data'Length - 1
+      loop
+         Result (Result'First + I) := Character'Val (Data (Data'First + I));
+      end loop;
+   end To_String;
 
 --  begin read only
-   end Test_To_String;
 --  end read only
-
 
 --  begin read only
    procedure Test_Decode (Gnattest_T : in out Test);
    procedure Test_Decode_9d8f81 (Gnattest_T : in out Test) renames Test_Decode;
 --  id:2.2/9d8f8119fdf6d82a/Decode/1/0/
    procedure Test_Decode (Gnattest_T : in out Test) is
-   --  base64.ads:36:4:Decode
+   --  base64.ads:13:4:Decode
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
