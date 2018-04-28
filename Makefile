@@ -1,6 +1,6 @@
 all:
 	@gprbuild -F -Pbase64 -p
-	@gnatprove -Pbase64 --warnings=error --timeout=0
+	@gnatprove -Pbase64 --warnings=error --steps=10000 --prover=altergo,z3,cvc4
 
 
 clean:
