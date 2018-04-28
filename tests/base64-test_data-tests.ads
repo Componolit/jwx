@@ -10,7 +10,7 @@ package Base64.Test_Data.Tests is
    with null record;
 
    procedure Test_Decode_9d8f81 (Gnattest_T : in out Test);
-   --  base64.ads:36:4:Decode
+   --  base64.ads:13:4:Decode
 
 end Base64.Test_Data.Tests;
 --  end read only

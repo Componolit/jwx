@@ -62,9 +62,31 @@ is
 
    subtype Byte_Array_Block is Byte_Array (1..3);
 
-   function Bytes_To_UInt6 is
-      new Ada.Unchecked_Conversion (Source => Byte_Array_Block,
-                                    Target => UInt6_Block);
+   ---------------
+   -- Mask_Mult --
+   ---------------
+
+   function Mask_Mult (Data : UInt6;
+                       Mask : Byte;
+                       Mult : Byte) return Byte
+   is
+   begin
+      return (Byte (Data) and Mask) * Mult;
+   end Mask_Mult;
+
+   --------------
+   -- Mask_Div --
+   --------------
+
+   function Mask_Div (Data : UInt6;
+                      Mask : Byte;
+                      Div  : Byte) return Byte
+   with
+      Pre => Div > 0
+   is
+   begin
+      return (Byte (Data) and Mask) / Div;
+   end Mask_Div;
 
    --------------------
    -- UInt6_To_Bytes --
@@ -74,9 +96,9 @@ is
    is
    begin
       return
-         (0 => ((Byte (Data (1)) and Byte'(16#3f#)) *  4) or ((Byte (Data (2)) and Byte'(16#30#)) / 16),
-          1 => ((Byte (Data (2)) and Byte'(16#0f#)) * 16) or ((Byte (Data (3)) and Byte'(16#3C#)) /  4),
-          2 => ((Byte (Data (3)) and Byte'(16#03#)) * 64) or ((Byte (Data (4)))));
+         (0 => Mask_Mult (Data (1), 16#3f#,  4) or Mask_Div (Data (2), 16#30#, 16),
+          1 => Mask_Mult (Data (2), 16#0f#, 16) or Mask_Div (Data (3), 16#3C#,  4),
+          2 => Mask_Mult (Data (3), 16#03#, 64) or Mask_Div (Data (4), 16#ff#,  1));
    end UInt6_To_Bytes;
 
    ------------
