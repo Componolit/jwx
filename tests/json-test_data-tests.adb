@@ -31,35 +31,41 @@ package body JSON.Test_Data.Tests is
 
 --  begin read only
    procedure Test_Parse (Gnattest_T : in out Test);
-   procedure Test_Parse_8d61b6 (Gnattest_T : in out Test) renames Test_Parse;
---  id:2.2/8d61b60544a8bbfd/Parse/1/0/
+   procedure Test_Parse_44459a (Gnattest_T : in out Test) renames Test_Parse;
+--  id:2.2/44459a1ec5d8e27c/Parse/1/0/
    procedure Test_Parse (Gnattest_T : in out Test) is
    --  json.ads:8:4:Parse
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
 
-      Valid   : Boolean;
+      Offset  : Natural;
       Context : Context_Type (Integer range 1..100);
    begin
 
-      Parse (Context, "true", Valid);
-      AUnit.Assertions.Assert (Valid, "Parse true.");
+      Offset := 0;
+      Parse (Context, Offset, "true");
+      AUnit.Assertions.Assert (Offset = 4, "Parse true");
 
-      Parse (Context, "false", Valid);
-      AUnit.Assertions.Assert (Valid, "Parse false.");
+      Offset := 0;
+      Parse (Context, Offset, "false");
+      AUnit.Assertions.Assert (Offset = 5, "Parse false.");
 
-      Parse (Context, "null", Valid);
-      AUnit.Assertions.Assert (Valid, "Parse null.");
+      Offset := 0;
+      Parse (Context, Offset, "null");
+      AUnit.Assertions.Assert (Offset = 4, "Parse null.");
 
-      Parse (Context, "True", Valid);
-      AUnit.Assertions.Assert (not Valid, "True case insensitive.");
+      Offset := 0;
+      Parse (Context, Offset, "True");
+      AUnit.Assertions.Assert (Offset = 0, "True case insensitive.");
 
-      Parse (Context, "FALSE", Valid);
-      AUnit.Assertions.Assert (not Valid, "True case insensitive.");
+      Offset := 0;
+      Parse (Context, Offset, "FALSE");
+      AUnit.Assertions.Assert (Offset = 0, "True case insensitive.");
 
-      Parse (Context, "nulL", Valid);
-      AUnit.Assertions.Assert (not Valid, "True case insensitive.");
+      Offset := 0;
+      Parse (Context, Offset, "nulL");
+      AUnit.Assertions.Assert (Offset = 0, "True case insensitive.");
 
 --  begin read only
    end Test_Parse;

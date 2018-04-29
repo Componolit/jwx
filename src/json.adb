@@ -7,30 +7,32 @@ is
 
    procedure Parse_Bool
      (Context : in out Context_Type;
-      Data    :        String;
-      Valid   :    out Boolean)
+      Offset  : in out Natural;
+      Data    :        String)
    with
-      Pre => Context'Length > 0;
+      Pre => Context'Length > 0 and
+             Data'First <= Integer'Last - Offset - 4 and
+             Offset < Data'Length;
 
    procedure Parse_Bool
      (Context : in out Context_Type;
-      Data    :        String;
-      Valid   :    out Boolean)
+      Offset  : in out Natural;
+      Data    :        String)
    is
+      Base : Natural := Data'First + Offset;
    begin
-      Valid := True;
-
-      if Data'Length > 3 and then Data (Data'First .. Data'First + 3) = "true"
+      if Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "true"
       then
          Context (Context'First) := (Kind => Kind_Boolean, Value => Value_True);
-      elsif Data'Length > 3 and then Data (Data'First .. Data'First + 3) = "null"
+         Offset := Offset + 4;
+      elsif Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "null"
       then
          Context (Context'First) := (Kind => Kind_Boolean, Value => Value_Null);
-      elsif Data'Length > 4 and then Data (Data'First .. Data'First + 4) = "false"
+         Offset := Offset + 4;
+      elsif Offset <= Data'Length - 5 and then Data (Base .. Base + 4) = "false"
       then
          Context (Context'First) := (Kind => Kind_Boolean, Value => Value_False);
-      else
-         Valid := False;
+         Offset := Offset + 5;
       end if;
    end Parse_Bool;
 
@@ -40,11 +42,11 @@ is
 
    procedure Parse
      (Context : in out Context_Type;
-      Data    :        String;
-      Valid   :    out Boolean)
+      Offset  : in out Natural;
+      Data    :        String)
    is
    begin
-      Parse_Bool (Context, Data, Valid);
+      Parse_Bool (Context, Offset, Data);
    end Parse;
 
 end JSON;
