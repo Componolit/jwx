@@ -9,7 +9,7 @@ package JSON.Test_Data.Tests is
    type Test is new GNATtest_Generated.GNATtest_Standard.JSON.Test_Data.Test
    with null record;
 
-   procedure Test_Parse_44459a (Gnattest_T : in out Test);
+   procedure Test_Parse_7ff026 (Gnattest_T : in out Test);
    --  json.ads:8:4:Parse
 
 end JSON.Test_Data.Tests;

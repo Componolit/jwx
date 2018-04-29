@@ -31,8 +31,8 @@ package body JSON.Test_Data.Tests is
 
 --  begin read only
    procedure Test_Parse (Gnattest_T : in out Test);
-   procedure Test_Parse_44459a (Gnattest_T : in out Test) renames Test_Parse;
---  id:2.2/44459a1ec5d8e27c/Parse/1/0/
+   procedure Test_Parse_7ff026 (Gnattest_T : in out Test) renames Test_Parse;
+--  id:2.2/7ff026f73f098df3/Parse/1/0/
    procedure Test_Parse (Gnattest_T : in out Test) is
    --  json.ads:8:4:Parse
 --  end read only
@@ -40,32 +40,45 @@ package body JSON.Test_Data.Tests is
       pragma Unreferenced (Gnattest_T);
 
       Offset  : Natural;
+      Match   : Boolean;
       Context : Context_Type (Integer range 1..100);
    begin
 
       Offset := 0;
-      Parse (Context, Offset, "true");
-      AUnit.Assertions.Assert (Offset = 4, "Parse true");
+      Parse (Context, Offset, Match, "true");
+      AUnit.Assertions.Assert (Match and Offset = 4, "Parse true");
 
       Offset := 0;
-      Parse (Context, Offset, "false");
-      AUnit.Assertions.Assert (Offset = 5, "Parse false.");
+      Parse (Context, Offset, Match, "false");
+      AUnit.Assertions.Assert (Match and Offset = 5, "Parse false.");
 
       Offset := 0;
-      Parse (Context, Offset, "null");
-      AUnit.Assertions.Assert (Offset = 4, "Parse null.");
+      Parse (Context, Offset, Match, "null");
+      AUnit.Assertions.Assert (Match and Offset = 4, "Parse null.");
 
       Offset := 0;
-      Parse (Context, Offset, "True");
-      AUnit.Assertions.Assert (Offset = 0, "True case insensitive.");
+      Parse (Context, Offset, Match, "True");
+      AUnit.Assertions.Assert (not Match and Offset = 0, "True case insensitive.");
 
       Offset := 0;
-      Parse (Context, Offset, "FALSE");
-      AUnit.Assertions.Assert (Offset = 0, "True case insensitive.");
+      Parse (Context, Offset, Match, "FALSE");
+      AUnit.Assertions.Assert (not Match and Offset = 0, "True case insensitive.");
 
       Offset := 0;
-      Parse (Context, Offset, "nulL");
-      AUnit.Assertions.Assert (Offset = 0, "True case insensitive.");
+      Parse (Context, Offset, Match, "nulL");
+      AUnit.Assertions.Assert (not Match and Offset = 0, "True case insensitive.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "    null");
+      AUnit.Assertions.Assert (Match, "Parse boolean with space.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "  " & ASCII.CR & ASCII.LF & "true");
+      AUnit.Assertions.Assert (Match, "Parse boolean with CRLF");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, ASCII.HT & "false");
+      AUnit.Assertions.Assert (Match, "Parse boolean with tab.");
 
 --  begin read only
    end Test_Parse;

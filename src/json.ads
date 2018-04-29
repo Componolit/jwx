@@ -7,6 +7,7 @@ is
 
    procedure Parse (Context : in out Context_Type;
                     Offset  : in out Natural;
+                    Match   :    out Boolean;
                     Data    :        String)
    with
       Pre => Context'Length > 1 and
