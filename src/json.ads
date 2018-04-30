@@ -14,6 +14,9 @@ is
    function Float_Element (Value : Float) return Context_Element_Type;
    -- Construct float element
 
+   function Integer_Element (Value : Integer) return Context_Element_Type;
+   -- Construct integer element
+
    function Get_Kind (Element : Context_Element_Type) return Kind_Type;
    -- Return kind of a context element
 
@@ -71,5 +74,11 @@ private
        Boolean_Value => False,
        Float_Value   => Value,
        Integer_Value => 0);
+
+   function Integer_Element (Value : Integer) return Context_Element_Type is
+      (Kind          => Kind_Integer,
+       Boolean_Value => False,
+       Float_Value   => 0.0,
+       Integer_Value => Value);
 
 end JSON;

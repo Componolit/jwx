@@ -34,7 +34,7 @@ package body JSON.Test_Data.Tests is
    procedure Test_Parse_7ff026 (Gnattest_T : in out Test) renames Test_Parse;
 --  id:2.2/7ff026f73f098df3/Parse/1/0/
    procedure Test_Parse (Gnattest_T : in out Test) is
-   --  json.ads:37:4:Parse
+   --  json.ads:40:4:Parse
 --  end read only
 
       pragma Unreferenced (Gnattest_T);

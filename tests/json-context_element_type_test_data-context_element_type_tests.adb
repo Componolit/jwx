@@ -107,11 +107,36 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
 
 
 --  begin read only
+   procedure Test_Integer_Element (Gnattest_T : in out Test_Context_Element_Type);
+   procedure Test_Integer_Element_95c870 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Integer_Element;
+--  id:2.2/95c8701ee645eb29/Integer_Element/1/0/
+   procedure Test_Integer_Element (Gnattest_T : in out Test_Context_Element_Type) is
+   --  json.ads:17:4:Integer_Element
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+      Test_Value : constant Integer := 4711;
+   begin
+
+      AUnit.Assertions.Assert
+        (Integer_Element (Test_Value) = (Kind          => Kind_Integer,
+                                         Boolean_Value => false,
+                                         Float_Value   => 0.0,
+                                         Integer_Value => Test_Value),
+         "Float element constuction.");
+
+--  begin read only
+   end Test_Integer_Element;
+--  end read only
+
+
+--  begin read only
    procedure Test_Get_Kind (Gnattest_T : in out Test_Context_Element_Type);
    procedure Test_Get_Kind_54b377 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Get_Kind;
 --  id:2.2/54b3772dd6597445/Get_Kind/1/0/
    procedure Test_Get_Kind (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:17:4:Get_Kind
+   --  json.ads:20:4:Get_Kind
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -130,7 +155,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Get_Boolean_521306 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Get_Boolean;
 --  id:2.2/5213066f5fbc2bf6/Get_Boolean/1/0/
    procedure Test_Get_Boolean (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:20:4:Get_Boolean
+   --  json.ads:23:4:Get_Boolean
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -156,7 +181,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Get_Float_11a14f (Gnattest_T : in out Test_Context_Element_Type) renames Test_Get_Float;
 --  id:2.2/11a14f2e5e32c6e3/Get_Float/1/0/
    procedure Test_Get_Float (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:25:4:Get_Float
+   --  json.ads:28:4:Get_Float
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -166,7 +191,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
 
       AUnit.Assertions.Assert
         (Float_Element (Test_Value).Get_Float = Test_Value,
-         "Float element constuction.");
+         "Float element accessor.");
 
 --  begin read only
    end Test_Get_Float;
@@ -178,7 +203,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Get_Integer_02bdc1 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Get_Integer;
 --  id:2.2/02bdc12333f30151/Get_Integer/1/0/
    procedure Test_Get_Integer (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:30:4:Get_Integer
+   --  json.ads:33:4:Get_Integer
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -186,8 +211,8 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    begin
 
       AUnit.Assertions.Assert
-        (Gnattest_Generated.Default_Assert_Value,
-         "Test not implemented.");
+        (Integer_Element (42).Get_Integer = 42,
+         "Integer element accessor.");
 
 --  begin read only
    end Test_Get_Integer;
