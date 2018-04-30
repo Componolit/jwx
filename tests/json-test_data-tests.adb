@@ -34,7 +34,7 @@ package body JSON.Test_Data.Tests is
    procedure Test_Parse_7ff026 (Gnattest_T : in out Test) renames Test_Parse;
 --  id:2.2/7ff026f73f098df3/Parse/1/0/
    procedure Test_Parse (Gnattest_T : in out Test) is
-   --  json.ads:23:4:Parse
+   --  json.ads:37:4:Parse
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -61,8 +61,7 @@ package body JSON.Test_Data.Tests is
       Parse (Context, Offset, Match, "null");
       AUnit.Assertions.Assert (Match and
                                Offset = 4 and
-                               Context (1).Get_Kind = Kind_Null and
-                               Context (1).Is_Null, "Parse null.");
+                               Context (1).Get_Kind = Kind_Null, "Parse null.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "True");

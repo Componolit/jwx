@@ -1,16 +1,6 @@
 package body JSON
    with SPARK_Mode
 is
-   -------------
-   -- Is_Null --
-   -------------
-
-   function Is_Null (Element : Context_Element_Type) return Boolean
-   is
-   begin
-      return Element.Value = Value_Null;
-   end Is_Null;
-
    --------------
    -- Get_Kind --
    --------------
@@ -27,15 +17,29 @@ is
 
    function Get_Boolean (Element : Context_Element_Type) return Boolean
    is
-      Result : Boolean;
    begin
-      case Element.Value is
-         when Value_True  => Result := True;
-         when Value_False => Result := False;
-         when others      => Result := False;
-      end case;
-      return Result;
+      return Element.Boolean_Value;
    end Get_Boolean;
+
+   ---------------
+   -- Get_Float --
+   ---------------
+
+   function Get_Float (Element : Context_Element_Type) return Float
+   is
+   begin
+      return Element.Float_Value;
+   end Get_Float;
+
+   -----------------
+   -- Get_Integer --
+   -----------------
+
+   function Get_Integer (Element : Context_Element_Type) return Integer
+   is
+   begin
+      return Element.Integer_Value;
+   end Get_Integer;
 
    ----------------------
    -- Parse_Whitespace --
@@ -93,7 +97,7 @@ is
       Match := False;
       if Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "null"
       then
-         Context (Context'First) := (Kind => Kind_Null, Value => Value_Null);
+         Context (Context'First) := Null_Element;
          Offset := Offset + 4;
          Match := True;
       end if;
@@ -124,17 +128,12 @@ is
       Match := False;
       if Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "true"
       then
-         Context (Context'First) := (Kind => Kind_Boolean, Value => Value_True);
-         Offset := Offset + 4;
-         Match := True;
-      elsif Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "null"
-      then
-         Context (Context'First) := (Kind => Kind_Boolean, Value => Value_Null);
+         Context (Context'First) := Boolean_Element (True);
          Offset := Offset + 4;
          Match := True;
       elsif Offset <= Data'Length - 5 and then Data (Base .. Base + 4) = "false"
       then
-         Context (Context'First) := (Kind => Kind_Boolean, Value => Value_False);
+         Context (Context'First) := Boolean_Element (False);
          Offset := Offset + 5;
          Match := True;
       end if;
