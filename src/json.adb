@@ -1,6 +1,42 @@
 package body JSON
    with SPARK_Mode
 is
+   -------------
+   -- Is_Null --
+   -------------
+
+   function Is_Null (Element : Context_Element_Type) return Boolean
+   is
+   begin
+      return Element.Value = Value_Null;
+   end Is_Null;
+
+   --------------
+   -- Get_Kind --
+   --------------
+
+   function Get_Kind (Element : Context_Element_Type) return Kind_Type
+   is
+   begin
+      return Element.Kind;
+   end Get_Kind;
+
+   -----------------
+   -- Get_Boolean --
+   -----------------
+
+   function Get_Boolean (Element : Context_Element_Type) return Boolean
+   is
+      Result : Boolean;
+   begin
+      case Element.Value is
+         when Value_True  => Result := True;
+         when Value_False => Result := False;
+         when others      => Result := False;
+      end case;
+      return Result;
+   end Get_Boolean;
+
    ----------------------
    -- Parse_Whitespace --
    ----------------------
@@ -33,6 +69,37 @@ is
    end Parse_Whitespace;
 
    ----------------
+   -- Parse_Null --
+   ----------------
+
+   procedure Parse_Null
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Boolean;
+      Data    :        String)
+   with
+      Pre => Context'Length > 0 and
+             Data'First <= Integer'Last - Offset - 3 and
+             Offset < Data'Length;
+
+   procedure Parse_Null
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Boolean;
+      Data    :        String)
+   is
+      Base : Natural := Data'First + Offset;
+   begin
+      Match := False;
+      if Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "null"
+      then
+         Context (Context'First) := (Kind => Kind_Null, Value => Value_Null);
+         Offset := Offset + 4;
+         Match := True;
+      end if;
+   end Parse_Null;
+
+   ----------------
    -- Parse_Bool --
    ----------------
 
@@ -54,9 +121,6 @@ is
    is
       Base : Natural := Data'First + Offset;
    begin
-
-      Parse_Whitespace (Offset, Data);
-
       Match := False;
       if Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "true"
       then
@@ -88,7 +152,11 @@ is
    is
    begin
       Parse_Whitespace (Offset, Data);
-      Parse_Bool (Context, Offset, Match, Data);
+
+      Parse_Null (Context, Offset, Match, Data);
+      if not Match then
+         Parse_Bool (Context, Offset, Match, Data);
+      end if;
    end Parse;
 
 end JSON;
