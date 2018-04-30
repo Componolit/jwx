@@ -12,4 +12,8 @@ project Proj is
         for Tests_Dir use "../tests";
     end Gnattest;
 
+   package Builder is
+      for Global_Configuration_Pragmas use "spark.adc";
+   end Builder;
+
 end Proj;
