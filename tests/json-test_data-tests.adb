@@ -87,6 +87,61 @@ package body JSON.Test_Data.Tests is
       Parse (Context, Offset, Match, ASCII.HT & "false");
       AUnit.Assertions.Assert (Match, "Parse boolean with tab.");
 
+      Offset := 0;
+      Parse (Context, Offset, Match, "42");
+      AUnit.Assertions.Assert (Match and
+                               Offset = 2 and
+                               Context (1).Get_Kind = Kind_Integer and
+                               Context (1).Get_Integer = 42, "Parse small positive integer.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "-42");
+      AUnit.Assertions.Assert (Match and
+                               Offset = 2 and
+                               Context (1).Get_Kind = Kind_Integer and
+                               Context (1).Get_Integer = -42, "Parse small negative integer.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "2147483648");
+      AUnit.Assertions.Assert (Match and
+                               Offset = 2 and
+                               Context (1).Get_Kind = Kind_Integer and
+                               Context (1).Get_Integer = 2147483647, "Parse big positive integer.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "   0 ");
+      AUnit.Assertions.Assert (Match and
+                               Offset = 2 and
+                               Context (1).Get_Kind = Kind_Integer and
+                               Context (1).Get_Integer = 0, "Parse zero integer.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "-2147483647");
+      AUnit.Assertions.Assert (Match and
+                               Offset = 2 and
+                               Context (1).Get_Kind = Kind_Integer and
+                               Context (1).Get_Integer = -2147483648, "Parse big positive integer.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "3.14");
+      AUnit.Assertions.Assert (Match and
+                               Offset = 2 and
+                               Context (1).Get_Kind = Kind_Float and
+                               Context (1).Get_Float = 3.14, "Parse small positive float.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "-3.14");
+      AUnit.Assertions.Assert (Match and
+                               Offset = 2 and
+                               Context (1).Get_Kind = Kind_Float and
+                               Context (1).Get_Float = -3.14, "Parse small negative float.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, " 0.0   ");
+      AUnit.Assertions.Assert (Match and
+                               Offset = 2 and
+                               Context (1).Get_Kind = Kind_Float and
+                               Context (1).Get_Float = 0.0, "Parse zero float.");
 --  begin read only
    end Test_Parse;
 --  end read only
