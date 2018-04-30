@@ -84,7 +84,9 @@ is
    with
       Pre => Context'Length > 0 and
              Data'First <= Integer'Last - Offset - 3 and
-             Offset < Data'Length;
+             Offset < Data'Length,
+      Post => (if not Match then Context = Context'Old and
+                                 Offset = Offset'Old);
 
    procedure Parse_Null
      (Context : in out Context_Type;
@@ -115,7 +117,9 @@ is
    with
       Pre => Context'Length > 0 and
              Data'First <= Integer'Last - Offset - 4 and
-             Offset < Data'Length;
+             Offset < Data'Length,
+      Post => (if not Match then Context = Context'Old and
+                                 Offset = Offset'Old);
 
    procedure Parse_Bool
      (Context : in out Context_Type;
@@ -150,11 +154,20 @@ is
       Data    :        String)
    is
    begin
+      Match := False;
       Parse_Whitespace (Offset, Data);
 
-      Parse_Null (Context, Offset, Match, Data);
-      if not Match then
-         Parse_Bool (Context, Offset, Match, Data);
+      if Data'First <= Integer'Last - Offset - 3 and
+         Offset < Data'Length
+      then
+         Parse_Null (Context, Offset, Match, Data);
+         if not Match
+         then
+            if Data'First <= Integer'Last - Offset - 4
+            then
+               Parse_Bool (Context, Offset, Match, Data);
+            end if;
+         end if;
       end if;
    end Parse;
 
