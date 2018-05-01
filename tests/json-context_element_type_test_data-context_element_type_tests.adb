@@ -108,15 +108,15 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
 
 --  begin read only
    procedure Test_Integer_Element (Gnattest_T : in out Test_Context_Element_Type);
-   procedure Test_Integer_Element_95c870 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Integer_Element;
---  id:2.2/95c8701ee645eb29/Integer_Element/1/0/
+   procedure Test_Integer_Element_44de66 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Integer_Element;
+--  id:2.2/44de66a5f8e9a5ab/Integer_Element/1/0/
    procedure Test_Integer_Element (Gnattest_T : in out Test_Context_Element_Type) is
    --  json.ads:17:4:Integer_Element
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
 
-      Test_Value : constant Integer := 4711;
+      Test_Value : constant Long_Integer := 4711;
    begin
 
       AUnit.Assertions.Assert
@@ -124,7 +124,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
                                          Boolean_Value => false,
                                          Float_Value   => 0.0,
                                          Integer_Value => Test_Value),
-         "Float element constuction.");
+         "Integer element constuction.");
 
 --  begin read only
    end Test_Integer_Element;
@@ -200,8 +200,8 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
 
 --  begin read only
    procedure Test_Get_Integer (Gnattest_T : in out Test_Context_Element_Type);
-   procedure Test_Get_Integer_02bdc1 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Get_Integer;
---  id:2.2/02bdc12333f30151/Get_Integer/1/0/
+   procedure Test_Get_Integer_47cd2c (Gnattest_T : in out Test_Context_Element_Type) renames Test_Get_Integer;
+--  id:2.2/47cd2c25a0b5f0b6/Get_Integer/1/0/
    procedure Test_Get_Integer (Gnattest_T : in out Test_Context_Element_Type) is
    --  json.ads:33:4:Get_Integer
 --  end read only

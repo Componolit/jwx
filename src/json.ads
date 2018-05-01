@@ -14,7 +14,7 @@ is
    function Float_Element (Value : Float) return Context_Element_Type;
    -- Construct float element
 
-   function Integer_Element (Value : Integer) return Context_Element_Type;
+   function Integer_Element (Value : Long_Integer) return Context_Element_Type;
    -- Construct integer element
 
    function Get_Kind (Element : Context_Element_Type) return Kind_Type;
@@ -30,7 +30,7 @@ is
       Pre'Class => Element.Get_Kind = Kind_Float;
    -- Return value of float context element
 
-   function Get_Integer (Element : Context_Element_Type) return Integer
+   function Get_Integer (Element : Context_Element_Type) return Long_Integer
    with
       Pre'Class => Element.Get_Kind = Kind_Integer;
    -- Return value of integer context element
@@ -51,10 +51,10 @@ private
 
    type Context_Element_Type is
    tagged record
-      Kind          : Kind_Type := Kind_Null;
-      Boolean_Value : Boolean   := False;
-      Float_Value   : Float     := 0.0;
-      Integer_Value : Integer   := 0;
+      Kind          : Kind_Type    := Kind_Null;
+      Boolean_Value : Boolean      := False;
+      Float_Value   : Float        := 0.0;
+      Integer_Value : Long_Integer := 0;
    end record;
 
    function Null_Element return Context_Element_Type is
@@ -75,7 +75,7 @@ private
        Float_Value   => Value,
        Integer_Value => 0);
 
-   function Integer_Element (Value : Integer) return Context_Element_Type is
+   function Integer_Element (Value : Long_Integer) return Context_Element_Type is
       (Kind          => Kind_Integer,
        Boolean_Value => False,
        Float_Value   => 0.0,

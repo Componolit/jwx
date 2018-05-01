@@ -35,7 +35,7 @@ is
    -- Get_Integer --
    -----------------
 
-   function Get_Integer (Element : Context_Element_Type) return Integer
+   function Get_Integer (Element : Context_Element_Type) return Long_Integer
    is
    begin
       return Element.Integer_Value;
@@ -144,6 +144,100 @@ is
    end Parse_Bool;
 
    -----------
+   -- Match --
+   -----------
+
+   function Match_Set
+     (Data   : String;
+      Offset : Natural;
+      Set    : String) return Boolean
+   with
+      Pre => Data'First < Integer'Last - Offset and
+             Offset < Data'Length;
+
+   function Match_Set
+     (Data   : String;
+      Offset : Natural;
+      Set    : String) return Boolean
+   is
+   begin
+      for Value of Set
+      loop
+         if Offset < Data'Length and then
+            Data (Data'First + Offset) = Value
+         then
+            return True;
+         end if;
+      end loop;
+      return False;
+   end Match_Set;
+
+   ------------------
+   -- Parse_Number --
+   ------------------
+
+   procedure Parse_Number
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Boolean;
+      Data    :        String)
+   with
+      Pre => Context'Length > 0 and
+             Data'First < Integer'Last - Offset and
+             Offset < Data'Length,
+      Post => (if not Match then Context = Context'Old and
+                                 Offset = Offset'Old);
+
+   procedure Parse_Number
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Boolean;
+      Data    :        String)
+   is
+      Negative   : Boolean;
+      Result     : Long_Integer := 0;
+      Tmp_Offset : Natural := Offset;
+      Tmp_Match  : Boolean := False;
+
+      function To_Number (Value : Character) return Long_Integer
+         is (Character'Pos (Value) - Character'Pos ('0'));
+   begin
+      Negative := Match_Set (Data, Tmp_Offset, "-");
+      if Negative then
+         Tmp_Offset := Tmp_Offset + 1;
+      end if;
+
+      while Tmp_Offset < Data'Length and then Match_Set (Data, Tmp_Offset, "0123456789")
+      loop
+
+         if Result >= Long_Integer'Last/10 then
+            Match := False;
+            return;
+         end if;
+
+         Result := Result * 10;
+         Result := Result + To_Number (Data (Data'First + Tmp_Offset));
+         Tmp_Offset := Tmp_Offset + 1;
+         Tmp_Match := True;
+
+      end loop;
+
+      if not Tmp_Match then
+         Match := False;
+         return;
+      end if;
+
+      if Negative then
+         Result := -Result;
+      end if;
+
+      Context (Context'First) := Integer_Element (Result);
+      Offset := Tmp_Offset;
+      Match  := True;
+
+   end Parse_Number;
+
+   -----------
    -- Parse --
    -----------
 
@@ -166,6 +260,10 @@ is
             if Data'First <= Integer'Last - Offset - 4
             then
                Parse_Bool (Context, Offset, Match, Data);
+               if not Match
+               then
+                  Parse_Number (Context, Offset, Match, Data);
+               end if;
             end if;
          end if;
       end if;
