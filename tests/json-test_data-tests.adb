@@ -145,11 +145,34 @@ package body JSON.Test_Data.Tests is
                                 Context (1).Get_Float = -3.14), "Parse small negative float.");
 
       Offset := 0;
+      Parse (Context, Offset, Match, "0.00000000001");
+      AUnit.Assertions.Assert (Match and then
+                               (Offset = 13 and
+                                Context (1).Get_Kind = Kind_Float and
+                                Context (1).Get_Float = 0.00000000001), "Very small positive float.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "-0.00000000001");
+      AUnit.Assertions.Assert (Match and then
+                               (Offset = 14 and
+                                Context (1).Get_Kind = Kind_Float and
+                                Context (1).Get_Float = -0.00000000001), "Very small negative float.");
+
+      Offset := 0;
       Parse (Context, Offset, Match, " 0.0   ");
       AUnit.Assertions.Assert (Match and then
                                (Offset = 4 and
                                 Context (1).Get_Kind = Kind_Float and
                                 Context (1).Get_Float = 0.0), "Parse zero float.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "000068547758080");
+      AUnit.Assertions.Assert (not Match, "Leading zero.");
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "54775. ");
+      AUnit.Assertions.Assert (not Match, "Missing fractional part.");
+
 --  begin read only
    end Test_Parse;
 --  end read only

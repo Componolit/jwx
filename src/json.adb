@@ -1,3 +1,6 @@
+with Ada.Text_IO;
+use Ada.Text_IO;
+
 package body JSON
    with SPARK_Mode
 is
@@ -194,10 +197,16 @@ is
       Match   :    out Boolean;
       Data    :        String)
    is
-      Negative   : Boolean;
-      Result     : Long_Integer := 0;
-      Tmp_Offset : Natural := Offset;
-      Tmp_Match  : Boolean := False;
+      Fractional_Component : Float := 0.0;
+      Integer_Component    : Long_Integer := 0;
+
+      Negative    : Boolean;
+      Divisor     : Long_Integer := 10;
+      Tmp_Offset  : Natural := Offset;
+      Num_Matches : Natural := 0;
+      Tmp_Match   : Boolean := False;
+      Frac_Match  : Boolean := False;
+      Fraction    : Boolean := False;
 
       function To_Number (Value : Character) return Long_Integer
          is (Character'Pos (Value) - Character'Pos ('0'));
@@ -209,15 +218,22 @@ is
 
       while Tmp_Offset < Data'Length and then Match_Set (Data, Tmp_Offset, "0123456789")
       loop
-
-         if Result >= Long_Integer'Last/10 then
+         -- Check for leading 0
+         if Num_Matches > 1 and Data (Data'First + Tmp_Offset) = '0' then
             Match := False;
             return;
          end if;
 
-         Result := Result * 10;
-         Result := Result + To_Number (Data (Data'First + Tmp_Offset));
+         -- Check for overflow
+         if Integer_Component >= Long_Integer'Last/10 then
+            Match := False;
+            return;
+         end if;
+
+         Integer_Component := Integer_Component * 10;
+         Integer_Component := Integer_Component + To_Number (Data (Data'First + Tmp_Offset));
          Tmp_Offset := Tmp_Offset + 1;
+         Num_Matches := Num_Matches + 1;
          Tmp_Match := True;
 
       end loop;
@@ -227,11 +243,49 @@ is
          return;
       end if;
 
-      if Negative then
-         Result := -Result;
+      -- Fractional part
+      Fraction := Match_Set (Data, Tmp_Offset, ".");
+      if Fraction then
+         Tmp_Offset := Tmp_Offset + 1;
       end if;
 
-      Context (Context'First) := Integer_Element (Result);
+      while (Fraction and
+             Tmp_Offset < Data'Length and
+             Divisor < Long_Integer'Last/10) and then
+             Match_Set (Data, Tmp_Offset, "0123456789")
+      loop
+         Fractional_Component :=
+            Fractional_Component +
+            Float (To_Number (Data (Data'First + Tmp_Offset))) / Float (Divisor);
+         Divisor    := Divisor * 10;
+         Frac_Match := True;
+         Tmp_Offset := Tmp_Offset + 1;
+      end loop;
+
+      -- Error: Dot found but not digits following it
+      if Fraction and not Frac_Match then
+         Match := False;
+         return;
+      end if;
+
+      -- FIXME: Support exponent as per RFC 7159, section 6
+
+      if Fraction then
+         declare
+            Tmp : Float := Float (Integer_Component) + Fractional_Component;
+         begin
+            if Negative then
+               Tmp := -Tmp;
+            end if;
+            Context (Context'First) := Float_Element (Tmp);
+         end;
+      else
+         if Negative then
+            Integer_Component := -Integer_Component;
+         end if;
+         Context (Context'First) := Integer_Element (Integer_Component);
+      end if;
+
       Offset := Tmp_Offset;
       Match  := True;
 
