@@ -34,7 +34,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Null_Element_014ed4 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Null_Element;
 --  id:2.2/014ed40dcdbb8de1/Null_Element/1/0/
    procedure Test_Null_Element (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:8:4:Null_Element
+   --  json.ads:9:4:Null_Element
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -58,7 +58,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Boolean_Element_55bbfe (Gnattest_T : in out Test_Context_Element_Type) renames Test_Boolean_Element;
 --  id:2.2/55bbfee41a3acb92/Boolean_Element/1/0/
    procedure Test_Boolean_Element (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:11:4:Boolean_Element
+   --  json.ads:12:4:Boolean_Element
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -86,7 +86,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Float_Element_cefcca (Gnattest_T : in out Test_Context_Element_Type) renames Test_Float_Element;
 --  id:2.2/cefccab2ed86d567/Float_Element/1/0/
    procedure Test_Float_Element (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:14:4:Float_Element
+   --  json.ads:15:4:Float_Element
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -111,7 +111,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Integer_Element_44de66 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Integer_Element;
 --  id:2.2/44de66a5f8e9a5ab/Integer_Element/1/0/
    procedure Test_Integer_Element (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:17:4:Integer_Element
+   --  json.ads:18:4:Integer_Element
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -136,7 +136,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Get_Kind_54b377 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Get_Kind;
 --  id:2.2/54b3772dd6597445/Get_Kind/1/0/
    procedure Test_Get_Kind (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:20:4:Get_Kind
+   --  json.ads:21:4:Get_Kind
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -155,19 +155,19 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Get_Boolean_521306 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Get_Boolean;
 --  id:2.2/5213066f5fbc2bf6/Get_Boolean/1/0/
    procedure Test_Get_Boolean (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:23:4:Get_Boolean
+   --  json.ads:24:4:Get_Boolean
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
 
       Offset  : Natural;
-      Match   : Boolean;
+      Match   : Match_Type;
       Context : Context_Type (Integer range 1..1);
    begin
 
       Offset := 0;
       Parse (Context, Offset, Match, "true");
-      AUnit.Assertions.Assert (Match and Offset = 4 and
+      AUnit.Assertions.Assert (Match = Match_OK and Offset = 4 and
                                Context (1).Get_Kind = Kind_Boolean and
                                Context (1).Get_Boolean = true, "Parse true");
 
@@ -181,7 +181,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Get_Float_11a14f (Gnattest_T : in out Test_Context_Element_Type) renames Test_Get_Float;
 --  id:2.2/11a14f2e5e32c6e3/Get_Float/1/0/
    procedure Test_Get_Float (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:28:4:Get_Float
+   --  json.ads:29:4:Get_Float
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -203,7 +203,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Get_Integer_47cd2c (Gnattest_T : in out Test_Context_Element_Type) renames Test_Get_Integer;
 --  id:2.2/47cd2c25a0b5f0b6/Get_Integer/1/0/
    procedure Test_Get_Integer (Gnattest_T : in out Test_Context_Element_Type) is
-   --  json.ads:33:4:Get_Integer
+   --  json.ads:34:4:Get_Integer
 --  end read only
 
       pragma Unreferenced (Gnattest_T);

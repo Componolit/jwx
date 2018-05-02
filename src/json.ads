@@ -3,6 +3,7 @@ package JSON
 is
 
    type Kind_Type  is (Kind_Null, Kind_Boolean, Kind_Float, Kind_Integer);
+   type Match_Type is (Match_OK, Match_None, Match_Invalid);
    type Context_Element_Type is tagged private;
 
    function Null_Element return Context_Element_Type;
@@ -39,7 +40,7 @@ is
 
    procedure Parse (Context : in out Context_Type;
                     Offset  : in out Natural;
-                    Match   :    out Boolean;
+                    Match   :    out Match_Type;
                     Data    :        String)
    with
       Pre => Context'Length > 1 and
