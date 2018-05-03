@@ -34,7 +34,7 @@ package body JSON.Test_Data.Tests is
    procedure Test_Parse_f44d29 (Gnattest_T : in out Test) renames Test_Parse;
 --  id:2.2/f44d29aaedc5307b/Parse/1/0/
    procedure Test_Parse (Gnattest_T : in out Test) is
-   --  json.ads:41:4:Parse
+   --  json.ads:49:4:Parse
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -172,6 +172,17 @@ package body JSON.Test_Data.Tests is
       Offset := 0;
       Parse (Context, Offset, Match, "54775. ");
       AUnit.Assertions.Assert (Match = Match_Invalid, "Missing fractional part.");
+
+      Offset := 0;
+      declare
+         Data : String := """Hello world!""";
+      begin
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then
+                                  (Offset = 13 and
+                                   Context (1).Get_Kind = Kind_String and
+                                   Context (1).Get_String (Data) = "Hello world!"), "Simple string");
+      end;
 
 --  begin read only
    end Test_Parse;

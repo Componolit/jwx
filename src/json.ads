@@ -2,7 +2,7 @@ package JSON
    with SPARK_Mode
 is
 
-   type Kind_Type  is (Kind_Null, Kind_Boolean, Kind_Float, Kind_Integer);
+   type Kind_Type  is (Kind_Null, Kind_Boolean, Kind_Float, Kind_Integer, Kind_String);
    type Match_Type is (Match_OK, Match_None, Match_Invalid);
    type Context_Element_Type is tagged private;
 
@@ -17,6 +17,9 @@ is
 
    function Integer_Element (Value : Long_Integer) return Context_Element_Type;
    -- Construct integer element
+
+   function String_Element (String_Start, String_End : Integer) return Context_Element_Type;
+   -- Construct string element
 
    function Get_Kind (Element : Context_Element_Type) return Kind_Type;
    -- Return kind of a context element
@@ -35,6 +38,11 @@ is
    with
       Pre'Class => Element.Get_Kind = Kind_Integer;
    -- Return value of integer context element
+
+   function Get_String (Element : Context_Element_Type; Data : String) return String
+   with
+      Pre'Class => Element.Get_Kind = Kind_String;
+   -- Return value of a string context element
 
    type Context_Type is array (Natural range <>) of Context_Element_Type;
 
@@ -56,30 +64,48 @@ private
       Boolean_Value : Boolean      := False;
       Float_Value   : Float        := 0.0;
       Integer_Value : Long_Integer := 0;
+      String_Start  : Integer      := 0;
+      String_End    : Integer      := 0;
    end record;
 
    function Null_Element return Context_Element_Type is
       (Kind          => Kind_Null,
        Boolean_Value => False,
        Float_Value   => 0.0,
-       Integer_Value => 0);
+       Integer_Value => 0,
+       String_Start  => 0,
+       String_End    => 0);
 
    function Boolean_Element (Value : Boolean) return Context_Element_Type is
       (Kind          => Kind_Boolean,
        Boolean_Value => Value,
        Float_Value   => 0.0,
-       Integer_Value => 0);
+       Integer_Value => 0,
+       String_Start  => 0,
+       String_End    => 0);
 
    function Float_Element (Value : Float) return Context_Element_Type is
       (Kind          => Kind_Float,
        Boolean_Value => False,
        Float_Value   => Value,
-       Integer_Value => 0);
+       Integer_Value => 0,
+       String_Start  => 0,
+       String_End    => 0);
 
    function Integer_Element (Value : Long_Integer) return Context_Element_Type is
       (Kind          => Kind_Integer,
        Boolean_Value => False,
        Float_Value   => 0.0,
-       Integer_Value => Value);
+       Integer_Value => Value,
+       String_Start  => 0,
+       String_End    => 0);
+
+   function String_Element (String_Start, String_End : Integer) return Context_Element_Type is
+      (Kind          => Kind_Integer,
+       Boolean_Value => False,
+       Float_Value   => 0.0,
+       Integer_Value => 0,
+       String_Start  => String_Start,
+       String_End    => String_End);
 
 end JSON;

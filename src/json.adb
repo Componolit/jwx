@@ -44,6 +44,17 @@ is
       return Element.Integer_Value;
    end Get_Integer;
 
+   ----------------
+   -- Get_String --
+   ----------------
+
+   function Get_String (Element : Context_Element_Type;
+                        Data    : String) return String
+   is
+   begin
+      return Data (Element.String_Start..Element.String_End);
+   end Get_String;
+
    ----------------------
    -- Parse_Whitespace --
    ----------------------
