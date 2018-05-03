@@ -342,6 +342,63 @@ is
 
    end Parse_Number;
 
+   ------------------
+   -- Parse_String --
+   ------------------
+
+   procedure Parse_String
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Match_Type;
+      Data    :        String)
+   with
+      Pre => Context'Length > 0 and
+             Data'First < Integer'Last - Offset and
+             Offset < Data'Length,
+      Post => (if Match /= Match_OK then Context = Context'Old and
+                                         Offset = Offset'Old);
+
+   procedure Parse_String
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Match_Type;
+      Data    :        String)
+   is
+      Tmp_Offset   : Natural := Offset;
+      String_Start : Natural;
+      String_End   : Natural;
+      Escaped      : Boolean := False;
+   begin
+      Match := Match_None;
+
+      -- Check for starting "
+      if not Match_Set (Data, Tmp_Offset, """") then
+         return;
+      end if;
+
+      Tmp_Offset   := Tmp_Offset + 1;
+      String_Start := Data'First + Tmp_Offset;
+      Match        := Match_Invalid;
+
+      while (Data'First < Integer'Last - Tmp_Offset and
+             Tmp_Offset < Data'Length)
+      loop
+         exit when not Escaped and Match_Set (Data, Tmp_Offset, """");
+         Escaped := (if not Escaped and Match_Set (Data, Tmp_Offset, "\") then True else False);
+         Tmp_Offset := Tmp_Offset + 1;
+      end loop;
+
+      if not Match_Set (Data, Tmp_Offset, """") then
+         return;
+      end if;
+
+      String_End := Data'First + Tmp_Offset - 1;
+      Context (Context'First) := String_Element (String_Start, String_End);
+      Offset := Tmp_Offset + 1;
+      Match := Match_OK;
+
+   end Parse_String;
+
    -----------
    -- Parse --
    -----------
@@ -360,14 +417,18 @@ is
          Offset < Data'Length
       then
          Parse_Null (Context, Offset, Match, Data);
-         if Match /= Match_OK
+         if Match = Match_None
          then
             if Data'First <= Integer'Last - Offset - 4
             then
                Parse_Bool (Context, Offset, Match, Data);
-               if Match /= Match_OK
+               if Match = Match_None
                then
                   Parse_Number (Context, Offset, Match, Data);
+                  if Match = Match_None
+                  then
+                     Parse_String (Context, Offset, Match, Data);
+                  end if;
                end if;
             end if;
          end if;

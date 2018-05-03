@@ -48,7 +48,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
                          Integer_Value => 0,
                          String_Start  => 0,
                          String_End    => 0),
-         "Null element constuction.");
+         "Null element construction.");
 
 --  begin read only
    end Test_Null_Element;
@@ -76,7 +76,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
                                    Integer_Value => 0,
                                    String_Start  => 0,
                                    String_End    => 0),
-            "Boolean element constuction for " & b'Img & ".");
+            "Boolean element construction for " & b'Img & ".");
       end loop;
 
 
@@ -105,7 +105,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
                                        Integer_Value => 0,
                                        String_Start  => 0,
                                        String_End    => 0),
-         "Float element constuction.");
+         "Float element construction.");
 
 --  begin read only
    end Test_Float_Element;
@@ -132,7 +132,7 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
                                          Integer_Value => Test_Value,
                                          String_Start  => 0,
                                          String_End    => 0),
-         "Integer element constuction.");
+         "Integer element construction.");
 
 --  begin read only
    end Test_Integer_Element;
@@ -152,13 +152,13 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    begin
 
       AUnit.Assertions.Assert
-        (String_Element (1, 5) = (Kind          => Kind_Integer,
+        (String_Element (1, 5) = (Kind          => Kind_String,
                                   Boolean_Value => false,
                                   Float_Value   => 0.0,
                                   Integer_Value => 0,
                                   String_Start  => 1,
                                   String_End    => 5),
-         "String element constuction.");
+         "String element construction.");
 
 --  begin read only
    end Test_String_Element;

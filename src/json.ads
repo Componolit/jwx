@@ -101,7 +101,7 @@ private
        String_End    => 0);
 
    function String_Element (String_Start, String_End : Integer) return Context_Element_Type is
-      (Kind          => Kind_Integer,
+      (Kind          => Kind_String,
        Boolean_Value => False,
        Float_Value   => 0.0,
        Integer_Value => 0,

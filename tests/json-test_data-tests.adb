@@ -179,9 +179,50 @@ package body JSON.Test_Data.Tests is
       begin
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then
-                                  (Offset = 13 and
+                                  (Offset = 14 and
                                    Context (1).Get_Kind = Kind_String and
                                    Context (1).Get_String (Data) = "Hello world!"), "Simple string");
+      end;
+
+      Offset := 0;
+      declare
+         Data : String := """Invalid String";
+      begin
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_Invalid, "Unclosed string");
+      end;
+
+      Offset := 0;
+      declare
+         Data : String := """Say \""Hello World\""!""";
+      begin
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then
+                                  (Offset = 22 and
+                                   Context (1).Get_Kind = Kind_String and
+                                   Context (1).Get_String (Data) = "Say \""Hello World\""!"), "Escaped string");
+      end;
+
+      Offset := 0;
+      declare
+         Data : String := """Escaped backslash\\""";
+      begin
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then
+                                  (Offset = 21 and
+                                   Context (1).Get_Kind = Kind_String and
+                                   Context (1).Get_String (Data) = "Escaped backslash\\"), "Escaped backslash");
+      end;
+
+      Offset := 0;
+      declare
+         Data : String := """Escaped \backslash""";
+      begin
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then
+                                  (Offset = 20 and
+                                   Context (1).Get_Kind = Kind_String and
+                                   Context (1).Get_String (Data) = "Escaped \backslash"), "Escaped regular character");
       end;
 
 --  begin read only
