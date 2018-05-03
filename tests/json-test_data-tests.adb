@@ -225,6 +225,24 @@ package body JSON.Test_Data.Tests is
                                    Context (1).Get_String (Data) = "Escaped \backslash"), "Escaped regular character");
       end;
 
+      Offset := 0;
+      declare
+         Data : String := " { ""precision"": ""zip"", ""Latitude"":  37.7668, ""Longitude"": -122.3959, ""Address"":   """", ""City"":      ""SAN FRANCISCO"", ""State"":     ""CA"", ""Zip"":       ""94107"", ""Country"":   ""US"" }";
+         Element : Context_Element_Type;
+      begin
+         Parse (Context, Offset, Match, Data);
+
+         if Match = Match_OK and then Context (1).Get_Kind = Kind_Object
+         then
+            Element := Query_Object (Context, 1, "precision");
+            AUnit.Assertions.Assert (Element.Get_Kind = Kind_String and
+                                     Element.Get_String (Data) = "zip", "Object #1");
+         else
+            AUnit.Assertions.Assert (False, "Object #1");
+         end if;
+
+      end;
+
 --  begin read only
    end Test_Parse;
 --  end read only

@@ -273,6 +273,27 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    end Test_Get_String;
 --  end read only
 
+
+--  begin read only
+   procedure Test_Query_Object (Gnattest_T : in out Test_Context_Element_Type);
+   procedure Test_Query_Object_868f8a (Gnattest_T : in out Test_Context_Element_Type) renames Test_Query_Object;
+--  id:2.2/868f8a7e39c977fe/Query_Object/1/0/
+   procedure Test_Query_Object (Gnattest_T : in out Test_Context_Element_Type) is
+   --  json.ads:59:4:Query_Object
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      AUnit.Assertions.Assert
+        (Gnattest_Generated.Default_Assert_Value,
+         "Test not implemented.");
+
+--  begin read only
+   end Test_Query_Object;
+--  end read only
+
 --  begin read only
 --  id:2.2/02/
 --

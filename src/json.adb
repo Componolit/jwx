@@ -399,6 +399,64 @@ is
 
    end Parse_String;
 
+   ------------------
+   -- Parse_Object --
+   ------------------
+
+   procedure Parse_Object
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Match_Type;
+      Data    :        String)
+   with
+      Pre => Context'Length > 0 and
+             Data'First < Integer'Last - Offset and
+             Offset < Data'Length,
+      Post => (if Match /= Match_OK then Context = Context'Old and
+                                         Offset = Offset'Old);
+
+   procedure Parse_Object
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Match_Type;
+      Data    :        String)
+   is
+      Tmp_Offset : Natural := Offset;
+      Match_Name : Match_Type;
+   begin
+      Match := Match_None;
+
+      -- Check for starting {
+      if not Match_Set (Data, Tmp_Offset, "{") then
+         return;
+      end if;
+
+      Tmp_Offset := Tmp_Offset + 1;
+      Match := Match_Invalid;
+
+      while (Data'First < Integer'Last - Tmp_Offset and
+             Tmp_Offset < Data'Length)
+      loop
+         exit when Match_Set (Data, Tmp_Offset, "}");
+
+         Parse_String (Context, Tmp_Offset, Match_Name, Data);
+         if Match_Name /= Match_OK then
+            return;
+         end if;
+
+         Tmp_Offset := Tmp_Offset + 1;
+      end loop;
+
+      -- Check for ending }
+      if not Match_Set (Data, Tmp_Offset, "}") then
+         return;
+      end if;
+
+      Tmp_Offset := Tmp_Offset + 1;
+      Match := Match_OK;
+
+   end Parse_Object;
+
    -----------
    -- Parse --
    -----------
@@ -428,11 +486,27 @@ is
                   if Match = Match_None
                   then
                      Parse_String (Context, Offset, Match, Data);
+                     if Match = Match_None
+                     then
+                        Parse_Object (Context, Offset, Match, Data);
+                     end if;
                   end if;
                end if;
             end if;
          end if;
       end if;
    end Parse;
+
+   ------------------
+   -- Query_Object --
+   ------------------
+
+   function Query_Object (Context  : Context_Type;
+                          Position : Natural;
+                          Name     : String) return Context_Element_Type
+   is
+   begin
+      return Null_Element;
+   end Query_Object;
 
 end JSON;

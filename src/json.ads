@@ -2,7 +2,7 @@ package JSON
    with SPARK_Mode
 is
 
-   type Kind_Type  is (Kind_Null, Kind_Boolean, Kind_Float, Kind_Integer, Kind_String);
+   type Kind_Type  is (Kind_Null, Kind_Boolean, Kind_Float, Kind_Integer, Kind_String, Kind_Object);
    type Match_Type is (Match_OK, Match_None, Match_Invalid);
    type Context_Element_Type is tagged private;
 
@@ -55,6 +55,14 @@ is
              Data'First <= Integer'Last - Offset - 4 and
              Offset < Data'Length;
    -- Parse a JSON file
+
+   function Query_Object (Context  : Context_Type;
+                          Position : Natural;
+                          Name     : String) return Context_Element_Type
+   with
+      Pre => Position in Context'Range and then
+             Context (Position).Get_Kind = Kind_Object;
+   -- Query an object by name
 
 private
 
