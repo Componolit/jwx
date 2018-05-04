@@ -1,7 +1,6 @@
 all:
-	@gprbuild -F -Pproj -p
-	@gnatprove -Pproj --warnings=error --steps=10000 --prover=altergo,z3,cvc4
-
+	@time gnatprove -Pproj --steps=5000 --prover=z3 -j0 --codepeer=on --output-header | tee proof.log
+	@egrep -q '\(medium\|warning\|error\):' proof.log
 
 clean:
 	@gprclean -Pproj
