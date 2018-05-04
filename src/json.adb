@@ -6,19 +6,32 @@ package body JSON
 is
 
    ------------------
+   -- Meta_Element --
+   ------------------
+
+   function Meta_Element (Initial_Offset : Natural) return Context_Element_Type is
+   -- Construct null element
+      (Kind           => Kind_Meta,
+       Boolean_Value  => False,
+       Float_Value    => 0.0,
+       Integer_Value  => 0,
+       String_Start   => 0,
+       String_End     => 0,
+       Context_Offset => Initial_Offset);
+
+   ------------------
    -- Null_Element --
    ------------------
 
    function Null_Element return Context_Element_Type is
    -- Construct null element
-      (Kind          => Kind_Null,
-       Boolean_Value => False,
-       Float_Value   => 0.0,
-       Integer_Value => 0,
-       String_Start  => 0,
-       String_End    => 0);
-
-   function Boolean_Element (Value : Boolean) return Context_Element_Type;
+      (Kind           => Kind_Null,
+       Boolean_Value  => False,
+       Float_Value    => 0.0,
+       Integer_Value  => 0,
+       String_Start   => 0,
+       String_End     => 0,
+       Context_Offset => 0);
 
    ---------------------
    -- Boolean_Element --
@@ -26,12 +39,13 @@ is
 
    function Boolean_Element (Value : Boolean) return Context_Element_Type is
    -- Construct boolean element
-      (Kind          => Kind_Boolean,
-       Boolean_Value => Value,
-       Float_Value   => 0.0,
-       Integer_Value => 0,
-       String_Start  => 0,
-       String_End    => 0);
+      (Kind           => Kind_Boolean,
+       Boolean_Value  => Value,
+       Float_Value    => 0.0,
+       Integer_Value  => 0,
+       String_Start   => 0,
+       String_End     => 0,
+       Context_Offset => 0);
 
    -------------------
    -- Float_Element --
@@ -39,12 +53,13 @@ is
 
    function Float_Element (Value : Float) return Context_Element_Type is
    -- Construct float element
-      (Kind          => Kind_Float,
-       Boolean_Value => False,
-       Float_Value   => Value,
-       Integer_Value => 0,
-       String_Start  => 0,
-       String_End    => 0);
+      (Kind           => Kind_Float,
+       Boolean_Value  => False,
+       Float_Value    => Value,
+       Integer_Value  => 0,
+       String_Start   => 0,
+       String_End     => 0,
+       Context_Offset => 0);
 
    ---------------------
    -- Integer_Element --
@@ -52,12 +67,13 @@ is
 
    function Integer_Element (Value : Long_Integer) return Context_Element_Type is
    -- Construct integer element
-      (Kind          => Kind_Integer,
-       Boolean_Value => False,
-       Float_Value   => 0.0,
-       Integer_Value => Value,
-       String_Start  => 0,
-       String_End    => 0);
+      (Kind           => Kind_Integer,
+       Boolean_Value  => False,
+       Float_Value    => 0.0,
+       Integer_Value  => Value,
+       String_Start   => 0,
+       String_End     => 0,
+       Context_Offset => 0);
 
    --------------------
    -- String_Element --
@@ -65,24 +81,47 @@ is
 
    function String_Element (String_Start, String_End : Integer) return Context_Element_Type is
    -- Construct string element
-      (Kind          => Kind_String,
-       Boolean_Value => False,
-       Float_Value   => 0.0,
-       Integer_Value => 0,
-       String_Start  => String_Start,
-       String_End    => String_End);
+      (Kind           => Kind_String,
+       Boolean_Value  => False,
+       Float_Value    => 0.0,
+       Integer_Value  => 0,
+       String_Start   => String_Start,
+       String_End     => String_End,
+       Context_Offset => 0);
 
    -----------------
    -- Get_Current --
    -----------------
 
+   function Get_Current_Index (Context : Context_Type) return Natural
+   -- Get current context index
+   is
+   begin
+      return Context (Context'First).Context_Offset;
+   end Get_Current_Index;
+
+   -----------------------
+   -- Get_Current_Index --
+   -----------------------
+
    function Get_Current (Context : Context_Type) return Context_Element_Type
    -- Return current element of a context
    is
    begin
-      -- FIXME: Get current element from meta data
-      return Context (Context'First);
+      return Context (Get_Current_Index (Context));
    end Get_Current;
+
+   -----------------------------
+   -- Increment_Current_Index --
+   -----------------------------
+
+   procedure Increment_Current_Index (Context : in out Context_Type)
+   -- Increment the current context offset
+   is
+   begin
+      Context (Get_Current_Index (Context)).Context_Offset :=
+         Context (Get_Current_Index (Context)).Context_Offset + 1;
+   end Increment_Current_Index;
 
    --------------
    -- Get_Kind --
@@ -194,7 +233,8 @@ is
       Match := Match_None;
       if Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "null"
       then
-         Context (Context'First) := Null_Element;
+         Increment_Current_Index (Context);
+         Context (Get_Current_Index (Context)) := Null_Element;
          Offset := Offset + 4;
          Match := Match_OK;
       end if;
@@ -227,12 +267,14 @@ is
       Match := Match_None;
       if Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "true"
       then
-         Context (Context'First) := Boolean_Element (True);
+         Increment_Current_Index (Context);
+         Context (Get_Current_Index (Context)) := Boolean_Element (True);
          Offset := Offset + 4;
          Match := Match_OK;
       elsif Offset <= Data'Length - 5 and then Data (Base .. Base + 4) = "false"
       then
-         Context (Context'First) := Boolean_Element (False);
+         Increment_Current_Index (Context);
+         Context (Get_Current_Index (Context)) := Boolean_Element (False);
          Offset := Offset + 5;
          Match := Match_OK;
       end if;
@@ -409,13 +451,15 @@ is
             if Negative then
                Tmp := -Tmp;
             end if;
-            Context (Context'First) := Float_Element (Tmp);
+            Increment_Current_Index (Context);
+            Context (Get_Current_Index (Context)) := Float_Element (Tmp);
          end;
       else
          if Negative then
             Integer_Component := -Integer_Component;
          end if;
-         Context (Context'First) := Integer_Element (Integer_Component);
+         Increment_Current_Index (Context);
+         Context (Get_Current_Index (Context)) := Integer_Element (Integer_Component);
       end if;
 
       Offset := Tmp_Offset;
@@ -474,7 +518,8 @@ is
       end if;
 
       String_End := Data'First + Tmp_Offset - 1;
-      Context (Context'First) := String_Element (String_Start, String_End);
+      Increment_Current_Index (Context);
+      Context (Get_Current_Index (Context)) := String_Element (String_Start, String_End);
       Offset := Tmp_Offset + 1;
       Match := Match_OK;
 
@@ -537,6 +582,16 @@ is
       Match := Match_OK;
 
    end Parse_Object;
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize (Context : in out Context_Type)
+   is
+   begin
+      Context (Context'First) := Meta_Element (Context'First);
+   end Initialize;
 
    -----------
    -- Parse --
