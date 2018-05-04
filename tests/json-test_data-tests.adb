@@ -34,7 +34,7 @@ package body JSON.Test_Data.Tests is
    procedure Test_Parse_f44d29 (Gnattest_T : in out Test) renames Test_Parse;
 --  id:2.2/f44d29aaedc5307b/Parse/1/0/
    procedure Test_Parse (Gnattest_T : in out Test) is
-   --  json.ads:49:4:Parse
+   --  json.ads:11:4:Parse
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -47,21 +47,21 @@ package body JSON.Test_Data.Tests is
       Offset := 0;
       Parse (Context, Offset, Match, "true");
       AUnit.Assertions.Assert (Match = Match_OK and Offset = 4 and
-                               Context (1).Get_Kind = Kind_Boolean and
-                               Context (1).Get_Boolean = true, "Parse true");
+                               Get_Kind (Context) = Kind_Boolean and
+                               Get_Boolean (Context), "Parse true");
 
       Offset := 0;
       Parse (Context, Offset, Match, "false");
       AUnit.Assertions.Assert (Match = Match_OK and
                                Offset = 5 and
-                               Context (1).Get_Kind = Kind_Boolean and
-                               Context (1).Get_Boolean = false, "Parse false.");
+                               Get_Kind (Context) = Kind_Boolean and
+                               not Get_Boolean (Context), "Parse false.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "null");
       AUnit.Assertions.Assert (Match = Match_OK and
                                Offset = 4 and
-                               Context (1).Get_Kind = Kind_Null, "Parse null.");
+                               Get_Kind (Context) = Kind_Null, "Parse null.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "True");
@@ -91,36 +91,36 @@ package body JSON.Test_Data.Tests is
       Parse (Context, Offset, Match, "42");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 2 and
-                                Context (1).Get_Kind = Kind_Integer and
-                                Context (1).Get_Integer = 42), "Parse small positive integer.");
+                                Get_Kind (Context) = Kind_Integer and
+                                Get_Integer (Context) = 42), "Parse small positive integer.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "-42");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 3 and
-                                Context (1).Get_Kind = Kind_Integer and
-                                Context (1).Get_Integer = -42), "Parse small negative integer.");
+                                Get_Kind (Context) = Kind_Integer and
+                                Get_Integer (Context) = -42), "Parse small negative integer.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "2147483647");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 10 and
-                                Context (1).Get_Kind = Kind_Integer and
-                                Context (1).Get_Integer = 2147483647), "Parse big positive integer.");
+                                Get_Kind (Context) = Kind_Integer and
+                                Get_Integer (Context) = 2147483647), "Parse big positive integer.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "   0 ");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 4 and
-                                Context (1).Get_Kind = Kind_Integer and
-                                Context (1).Get_Integer = 0), "Parse zero integer.");
+                                Get_Kind (Context) = Kind_Integer and
+                                Get_Integer (Context) = 0), "Parse zero integer.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "-2147483647");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 11 and
-                                Context (1).Get_Kind = Kind_Integer and
-                                Context (1).Get_Integer = -2147483647), "Parse big negative integer.");
+                                Get_Kind (Context) = Kind_Integer and
+                                Get_Integer (Context) = -2147483647), "Parse big negative integer.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "92233720368547758080");
@@ -134,36 +134,36 @@ package body JSON.Test_Data.Tests is
       Parse (Context, Offset, Match, "3.14");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 4 and
-                                Context (1).Get_Kind = Kind_Float and
-                                Context (1).Get_Float = 3.14), "Parse small positive float.");
+                                Get_Kind (Context) = Kind_Float and
+                                Get_Float (Context) = 3.14), "Parse small positive float.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "-3.14");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 5 and
-                                Context (1).Get_Kind = Kind_Float and
-                                Context (1).Get_Float = -3.14), "Parse small negative float.");
+                                Get_Kind (Context) = Kind_Float and
+                                Get_Float (Context) = -3.14), "Parse small negative float.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "0.00000000001");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 13 and
-                                Context (1).Get_Kind = Kind_Float and
-                                Context (1).Get_Float = 0.00000000001), "Very small positive float.");
+                                Get_Kind (Context) = Kind_Float and
+                                Get_Float (Context)= 0.00000000001), "Very small positive float.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "-0.00000000001");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 14 and
-                                Context (1).Get_Kind = Kind_Float and
-                                Context (1).Get_Float = -0.00000000001), "Very small negative float.");
+                                Get_Kind (Context) = Kind_Float and
+                                Get_Float (Context) = -0.00000000001), "Very small negative float.");
 
       Offset := 0;
       Parse (Context, Offset, Match, " 0.0   ");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 4 and
-                                Context (1).Get_Kind = Kind_Float and
-                                Context (1).Get_Float = 0.0), "Parse zero float.");
+                                Get_Kind (Context) = Kind_Float and
+                                Get_Float (Context) = 0.0), "Parse zero float.");
 
       Offset := 0;
       Parse (Context, Offset, Match, "000068547758080");
@@ -180,8 +180,8 @@ package body JSON.Test_Data.Tests is
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then
                                   (Offset = 14 and
-                                   Context (1).Get_Kind = Kind_String and
-                                   Context (1).Get_String (Data) = "Hello world!"), "Simple string");
+                                   Get_Kind (Context) = Kind_String and
+                                   Get_String (Context, Data) = "Hello world!"), "Simple string");
       end;
 
       Offset := 0;
@@ -199,8 +199,8 @@ package body JSON.Test_Data.Tests is
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then
                                   (Offset = 22 and
-                                   Context (1).Get_Kind = Kind_String and
-                                   Context (1).Get_String (Data) = "Say \""Hello World\""!"), "Escaped string");
+                                   Get_Kind (Context) = Kind_String and
+                                   Get_String (Context, Data) = "Say \""Hello World\""!"), "Escaped string");
       end;
 
       Offset := 0;
@@ -210,8 +210,8 @@ package body JSON.Test_Data.Tests is
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then
                                   (Offset = 21 and
-                                   Context (1).Get_Kind = Kind_String and
-                                   Context (1).Get_String (Data) = "Escaped backslash\\"), "Escaped backslash");
+                                   Get_Kind (Context) = Kind_String and
+                                   Get_String (Context, Data) = "Escaped backslash\\"), "Escaped backslash");
       end;
 
       Offset := 0;
@@ -221,22 +221,21 @@ package body JSON.Test_Data.Tests is
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then
                                   (Offset = 20 and
-                                   Context (1).Get_Kind = Kind_String and
-                                   Context (1).Get_String (Data) = "Escaped \backslash"), "Escaped regular character");
+                                   Get_Kind (Context) = Kind_String and
+                                   Get_String (Context, Data) = "Escaped \backslash"), "Escaped regular character");
       end;
 
       Offset := 0;
       declare
          Data : String := " { ""precision"": ""zip"", ""Latitude"":  37.7668, ""Longitude"": -122.3959, ""Address"":   """", ""City"":      ""SAN FRANCISCO"", ""State"":     ""CA"", ""Zip"":       ""94107"", ""Country"":   ""US"" }";
-         Element : Context_Element_Type;
       begin
          Parse (Context, Offset, Match, Data);
 
-         if Match = Match_OK and then Context (1).Get_Kind = Kind_Object
+         if Match = Match_OK and then Get_Kind (Context) = Kind_Object
          then
-            Element := Query_Object (Context, 1, "precision");
-            AUnit.Assertions.Assert (Element.Get_Kind = Kind_String and
-                                     Element.Get_String (Data) = "zip", "Object #1");
+            Query_Object (Context, "precision");
+            AUnit.Assertions.Assert (Get_Kind (Context) = Kind_String and
+                                     Get_String (Context, Data) = "zip", "Object #1");
          else
             AUnit.Assertions.Assert (False, "Object #1");
          end if;
@@ -245,6 +244,130 @@ package body JSON.Test_Data.Tests is
 
 --  begin read only
    end Test_Parse;
+--  end read only
+
+
+--  begin read only
+   procedure Test_Get_Kind (Gnattest_T : in out Test);
+   procedure Test_Get_Kind_4c1c6f (Gnattest_T : in out Test) renames Test_Get_Kind;
+--  id:2.2/4c1c6fe2e8fca998/Get_Kind/1/0/
+   procedure Test_Get_Kind (Gnattest_T : in out Test) is
+   --  json.ads:21:4:Get_Kind
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      null;
+      -- AUnit.Assertions.Assert
+      --   (Gnattest_Generated.Default_Assert_Value,
+      --    "Test not implemented.");
+
+--  begin read only
+   end Test_Get_Kind;
+--  end read only
+
+
+--  begin read only
+   procedure Test_Get_Boolean (Gnattest_T : in out Test);
+   procedure Test_Get_Boolean_4d5fb0 (Gnattest_T : in out Test) renames Test_Get_Boolean;
+--  id:2.2/4d5fb04694b2c853/Get_Boolean/1/0/
+   procedure Test_Get_Boolean (Gnattest_T : in out Test) is
+   --  json.ads:24:4:Get_Boolean
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+      Offset  : Natural;
+      Match   : Match_Type;
+      Context : Context_Type (Integer range 1..10);
+   begin
+
+      Offset := 0;
+      Parse (Context, Offset, Match, "true");
+      AUnit.Assertions.Assert (Match = Match_OK and Offset = 4 and
+                               Get_Kind (Context) = Kind_Boolean and
+                               Get_Boolean (Context) = true, "Parse true");
+
+--  begin read only
+   end Test_Get_Boolean;
+--  end read only
+
+
+--  begin read only
+   procedure Test_Get_Float (Gnattest_T : in out Test);
+   procedure Test_Get_Float_492cca (Gnattest_T : in out Test) renames Test_Get_Float;
+--  id:2.2/492cca72be95f3c3/Get_Float/1/0/
+   procedure Test_Get_Float (Gnattest_T : in out Test) is
+   --  json.ads:29:4:Get_Float
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      null;
+
+--  begin read only
+   end Test_Get_Float;
+--  end read only
+
+
+--  begin read only
+   procedure Test_Get_Integer (Gnattest_T : in out Test);
+   procedure Test_Get_Integer_127000 (Gnattest_T : in out Test) renames Test_Get_Integer;
+--  id:2.2/127000ceacbb4664/Get_Integer/1/0/
+   procedure Test_Get_Integer (Gnattest_T : in out Test) is
+   --  json.ads:34:4:Get_Integer
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      null;
+
+--  begin read only
+   end Test_Get_Integer;
+--  end read only
+
+
+--  begin read only
+   procedure Test_Get_String (Gnattest_T : in out Test);
+   procedure Test_Get_String_db6fb3 (Gnattest_T : in out Test) renames Test_Get_String;
+--  id:2.2/db6fb3c6ae402a77/Get_String/1/0/
+   procedure Test_Get_String (Gnattest_T : in out Test) is
+   --  json.ads:39:4:Get_String
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      null;
+
+--  begin read only
+   end Test_Get_String;
+--  end read only
+
+
+--  begin read only
+   procedure Test_Query_Object (Gnattest_T : in out Test);
+   procedure Test_Query_Object_4effdc (Gnattest_T : in out Test) renames Test_Query_Object;
+--  id:2.2/4effdc2547cb6395/Query_Object/1/0/
+   procedure Test_Query_Object (Gnattest_T : in out Test) is
+   --  json.ads:45:4:Query_Object
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      null;
+
+--  begin read only
+   end Test_Query_Object;
 --  end read only
 
 --  begin read only

@@ -4,55 +4,136 @@ use Ada.Text_IO;
 package body JSON
    with SPARK_Mode
 is
+
+   ------------------
+   -- Null_Element --
+   ------------------
+
+   function Null_Element return Context_Element_Type is
+   -- Construct null element
+      (Kind          => Kind_Null,
+       Boolean_Value => False,
+       Float_Value   => 0.0,
+       Integer_Value => 0,
+       String_Start  => 0,
+       String_End    => 0);
+
+   function Boolean_Element (Value : Boolean) return Context_Element_Type;
+
+   ---------------------
+   -- Boolean_Element --
+   ---------------------
+
+   function Boolean_Element (Value : Boolean) return Context_Element_Type is
+   -- Construct boolean element
+      (Kind          => Kind_Boolean,
+       Boolean_Value => Value,
+       Float_Value   => 0.0,
+       Integer_Value => 0,
+       String_Start  => 0,
+       String_End    => 0);
+
+   -------------------
+   -- Float_Element --
+   -------------------
+
+   function Float_Element (Value : Float) return Context_Element_Type is
+   -- Construct float element
+      (Kind          => Kind_Float,
+       Boolean_Value => False,
+       Float_Value   => Value,
+       Integer_Value => 0,
+       String_Start  => 0,
+       String_End    => 0);
+
+   ---------------------
+   -- Integer_Element --
+   ---------------------
+
+   function Integer_Element (Value : Long_Integer) return Context_Element_Type is
+   -- Construct integer element
+      (Kind          => Kind_Integer,
+       Boolean_Value => False,
+       Float_Value   => 0.0,
+       Integer_Value => Value,
+       String_Start  => 0,
+       String_End    => 0);
+
+   --------------------
+   -- String_Element --
+   --------------------
+
+   function String_Element (String_Start, String_End : Integer) return Context_Element_Type is
+   -- Construct string element
+      (Kind          => Kind_String,
+       Boolean_Value => False,
+       Float_Value   => 0.0,
+       Integer_Value => 0,
+       String_Start  => String_Start,
+       String_End    => String_End);
+
+   -----------------
+   -- Get_Current --
+   -----------------
+
+   function Get_Current (Context : Context_Type) return Context_Element_Type
+   -- Return current element of a context
+   is
+   begin
+      -- FIXME: Get current element from meta data
+      return Context (Context'First);
+   end Get_Current;
+
    --------------
    -- Get_Kind --
    --------------
 
-   function Get_Kind (Element : Context_Element_Type) return Kind_Type
+   function Get_Kind (Context : Context_Type) return Kind_Type
    is
    begin
-      return Element.Kind;
+      return Get_Current (Context).Kind;
    end Get_Kind;
 
    -----------------
    -- Get_Boolean --
    -----------------
 
-   function Get_Boolean (Element : Context_Element_Type) return Boolean
+   function Get_Boolean (Context : Context_Type) return Boolean
    is
    begin
-      return Element.Boolean_Value;
+      return Get_Current (Context).Boolean_Value;
    end Get_Boolean;
 
    ---------------
    -- Get_Float --
    ---------------
 
-   function Get_Float (Element : Context_Element_Type) return Float
+   function Get_Float (Context : Context_Type) return Float
    is
    begin
-      return Element.Float_Value;
+      return Get_Current (Context).Float_Value;
    end Get_Float;
 
    -----------------
    -- Get_Integer --
    -----------------
 
-   function Get_Integer (Element : Context_Element_Type) return Long_Integer
+   function Get_Integer (Context : Context_Type) return Long_Integer
    is
    begin
-      return Element.Integer_Value;
+      return Get_Current (Context).Integer_Value;
    end Get_Integer;
 
    ----------------
    -- Get_String --
    ----------------
 
-   function Get_String (Element : Context_Element_Type;
+   function Get_String (Context : Context_Type;
                         Data    : String) return String
    is
+      Element : Context_Element_Type := Get_Current (Context);
    begin
-      return Data (Element.String_Start..Element.String_End);
+      return Data (Element.String_Start .. Element.String_End);
    end Get_String;
 
    ----------------------
@@ -501,12 +582,11 @@ is
    -- Query_Object --
    ------------------
 
-   function Query_Object (Context  : Context_Type;
-                          Position : Natural;
-                          Name     : String) return Context_Element_Type
+   procedure Query_Object (Context  : in out Context_Type;
+                           Name     :        String)
    is
    begin
-      return Null_Element;
+      null;
    end Query_Object;
 
 end JSON;
