@@ -11,7 +11,32 @@ is
                       Kind_Meta);
 
    type Match_Type is (Match_OK, Match_None, Match_Invalid);
+
    type Context_Element_Type is tagged private;
+
+   -- Return kind of an element
+   function Get_Kind (Element : Context_Element_Type) return Kind_Type;
+
+   -- Return boolean from element
+   function Get_Boolean (Element : Context_Element_Type) return Boolean
+   with
+      Pre'Class => Element.Get_Kind = Kind_Boolean;
+
+   -- Return float from element
+   function Get_Float (Element : Context_Element_Type) return Float
+   with
+      Pre'Class => Element.Get_Kind = Kind_Float;
+
+   -- Return integer from element
+   function Get_Integer (Element : Context_Element_Type) return Long_Integer
+   with
+      Pre'Class => Element.Get_Kind = Kind_Integer;
+
+   -- Return string from element
+   function Get_String (Element : Context_Element_Type;
+                        Data    : String) return String
+   with
+      Pre'Class => Element.Get_Kind = Kind_String;
 
    type Context_Type is array (Natural range <>) of Context_Element_Type;
 
@@ -67,11 +92,11 @@ is
              Get_Kind (Context) = Kind_String;
 
    -- Query an object by name
-   procedure Query_Object (Context  : in out Context_Type;
-                           Name     :        String)
+   function Query_Object (Context : Context_Type;
+                           Name   : String) return Context_Element_Type
    with
-      Pre => Context_Valid (Context) and then
-             Get_Kind (Context) = Kind_Object;
+      Pre'Class => Context_Valid (Context) and then
+                   Get_Kind (Context) = Kind_Object;
 
 private
 

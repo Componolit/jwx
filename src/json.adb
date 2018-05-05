@@ -163,10 +163,67 @@ is
    -- Get_Kind --
    --------------
 
+   function Get_Kind (Element : Context_Element_Type) return Kind_Type
+   is
+   begin
+      return Element.Kind;
+   end Get_Kind;
+
+   -----------------
+   -- Get_Boolean --
+   -----------------
+
+   function Get_Boolean (Element : Context_Element_Type) return Boolean
+   is
+   begin
+      return Element.Boolean_Value;
+   end Get_Boolean;
+
+   ---------------
+   -- Get_Float --
+   ---------------
+
+   function Get_Float (Element : Context_Element_Type) return Float
+   is
+   begin
+      return Element.Float_Value;
+   end Get_Float;
+
+   -----------------
+   -- Get_Integer --
+   -----------------
+
+   function Get_Integer (Element : Context_Element_Type) return Long_Integer
+   is
+   begin
+      return Element.Integer_Value;
+   end Get_Integer;
+
+   ----------------
+   -- Get_String --
+   ----------------
+
+   function Get_String (Element : Context_Element_Type;
+                        Data    : String) return String
+   is
+   begin
+      if Element.String_Start in Data'Range and
+         Element.String_End in Data'Range
+      then
+         return Data (Element.String_Start .. Element.String_End);
+      else
+         return "";
+      end if;
+   end Get_String;
+
+   --------------
+   -- Get_Kind --
+   --------------
+
    function Get_Kind (Context : Context_Type) return Kind_Type
    is
    begin
-      return Get_Current (Context).Kind;
+      return Get_Current (Context).Get_Kind;
    end Get_Kind;
 
    -----------------
@@ -176,7 +233,7 @@ is
    function Get_Boolean (Context : Context_Type) return Boolean
    is
    begin
-      return Get_Current (Context).Boolean_Value;
+      return Get_Current (Context).Get_Boolean;
    end Get_Boolean;
 
    ---------------
@@ -186,7 +243,7 @@ is
    function Get_Float (Context : Context_Type) return Float
    is
    begin
-      return Get_Current (Context).Float_Value;
+      return Get_Current (Context).Get_Float;
    end Get_Float;
 
    -----------------
@@ -196,7 +253,7 @@ is
    function Get_Integer (Context : Context_Type) return Long_Integer
    is
    begin
-      return Get_Current (Context).Integer_Value;
+      return Get_Current (Context).Get_Integer;
    end Get_Integer;
 
    ----------------
@@ -206,15 +263,8 @@ is
    function Get_String (Context : Context_Type;
                         Data    : String) return String
    is
-      Element : Context_Element_Type := Get_Current (Context);
    begin
-      if Element.String_Start in Data'Range and
-         Element.String_End in Data'Range
-      then
-         return Data (Element.String_Start .. Element.String_End);
-      else
-         return "";
-      end if;
+      return Get_Current (Context).Get_String (Data);
    end Get_String;
 
    ----------------------
@@ -728,11 +778,11 @@ is
    -- Query_Object --
    ------------------
 
-   procedure Query_Object (Context  : in out Context_Type;
-                           Name     :        String)
+   function Query_Object (Context  : Context_Type;
+                          Name     : String) return Context_Element_Type
    is
    begin
-      null;
+      return Null_Element;
    end Query_Object;
 
 end JSON;

@@ -34,7 +34,7 @@ package body JSON.Test_Data.Tests is
    procedure Test_Initialize_e84d09 (Gnattest_T : in out Test) renames Test_Initialize;
 --  id:2.2/e84d09615b851310/Initialize/1/0/
    procedure Test_Initialize (Gnattest_T : in out Test) is
-   --  json.ads:24:4:Initialize
+   --  json.ads:49:4:Initialize
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -53,7 +53,7 @@ package body JSON.Test_Data.Tests is
    procedure Test_Parse_f44d29 (Gnattest_T : in out Test) renames Test_Parse;
 --  id:2.2/f44d29aaedc5307b/Parse/1/0/
    procedure Test_Parse (Gnattest_T : in out Test) is
-   --  json.ads:30:4:Parse
+   --  json.ads:55:4:Parse
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -249,10 +249,45 @@ package body JSON.Test_Data.Tests is
       Offset := 0;
       declare
          Data : String := " { ""precision"": ""zip"", ""Latitude"":  37.7668, ""Longitude"": -122.3959, ""Address"":   """", ""City"":      ""SAN FRANCISCO"", ""State"":     ""CA"", ""Zip"":       ""94107"", ""Country"":   ""US"" }";
+         Result : Context_Element_Type;
       begin
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then Get_Kind (Context) = Kind_Object, "Parse simple object");
 
+         Result := Query_Object (Context, "precision");
+         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
+                                  Result.Get_String (Data) = "zip", "Query string from simple object");
+
+         Result := Query_Object (Context, "Latitude");
+         AUnit.Assertions.Assert (Result.Get_Kind = Kind_Float and then
+                                  Result.Get_Float = 37.7668, "Query float from simple object");
+
+         Result := Query_Object (Context, "Longitude");
+         AUnit.Assertions.Assert (Result.Get_Kind = Kind_Float and then
+                                  Result.Get_Float = -122.3959, "Query negative float from simple object");
+
+         Result := Query_Object (Context, "Address");
+         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
+                                  Result.Get_String (Data) = "", "Query empty string from simple object");
+
+         Result := Query_Object (Context, "City");
+         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
+                                  Result.Get_String (Data) = "SAN FRANCISCO", "Query string from simple object");
+
+         Result := Query_Object (Context, "State");
+         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
+                                  Result.Get_String (Data) = "CA", "Query string from simple object");
+
+         Result := Query_Object (Context, "Zip");
+         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
+                                  Result.Get_String (Data) = "94107", "Query digit-only string from simple object");
+
+         Result := Query_Object (Context, "Country");
+         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
+                                  Result.Get_String (Data) = "US", "Query string from simple object");
+
+         Result := Query_Object (Context, "Does-not-exist");
+         AUnit.Assertions.Assert (Result.Get_Kind = Kind_Null, "Query non-existing member from simple object");
       end;
 
 --  begin read only
@@ -261,11 +296,11 @@ package body JSON.Test_Data.Tests is
 
 
 --  begin read only
-   procedure Test_Get_Kind (Gnattest_T : in out Test);
-   procedure Test_Get_Kind_4c1c6f (Gnattest_T : in out Test) renames Test_Get_Kind;
+   procedure Test_1_Get_Kind (Gnattest_T : in out Test);
+   procedure Test_Get_Kind_4c1c6f (Gnattest_T : in out Test) renames Test_1_Get_Kind;
 --  id:2.2/4c1c6fe2e8fca998/Get_Kind/1/0/
-   procedure Test_Get_Kind (Gnattest_T : in out Test) is
-   --  json.ads:40:4:Get_Kind
+   procedure Test_1_Get_Kind (Gnattest_T : in out Test) is
+   --  json.ads:65:4:Get_Kind
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -275,16 +310,16 @@ package body JSON.Test_Data.Tests is
       null;
 
 --  begin read only
-   end Test_Get_Kind;
+   end Test_1_Get_Kind;
 --  end read only
 
 
 --  begin read only
-   procedure Test_Get_Boolean (Gnattest_T : in out Test);
-   procedure Test_Get_Boolean_4d5fb0 (Gnattest_T : in out Test) renames Test_Get_Boolean;
+   procedure Test_1_Get_Boolean (Gnattest_T : in out Test);
+   procedure Test_Get_Boolean_4d5fb0 (Gnattest_T : in out Test) renames Test_1_Get_Boolean;
 --  id:2.2/4d5fb04694b2c853/Get_Boolean/1/0/
-   procedure Test_Get_Boolean (Gnattest_T : in out Test) is
-   --  json.ads:45:4:Get_Boolean
+   procedure Test_1_Get_Boolean (Gnattest_T : in out Test) is
+   --  json.ads:70:4:Get_Boolean
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -302,16 +337,16 @@ package body JSON.Test_Data.Tests is
                                Get_Boolean (Context) = true, "Parse true");
 
 --  begin read only
-   end Test_Get_Boolean;
+   end Test_1_Get_Boolean;
 --  end read only
 
 
 --  begin read only
-   procedure Test_Get_Float (Gnattest_T : in out Test);
-   procedure Test_Get_Float_492cca (Gnattest_T : in out Test) renames Test_Get_Float;
+   procedure Test_1_Get_Float (Gnattest_T : in out Test);
+   procedure Test_Get_Float_492cca (Gnattest_T : in out Test) renames Test_1_Get_Float;
 --  id:2.2/492cca72be95f3c3/Get_Float/1/0/
-   procedure Test_Get_Float (Gnattest_T : in out Test) is
-   --  json.ads:51:4:Get_Float
+   procedure Test_1_Get_Float (Gnattest_T : in out Test) is
+   --  json.ads:76:4:Get_Float
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -321,16 +356,16 @@ package body JSON.Test_Data.Tests is
       null;
 
 --  begin read only
-   end Test_Get_Float;
+   end Test_1_Get_Float;
 --  end read only
 
 
 --  begin read only
-   procedure Test_Get_Integer (Gnattest_T : in out Test);
-   procedure Test_Get_Integer_127000 (Gnattest_T : in out Test) renames Test_Get_Integer;
+   procedure Test_1_Get_Integer (Gnattest_T : in out Test);
+   procedure Test_Get_Integer_127000 (Gnattest_T : in out Test) renames Test_1_Get_Integer;
 --  id:2.2/127000ceacbb4664/Get_Integer/1/0/
-   procedure Test_Get_Integer (Gnattest_T : in out Test) is
-   --  json.ads:57:4:Get_Integer
+   procedure Test_1_Get_Integer (Gnattest_T : in out Test) is
+   --  json.ads:82:4:Get_Integer
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -340,16 +375,16 @@ package body JSON.Test_Data.Tests is
       null;
 
 --  begin read only
-   end Test_Get_Integer;
+   end Test_1_Get_Integer;
 --  end read only
 
 
 --  begin read only
-   procedure Test_Get_String (Gnattest_T : in out Test);
-   procedure Test_Get_String_db6fb3 (Gnattest_T : in out Test) renames Test_Get_String;
+   procedure Test_1_Get_String (Gnattest_T : in out Test);
+   procedure Test_Get_String_db6fb3 (Gnattest_T : in out Test) renames Test_1_Get_String;
 --  id:2.2/db6fb3c6ae402a77/Get_String/1/0/
-   procedure Test_Get_String (Gnattest_T : in out Test) is
-   --  json.ads:63:4:Get_String
+   procedure Test_1_Get_String (Gnattest_T : in out Test) is
+   --  json.ads:88:4:Get_String
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -359,26 +394,7 @@ package body JSON.Test_Data.Tests is
       null;
 
 --  begin read only
-   end Test_Get_String;
---  end read only
-
-
---  begin read only
-   procedure Test_Query_Object (Gnattest_T : in out Test);
-   procedure Test_Query_Object_4effdc (Gnattest_T : in out Test) renames Test_Query_Object;
---  id:2.2/4effdc2547cb6395/Query_Object/1/0/
-   procedure Test_Query_Object (Gnattest_T : in out Test) is
-   --  json.ads:70:4:Query_Object
---  end read only
-
-      pragma Unreferenced (Gnattest_T);
-
-   begin
-
-      null;
-
---  begin read only
-   end Test_Query_Object;
+   end Test_1_Get_String;
 --  end read only
 
 --  begin read only
