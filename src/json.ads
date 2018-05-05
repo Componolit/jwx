@@ -8,6 +8,7 @@ is
                       Kind_Integer,
                       Kind_String,
                       Kind_Object,
+                      Kind_Array,
                       Kind_Meta);
 
    type Match_Type is (Match_OK, Match_None, Match_Invalid);
@@ -98,6 +99,19 @@ is
    with
       Pre'Class => Context_Valid (Context) and then
                    Get_Kind (Context) = Kind_Object;
+
+   -- Return length of an array
+   function Length (Context : Context_Type) return Natural
+   with
+      Pre => Context_Valid (Context) and then
+             Get_Kind (Context) = Kind_Array;
+
+   -- Return object at given position of an array
+   function Pos (Context  : Context_Type;
+                 Position : Natural) return Context_Element_Type
+   with
+      Pre'Class => Context_Valid (Context) and then
+                   Get_Kind (Context) = Kind_Array;
 
 private
 

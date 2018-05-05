@@ -814,4 +814,24 @@ is
       return Null_Element;
    end Query_Object;
 
+   ------------
+   -- Length --
+   ------------
+
+   function Length (Context : Context_Type) return Natural
+   is
+   begin
+      return 0;
+   end Length;
+
+   ---------
+   -- Pos --
+   ---------
+
+   function Pos (Context  : Context_Type;
+                 Position : Natural) return Context_Element_Type
+   is
+   begin
+      return Null_Element;
+   end Pos;
 end JSON;
