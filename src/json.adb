@@ -1,10 +1,6 @@
-with Ada.Text_IO;
-use Ada.Text_IO;
-
 package body JSON
    with SPARK_Mode
 is
-
    ------------------
    -- Meta_Element --
    ------------------
