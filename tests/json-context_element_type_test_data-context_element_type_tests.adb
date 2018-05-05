@@ -134,8 +134,8 @@ package body JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
 
 --  begin read only
    procedure Test_Query_Object (Gnattest_T : in out Test_Context_Element_Type);
-   procedure Test_Query_Object_cceaf1 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Query_Object;
---  id:2.2/cceaf14acd4eb9f0/Query_Object/0/0/
+   procedure Test_Query_Object_e31e47 (Gnattest_T : in out Test_Context_Element_Type) renames Test_Query_Object;
+--  id:2.2/e31e47c4db04a16b/Query_Object/1/0/
    procedure Test_Query_Object (Gnattest_T : in out Test_Context_Element_Type) is
    --  json.ads:95:4:Query_Object
 --  end read only

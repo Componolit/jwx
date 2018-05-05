@@ -24,7 +24,7 @@ package JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests is
    procedure Test_Get_String_8657fa (Gnattest_T : in out Test_Context_Element_Type);
    --  json.ads:36:4:Get_String
 
-   procedure Test_Query_Object_cceaf1 (Gnattest_T : in out Test_Context_Element_Type);
+   procedure Test_Query_Object_e31e47 (Gnattest_T : in out Test_Context_Element_Type);
    --  json.ads:95:4:Query_Object
 
 end JSON.Context_Element_Type_Test_Data.Context_Element_Type_Tests;

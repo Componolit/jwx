@@ -93,7 +93,8 @@ is
 
    -- Query an object by name
    function Query_Object (Context : Context_Type;
-                           Name   : String) return Context_Element_Type
+                          Data    : String;
+                          Name   : String) return Context_Element_Type
    with
       Pre'Class => Context_Valid (Context) and then
                    Get_Kind (Context) = Kind_Object;
@@ -109,6 +110,7 @@ private
       String_Start   : Integer      := 0;
       String_End     : Integer      := 0;
       Context_Offset : Natural      := 0;
+      Next_Element   : Natural      := 0;
    end record;
 
 end JSON;

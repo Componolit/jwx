@@ -72,6 +72,7 @@ package body JSON.Test_Data.Tests is
                                 Get_Boolean (Context)), "Parse true");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "false");
       AUnit.Assertions.Assert (Match = Match_OK and
                                Offset = 5 and
@@ -79,36 +80,44 @@ package body JSON.Test_Data.Tests is
                                not Get_Boolean (Context), "Parse false.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "null");
       AUnit.Assertions.Assert (Match = Match_OK and
                                Offset = 4 and
                                Get_Kind (Context) = Kind_Null, "Parse null.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "True");
       AUnit.Assertions.Assert (Match /= Match_OK and Offset = 0, "True case insensitive.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "FALSE");
       AUnit.Assertions.Assert (Match /= Match_OK and Offset = 0, "False case insensitive.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "nulL");
       AUnit.Assertions.Assert (Match /= Match_OK and Offset = 0, "Null case insensitive.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "    null");
       AUnit.Assertions.Assert (Match = Match_OK, "Parse boolean with space.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "  " & ASCII.CR & ASCII.LF & "true");
       AUnit.Assertions.Assert (Match = Match_OK, "Parse boolean with CRLF");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, ASCII.HT & "false");
       AUnit.Assertions.Assert (Match = Match_OK, "Parse boolean with tab.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "42");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 2 and
@@ -116,6 +125,7 @@ package body JSON.Test_Data.Tests is
                                 Get_Integer (Context) = 42), "Parse small positive integer.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "-42");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 3 and
@@ -123,6 +133,7 @@ package body JSON.Test_Data.Tests is
                                 Get_Integer (Context) = -42), "Parse small negative integer.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "2147483647");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 10 and
@@ -130,6 +141,7 @@ package body JSON.Test_Data.Tests is
                                 Get_Integer (Context) = 2147483647), "Parse big positive integer.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "   0 ");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 4 and
@@ -137,6 +149,7 @@ package body JSON.Test_Data.Tests is
                                 Get_Integer (Context) = 0), "Parse zero integer.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "-2147483647");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 11 and
@@ -144,14 +157,17 @@ package body JSON.Test_Data.Tests is
                                 Get_Integer (Context) = -2147483647), "Parse big negative integer.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "92233720368547758080");
       AUnit.Assertions.Assert (Match = Match_Invalid, "Too big integer.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "-92233720368547758080");
       AUnit.Assertions.Assert (Match = Match_Invalid, "Too small integer.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "3.14");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 4 and
@@ -159,6 +175,7 @@ package body JSON.Test_Data.Tests is
                                 Get_Float (Context) = 3.14), "Parse small positive float.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "-3.14");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 5 and
@@ -166,6 +183,7 @@ package body JSON.Test_Data.Tests is
                                 Get_Float (Context) = -3.14), "Parse small negative float.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "0.00000000001");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 13 and
@@ -173,6 +191,7 @@ package body JSON.Test_Data.Tests is
                                 Get_Float (Context)= 0.00000000001), "Very small positive float.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "-0.00000000001");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 14 and
@@ -180,6 +199,7 @@ package body JSON.Test_Data.Tests is
                                 Get_Float (Context) = -0.00000000001), "Very small negative float.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, " 0.0   ");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 4 and
@@ -187,14 +207,17 @@ package body JSON.Test_Data.Tests is
                                 Get_Float (Context) = 0.0), "Parse zero float.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "000068547758080");
       AUnit.Assertions.Assert (Match = Match_Invalid, "Leading zero.");
 
       Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "54775. ");
       AUnit.Assertions.Assert (Match = Match_Invalid, "Missing fractional part.");
 
       Offset := 0;
+      Initialize (Context);
       declare
          Data : String := """Hello world!""";
       begin
@@ -206,6 +229,7 @@ package body JSON.Test_Data.Tests is
       end;
 
       Offset := 0;
+      Initialize (Context);
       declare
          Data : String := """Invalid String";
       begin
@@ -214,6 +238,7 @@ package body JSON.Test_Data.Tests is
       end;
 
       Offset := 0;
+      Initialize (Context);
       declare
          Data : String := """Say \""Hello World\""!""";
       begin
@@ -225,6 +250,7 @@ package body JSON.Test_Data.Tests is
       end;
 
       Offset := 0;
+      Initialize (Context);
       declare
          Data : String := """Escaped backslash\\""";
       begin
@@ -236,6 +262,7 @@ package body JSON.Test_Data.Tests is
       end;
 
       Offset := 0;
+      Initialize (Context);
       declare
          Data : String := """Escaped \backslash""";
       begin
@@ -247,6 +274,7 @@ package body JSON.Test_Data.Tests is
       end;
 
       Offset := 0;
+      Initialize (Context);
       declare
          Data : String := " { ""precision"": ""zip"", ""Latitude"":  37.7668, ""Longitude"": -122.3959, ""Address"":   """", ""City"":      ""SAN FRANCISCO"", ""State"":     ""CA"", ""Zip"":       ""94107"", ""Country"":   ""US"" }";
          Result : Context_Element_Type;
@@ -254,39 +282,39 @@ package body JSON.Test_Data.Tests is
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then Get_Kind (Context) = Kind_Object, "Parse simple object");
 
-         Result := Query_Object (Context, "precision");
+         Result := Query_Object (Context, Data, "precision");
          AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
-                                  Result.Get_String (Data) = "zip", "Query string from simple object");
+                                  Result.Get_String (Data) = "zip", "Query string from simple object: " & Result.Get_Kind'Img);
 
-         Result := Query_Object (Context, "Latitude");
+         Result := Query_Object (Context, Data, "Latitude");
          AUnit.Assertions.Assert (Result.Get_Kind = Kind_Float and then
                                   Result.Get_Float = 37.7668, "Query float from simple object");
 
-         Result := Query_Object (Context, "Longitude");
+         Result := Query_Object (Context, Data, "Longitude");
          AUnit.Assertions.Assert (Result.Get_Kind = Kind_Float and then
                                   Result.Get_Float = -122.3959, "Query negative float from simple object");
 
-         Result := Query_Object (Context, "Address");
+         Result := Query_Object (Context, Data, "Address");
          AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
                                   Result.Get_String (Data) = "", "Query empty string from simple object");
 
-         Result := Query_Object (Context, "City");
+         Result := Query_Object (Context, Data, "City");
          AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
                                   Result.Get_String (Data) = "SAN FRANCISCO", "Query string from simple object");
 
-         Result := Query_Object (Context, "State");
+         Result := Query_Object (Context, Data, "State");
          AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
                                   Result.Get_String (Data) = "CA", "Query string from simple object");
 
-         Result := Query_Object (Context, "Zip");
+         Result := Query_Object (Context, Data, "Zip");
          AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
                                   Result.Get_String (Data) = "94107", "Query digit-only string from simple object");
 
-         Result := Query_Object (Context, "Country");
+         Result := Query_Object (Context, Data, "Country");
          AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
                                   Result.Get_String (Data) = "US", "Query string from simple object");
 
-         Result := Query_Object (Context, "Does-not-exist");
+         Result := Query_Object (Context, Data, "Does-not-exist");
          AUnit.Assertions.Assert (Result.Get_Kind = Kind_Null, "Query non-existing member from simple object");
       end;
 

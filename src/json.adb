@@ -17,7 +17,8 @@ is
        Integer_Value  => 0,
        String_Start   => 0,
        String_End     => 0,
-       Context_Offset => Initial_Offset);
+       Context_Offset => Initial_Offset,
+       Next_Element   => 0);
 
    ------------------
    -- Null_Element --
@@ -31,7 +32,8 @@ is
        Integer_Value  => 0,
        String_Start   => 0,
        String_End     => 0,
-       Context_Offset => 0);
+       Context_Offset => 0,
+       Next_Element   => 0);
 
    ---------------------
    -- Boolean_Element --
@@ -45,7 +47,8 @@ is
        Integer_Value  => 0,
        String_Start   => 0,
        String_End     => 0,
-       Context_Offset => 0);
+       Context_Offset => 0,
+       Next_Element   => 0);
 
    -------------------
    -- Float_Element --
@@ -59,7 +62,8 @@ is
        Integer_Value  => 0,
        String_Start   => 0,
        String_End     => 0,
-       Context_Offset => 0);
+       Context_Offset => 0,
+       Next_Element   => 0);
 
    ---------------------
    -- Integer_Element --
@@ -73,7 +77,8 @@ is
        Integer_Value  => Value,
        String_Start   => 0,
        String_End     => 0,
-       Context_Offset => 0);
+       Context_Offset => 0,
+       Next_Element   => 0);
 
    --------------------
    -- String_Element --
@@ -87,7 +92,8 @@ is
        Integer_Value  => 0,
        String_Start   => String_Start,
        String_End     => String_End,
-       Context_Offset => 0);
+       Context_Offset => 0,
+       Next_Element   => 0);
 
    --------------------
    -- Object_Element --
@@ -101,7 +107,8 @@ is
        Integer_Value  => 0,
        String_Start   => 0,
        String_End     => 0,
-       Context_Offset => 0);
+       Context_Offset => 0,
+       Next_Element   => 0);
 
    -------------------
    -- Context_Valid --
@@ -662,6 +669,7 @@ is
       Match_Name   : Match_Type;
       Match_Member : Match_Type;
       Object_Index : Natural;
+      Previous_Member : Natural;
    begin
       Match := Match_None;
 
@@ -672,6 +680,8 @@ is
 
       Increment_Current_Index (Context);
       Object_Index := Get_Current_Index (Context);
+      Context (Object_Index) := Object_Element;
+      Previous_Member := Object_Index;
 
       Tmp_Offset := Tmp_Offset + 1;
       Match := Match_Invalid;
@@ -689,6 +699,10 @@ is
          if Match_Name /= Match_OK then
             return;
          end if;
+
+         -- Link previous element to this element
+         Context (Previous_Member).Next_Element := Get_Current_Index (Context);
+         Previous_Member := Get_Current_Index (Context);
 
          -- Check for name separator (:)
          Parse_Whitespace (Tmp_Offset, Data);
@@ -717,7 +731,7 @@ is
 
       end loop;
 
-      Context (Object_Index) := Object_Element;
+      Context (Previous_Member).Next_Element := 0;
       Context (Context'First).Context_Offset := Object_Index;
       Offset := Tmp_Offset;
       Match := Match_OK;
@@ -779,9 +793,24 @@ is
    ------------------
 
    function Query_Object (Context  : Context_Type;
+                          Data     : String;
                           Name     : String) return Context_Element_Type
    is
+      Element       : Context_Element_Type := Get_Current (Context);
+      Element_Index : Natural;
    begin
+      while Element.Next_Element /= 0
+      loop
+         Element_Index := Element.Next_Element;
+         Element       := Context (Element_Index);
+
+         if Element.Get_Kind = Kind_String and then
+            Element.Get_String (Data) = Name
+         then
+            -- Value object are stored next to member names
+            return Context (Element_Index + 1);
+         end if;
+      end loop;
       return Null_Element;
    end Query_Object;
 
