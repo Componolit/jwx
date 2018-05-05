@@ -111,6 +111,21 @@ is
        Next_Element   => 0);
 
    -------------------
+   -- Array_Element --
+   -------------------
+
+   function Array_Element return Context_Element_Type is
+   -- Construct array element
+      (Kind           => Kind_Array,
+       Boolean_Value  => False,
+       Float_Value    => 0.0,
+       Integer_Value  => 0,
+       String_Start   => 0,
+       String_End     => 0,
+       Context_Offset => 0,
+       Next_Element   => 0);
+
+   -------------------
    -- Context_Valid --
    -------------------
 
@@ -693,6 +708,14 @@ is
             return;
          end if;
 
+         -- Check for ending '}'
+         Parse_Whitespace (Tmp_Offset, Data);
+         if Match_Set (Data, Tmp_Offset, "}")
+         then
+            Tmp_Offset := Tmp_Offset + 1;
+            exit;
+         end if;
+
          -- Parse member name
          Parse_Whitespace (Tmp_Offset, Data);
          Parse_String (Context, Tmp_Offset, Match_Name, Data);
@@ -722,11 +745,6 @@ is
          -- Check for value separator ','
          if Match_Set (Data, Tmp_Offset, ",") then
             Tmp_Offset := Tmp_Offset + 1;
-         -- Check for ending '}'
-         elsif Match_Set (Data, Tmp_Offset, "}")
-         then
-            Tmp_Offset := Tmp_Offset + 1;
-            exit;
          end if;
 
       end loop;
@@ -738,6 +756,89 @@ is
 
    end Parse_Object;
 
+   ------------------
+   -- Parse_Array --
+   ------------------
+
+   procedure Parse_Array
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Match_Type;
+      Data    :        String)
+   with
+      Pre => Context_Valid (Context) and
+             Data'First < Integer'Last - Offset and
+             Offset < Data'Length,
+      Post => (if Match /= Match_OK then Context = Context'Old and
+                                         Offset = Offset'Old);
+
+   procedure Parse_Array
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Match_Type;
+      Data    :        String)
+   is
+      Tmp_Offset       : Natural := Offset;
+      Match_Element    : Match_Type;
+      Array_Index      : Natural;
+      Previous_Element : Natural;
+   begin
+      Match := Match_None;
+
+      -- Check for starting [
+      if not Match_Set (Data, Tmp_Offset, "[") then
+         return;
+      end if;
+
+      Increment_Current_Index (Context);
+      Array_Index := Get_Current_Index (Context);
+      Context (Array_Index) := Array_Element;
+      Previous_Element := Array_Index;
+
+      Tmp_Offset := Tmp_Offset + 1;
+      Match := Match_Invalid;
+
+      loop
+         if Data'First >= Integer'Last - Tmp_Offset or
+            Tmp_Offset >= Data'Length
+         then
+            return;
+         end if;
+
+         Parse_Whitespace (Tmp_Offset, Data);
+         if Match_Set (Data, Tmp_Offset, "]")
+         then
+            Tmp_Offset := Tmp_Offset + 1;
+            exit;
+         end if;
+
+         -- Parse member
+         Parse (Context, Tmp_Offset, Match_Element, Data);
+         if Match_Element /= Match_OK then
+            return;
+         end if;
+
+         -- Link previous object to this element
+         Context (Previous_Element).Next_Element := Get_Current_Index (Context);
+         Previous_Element := Get_Current_Index (Context);
+
+         Parse_Whitespace (Tmp_Offset, Data);
+
+         -- Check for value separator ','
+         if Match_Set (Data, Tmp_Offset, ",") then
+            Tmp_Offset := Tmp_Offset + 1;
+         -- Check for ending '}'
+         end if;
+
+      end loop;
+
+      Context (Previous_Element).Next_Element := 0;
+      Context (Context'First).Context_Offset := Array_Index;
+      Offset := Tmp_Offset;
+      Match := Match_OK;
+
+   end Parse_Array;
+
    ----------------
    -- Initialize --
    ----------------
@@ -745,6 +846,7 @@ is
    procedure Initialize (Context : in out Context_Type)
    is
    begin
+      Context := (others => Null_Element);
       Context (Context'First) := Meta_Element (Context'First);
    end Initialize;
 
@@ -780,6 +882,10 @@ is
                      if Match = Match_None
                      then
                         Parse_Object (Context, Offset, Match, Data);
+                        if Match = Match_None
+                        then
+                           Parse_Array (Context, Offset, Match, Data);
+                        end if;
                      end if;
                   end if;
                end if;
@@ -820,8 +926,15 @@ is
 
    function Length (Context : Context_Type) return Natural
    is
+      Element : Context_Element_Type := Get_Current (Context);
+      Count   : Natural := 0;
    begin
-      return 0;
+      loop
+         exit when Element.Next_Element = 0;
+         Element := Context (Element.Next_Element);
+         Count := Count + 1;
+      end loop;
+      return Count;
    end Length;
 
    ---------
@@ -831,7 +944,18 @@ is
    function Pos (Context  : Context_Type;
                  Position : Natural) return Context_Element_Type
    is
+      Element : Context_Element_Type := Get_Current (Context);
+      Count   : Natural := 0;
    begin
-      return Null_Element;
+      loop
+         exit when Count = Position;
+         if Element.Next_Element = 0
+         then
+            return Null_Element;
+         end if;
+         Element := Context (Element.Next_Element);
+         Count := Count + 1;
+      end loop;
+      return Element;
    end Pos;
 end JSON;

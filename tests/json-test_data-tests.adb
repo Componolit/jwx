@@ -320,6 +320,11 @@ package body JSON.Test_Data.Tests is
 
       Offset := 0;
       Initialize (Context);
+      Parse (Context, Offset, Match, "  {} ");
+      AUnit.Assertions.Assert (Match = Match_OK and then Get_Kind (Context) = Kind_Object, "Parse empty object");
+
+      Offset := 0;
+      Initialize (Context);
       declare
          Data : String := "  [116, 943, 234, 38793] ";
          Result : Context_Element_Type;
@@ -359,6 +364,17 @@ package body JSON.Test_Data.Tests is
          AUnit.Assertions.Assert (Pos (Context, 2).Get_Float = -4.5, "Get mixed array float element");
          AUnit.Assertions.Assert (Pos (Context, 3).Get_String (Data) = "baz", "Get mixed array string element");
          AUnit.Assertions.Assert (Pos (Context, 4).Get_Boolean = true, "Get mixed array boolean element");
+      end;
+
+      Offset := 0;
+      Initialize (Context);
+      declare
+         Data : String := "    [] ";
+         Result : Context_Element_Type;
+      begin
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then Get_Kind (Context) = Kind_Array, "Parse empty array: " & Match'Img);
+         AUnit.Assertions.Assert (Length (Context) = 0, "Empty array length");
       end;
 
 --  begin read only
