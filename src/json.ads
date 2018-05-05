@@ -12,64 +12,65 @@ is
 
    type Match_Type is (Match_OK, Match_None, Match_Invalid);
    type Context_Element_Type is tagged private;
+
    type Context_Type is array (Natural range <>) of Context_Element_Type;
 
    -- Predicate stating that context is initialized
-   function Initialized (Context : Context_Type) return Boolean
+   function Context_Valid (Context : Context_Type) return Boolean
    with
-      Ghost, Import;
+      Ghost;
 
    -- Initialize Context
    procedure Initialize (Context : in out Context_Type)
    with
-      Pre  => Context'Length > 2,
-      Post => Initialized (Context);
- 
+      Pre  => Context'Length > 1,
+      Post => Context_Valid (Context);
+
    -- Parse a JSON file
    procedure Parse (Context : in out Context_Type;
                     Offset  : in out Natural;
                     Match   :    out Match_Type;
                     Data    :        String)
    with
-      Pre => Initialized (Context) and
+      Pre => Context_Valid (Context) and
              Data'First <= Integer'Last - Offset - 4 and
              Offset < Data'Length;
 
    -- Return kind of current element of a context
    function Get_Kind (Context : Context_Type) return Kind_Type
    with
-      Pre => Initialized (Context);
+      Pre => Context_Valid (Context);
 
    -- Return value of a boolean context element
    function Get_Boolean (Context : Context_Type) return Boolean
    with
-      Pre => Initialized (Context) and then
+      Pre => Context_Valid (Context) and then
              Get_Kind (Context) = Kind_Boolean;
 
    -- Return value of float context element
    function Get_Float (Context : Context_Type) return Float
    with
-      Pre => Initialized (Context) and then
+      Pre => Context_Valid (Context) and then
              Get_Kind (Context) = Kind_Float;
 
    -- Return value of integer context element
    function Get_Integer (Context : Context_Type) return Long_Integer
    with
-      Pre => Initialized (Context) and then
+      Pre => Context_Valid (Context) and then
              Get_Kind (Context) = Kind_Integer;
 
    -- Return value of a string context element
    function Get_String (Context : Context_Type;
                         Data    : String) return String
    with
-      Pre => Initialized (Context) and then
+      Pre => Context_Valid (Context) and then
              Get_Kind (Context) = Kind_String;
 
    -- Query an object by name
    procedure Query_Object (Context  : in out Context_Type;
                            Name     :        String)
    with
-      Pre => Initialized (Context) and then
+      Pre => Context_Valid (Context) and then
              Get_Kind (Context) = Kind_Object;
 
 private

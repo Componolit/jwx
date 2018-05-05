@@ -10,28 +10,28 @@ package JSON.Test_Data.Tests is
    with null record;
 
    procedure Test_Initialize_e84d09 (Gnattest_T : in out Test);
-   --  json.ads:23:4:Initialize
+   --  json.ads:24:4:Initialize
 
    procedure Test_Parse_f44d29 (Gnattest_T : in out Test);
-   --  json.ads:29:4:Parse
+   --  json.ads:30:4:Parse
 
    procedure Test_Get_Kind_4c1c6f (Gnattest_T : in out Test);
-   --  json.ads:39:4:Get_Kind
+   --  json.ads:40:4:Get_Kind
 
    procedure Test_Get_Boolean_4d5fb0 (Gnattest_T : in out Test);
-   --  json.ads:44:4:Get_Boolean
+   --  json.ads:45:4:Get_Boolean
 
    procedure Test_Get_Float_492cca (Gnattest_T : in out Test);
-   --  json.ads:50:4:Get_Float
+   --  json.ads:51:4:Get_Float
 
    procedure Test_Get_Integer_127000 (Gnattest_T : in out Test);
-   --  json.ads:56:4:Get_Integer
+   --  json.ads:57:4:Get_Integer
 
    procedure Test_Get_String_db6fb3 (Gnattest_T : in out Test);
-   --  json.ads:62:4:Get_String
+   --  json.ads:63:4:Get_String
 
    procedure Test_Query_Object_4effdc (Gnattest_T : in out Test);
-   --  json.ads:69:4:Query_Object
+   --  json.ads:70:4:Query_Object
 
 end JSON.Test_Data.Tests;
 --  end read only

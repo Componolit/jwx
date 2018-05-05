@@ -89,9 +89,36 @@ is
        String_End     => String_End,
        Context_Offset => 0);
 
-   -----------------
-   -- Get_Current --
-   -----------------
+   --------------------
+   -- Object_Element --
+   --------------------
+
+   function Object_Element return Context_Element_Type is
+   -- Construct object element
+      (Kind           => Kind_Object,
+       Boolean_Value  => False,
+       Float_Value    => 0.0,
+       Integer_Value  => 0,
+       String_Start   => 0,
+       String_End     => 0,
+       Context_Offset => 0);
+
+   -------------------
+   -- Context_Valid --
+   -------------------
+
+   function Context_Valid (Context : Context_Type) return Boolean is
+      (Context'Length > 1 and then
+       Context (Context'First).Context_Offset in Context'Range);
+
+   -----------------------
+   -- Get_Current_Index --
+   -----------------------
+
+   function Get_Current_Index (Context : Context_Type) return Natural
+   with
+      Pre  => Context_Valid (Context),
+      Post => Get_Current_Index'Result in Context'Range;
 
    function Get_Current_Index (Context : Context_Type) return Natural
    -- Get current context index
@@ -100,12 +127,14 @@ is
       return Context (Context'First).Context_Offset;
    end Get_Current_Index;
 
-   -----------------------
-   -- Get_Current_Index --
-   -----------------------
+   -----------------
+   -- Get_Current --
+   -----------------
 
    function Get_Current (Context : Context_Type) return Context_Element_Type
    -- Return current element of a context
+   with
+      Pre => Context_Valid (Context)
    is
    begin
       return Context (Get_Current_Index (Context));
@@ -116,11 +145,18 @@ is
    -----------------------------
 
    procedure Increment_Current_Index (Context : in out Context_Type)
+   with
+      Pre => Context_Valid (Context) and then
+             Get_Current_Index (Context) < Context'Last,
+      Post => Context_Valid (Context) and then
+              Get_Current_Index (Context) in Context'Range;
+
+   procedure Increment_Current_Index (Context : in out Context_Type)
    -- Increment the current context offset
    is
    begin
-      Context (Get_Current_Index (Context)).Context_Offset :=
-         Context (Get_Current_Index (Context)).Context_Offset + 1;
+      Context (Context'First).Context_Offset :=
+         Context (Context'First).Context_Offset + 1;
    end Increment_Current_Index;
 
    --------------
@@ -172,7 +208,13 @@ is
    is
       Element : Context_Element_Type := Get_Current (Context);
    begin
-      return Data (Element.String_Start .. Element.String_End);
+      if Element.String_Start in Data'Range and
+         Element.String_End in Data'Range
+      then
+         return Data (Element.String_Start .. Element.String_End);
+      else
+         return "";
+      end if;
    end Get_String;
 
    ----------------------
@@ -216,7 +258,7 @@ is
       Match   :    out Match_Type;
       Data    :        String)
    with
-      Pre => Context'Length > 0 and
+      Pre => Context_Valid (Context) and
              Data'First <= Integer'Last - Offset - 3 and
              Offset < Data'Length,
       Post => (if Match /= Match_OK then Context = Context'Old and
@@ -231,7 +273,8 @@ is
       Base : Natural := Data'First + Offset;
    begin
       Match := Match_None;
-      if Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "null"
+      if Get_Current_Index (Context) < Context'Last and
+         (Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "null")
       then
          Increment_Current_Index (Context);
          Context (Get_Current_Index (Context)) := Null_Element;
@@ -250,8 +293,8 @@ is
       Match   :    out Match_Type;
       Data    :        String)
    with
-      Pre => Context'Length > 0 and
-             Data'First <= Integer'Last - Offset - 4 and
+      Pre => Context_Valid (Context) and
+             Data'First <= Integer'Last - Offset - 5 and
              Offset < Data'Length,
       Post => (if Match /= Match_OK then Context = Context'Old and
                                          Offset = Offset'Old);
@@ -265,13 +308,15 @@ is
       Base : Natural := Data'First + Offset;
    begin
       Match := Match_None;
-      if Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "true"
+      if Get_Current_Index (Context) < Context'Last and
+         (Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "true")
       then
          Increment_Current_Index (Context);
          Context (Get_Current_Index (Context)) := Boolean_Element (True);
          Offset := Offset + 4;
          Match := Match_OK;
-      elsif Offset <= Data'Length - 5 and then Data (Base .. Base + 4) = "false"
+      elsif Get_Current_Index (Context) < Context'Last and
+            (Offset <= Data'Length - 5 and then Data (Base .. Base + 4) = "false")
       then
          Increment_Current_Index (Context);
          Context (Get_Current_Index (Context)) := Boolean_Element (False);
@@ -380,7 +425,7 @@ is
       Match   :    out Match_Type;
       Data    :        String)
    with
-      Pre => Context'Length > 0 and
+      Pre => Context_Valid (Context) and
              Data'First < Integer'Last - Offset and
              Offset < Data'Length,
       Post => (if Match /= Match_OK then Context = Context'Old and
@@ -408,13 +453,20 @@ is
          Tmp_Offset := Tmp_Offset + 1;
       end if;
 
-      while (Data'First < Integer'Last - Tmp_Offset and Tmp_Offset < Data'Length) and then
-             (Num_Matches < Natural'Last and Match_Set (Data, Tmp_Offset, "0123456789"))
+      while Data'First < Integer'Last - Tmp_Offset and
+            Tmp_Offset < Data'Length and
+            Num_Matches < Natural'Last
       loop
+
+         -- Valid digit?
+         exit when not Match_Set (Data, Tmp_Offset, "0123456789");
+
          -- Check for leading 0
          if Num_Matches > 1 and Data (Data'First + Tmp_Offset) = '0' then
             return;
          end if;
+
+         pragma Loop_Invariant (Integer_Component >= 0);
 
          -- Check for overflow
          if Integer_Component >= Long_Integer'Last/10 then
@@ -438,7 +490,8 @@ is
          Parse_Fractional_Part (Tmp_Offset, Frac_Result, Fractional_Component, Data);
       end if;
 
-      if Frac_Result = Match_Invalid then
+      if Frac_Result = Match_Invalid or
+         Get_Current_Index (Context) >= Context'Last then
          Match := Match_Invalid;
          return;
       end if;
@@ -477,7 +530,7 @@ is
       Match   :    out Match_Type;
       Data    :        String)
    with
-      Pre => Context'Length > 0 and
+      Pre => Context_Valid (Context) and
              Data'First < Integer'Last - Offset and
              Offset < Data'Length,
       Post => (if Match /= Match_OK then Context = Context'Old and
@@ -513,7 +566,15 @@ is
          Tmp_Offset := Tmp_Offset + 1;
       end loop;
 
-      if not Match_Set (Data, Tmp_Offset, """") then
+      if Data'First >= Integer'Last - Tmp_Offset or
+         Tmp_Offset >= Data'Length
+      then
+         return;
+      end if;
+
+      if not Match_Set (Data, Tmp_Offset, """") or
+         Get_Current_Index (Context) >= Context'Last
+      then
          return;
       end if;
 
@@ -535,7 +596,7 @@ is
       Match   :    out Match_Type;
       Data    :        String)
    with
-      Pre => Context'Length > 0 and
+      Pre => Context_Valid (Context) and
              Data'First < Integer'Last - Offset and
              Offset < Data'Length,
       Post => (if Match /= Match_OK then Context = Context'Old and
@@ -547,8 +608,10 @@ is
       Match   :    out Match_Type;
       Data    :        String)
    is
-      Tmp_Offset : Natural := Offset;
-      Match_Name : Match_Type;
+      Tmp_Offset   : Natural := Offset;
+      Match_Name   : Match_Type;
+      Match_Member : Match_Type;
+      Object_Index : Natural;
    begin
       Match := Match_None;
 
@@ -557,28 +620,56 @@ is
          return;
       end if;
 
+      Increment_Current_Index (Context);
+      Object_Index := Get_Current_Index (Context);
+
       Tmp_Offset := Tmp_Offset + 1;
       Match := Match_Invalid;
 
-      while (Data'First < Integer'Last - Tmp_Offset and
-             Tmp_Offset < Data'Length)
       loop
-         exit when Match_Set (Data, Tmp_Offset, "}");
+         if Data'First >= Integer'Last - Tmp_Offset or
+            Tmp_Offset >= Data'Length
+         then
+            return;
+         end if;
 
+         -- Parse member name
+         Parse_Whitespace (Tmp_Offset, Data);
          Parse_String (Context, Tmp_Offset, Match_Name, Data);
          if Match_Name /= Match_OK then
             return;
          end if;
 
+         -- Check for name separator (:)
+         Parse_Whitespace (Tmp_Offset, Data);
+         if not Match_Set (Data, Tmp_Offset, ":") then
+            return;
+         end if;
          Tmp_Offset := Tmp_Offset + 1;
+
+         -- Parse member
+         Parse (Context, Tmp_Offset, Match_Member, Data);
+         if Match_Member /= Match_OK then
+            return;
+         end if;
+
+         Parse_Whitespace (Tmp_Offset, Data);
+
+         -- Check for value separator ','
+         if Match_Set (Data, Tmp_Offset, ",") then
+            Tmp_Offset := Tmp_Offset + 1;
+         -- Check for ending '}'
+         elsif Match_Set (Data, Tmp_Offset, "}")
+         then
+            Tmp_Offset := Tmp_Offset + 1;
+            exit;
+         end if;
+
       end loop;
 
-      -- Check for ending }
-      if not Match_Set (Data, Tmp_Offset, "}") then
-         return;
-      end if;
-
-      Tmp_Offset := Tmp_Offset + 1;
+      Context (Object_Index) := Object_Element;
+      Context (Context'First).Context_Offset := Object_Index;
+      Offset := Tmp_Offset;
       Match := Match_OK;
 
    end Parse_Object;
