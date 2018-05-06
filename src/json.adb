@@ -508,10 +508,11 @@ is
       Fractional_Component : Float := 0.0;
       Integer_Component    : Long_Integer := 0;
 
-      Negative    : Boolean;
-      Tmp_Offset  : Natural := Offset;
-      Num_Matches : Natural := 0;
-      Frac_Result : Match_Type := Match_None;
+      Negative     : Boolean;
+      Leading_Zero : Boolean := False;
+      Tmp_Offset   : Natural := Offset;
+      Num_Matches  : Natural := 0;
+      Frac_Result  : Match_Type := Match_None;
 
    begin
       Match := Match_Invalid;
@@ -525,13 +526,12 @@ is
             Tmp_Offset < Data'Length and
             Num_Matches < Natural'Last
       loop
-
          -- Valid digit?
          exit when not Match_Set (Data, Tmp_Offset, "0123456789");
 
-         -- Check for leading 0
-         if Num_Matches > 1 and Data (Data'First + Tmp_Offset) = '0' then
-            return;
+         -- Check for leading '0'
+         if Num_Matches = 0 and Data (Data'First + Tmp_Offset) = '0' then
+            Leading_Zero := True;
          end if;
 
          pragma Loop_Invariant (Integer_Component >= 0);
@@ -550,6 +550,13 @@ is
       -- No digits found
       if Num_Matches = 0 then
          Match := Match_None;
+         return;
+      end if;
+
+      -- Leading zeros found
+      if (Integer_Component > 0 and Leading_Zero) or
+         (Integer_Component = 0 and Num_Matches > 1)
+      then
          return;
       end if;
 

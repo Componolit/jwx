@@ -126,6 +126,13 @@ package body JSON.Test_Data.Tests is
 
       Offset := 0;
       Initialize (Context);
+      Parse (Context, Offset, Match, "40000");
+      AUnit.Assertions.Assert (Match = Match_OK and then
+                               (Get_Kind (Context) = Kind_Integer and
+                                Get_Integer (Context) = 40000), "Parse positive integer.");
+
+      Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "-42");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 3 and
@@ -210,6 +217,11 @@ package body JSON.Test_Data.Tests is
       Initialize (Context);
       Parse (Context, Offset, Match, "000068547758080");
       AUnit.Assertions.Assert (Match = Match_Invalid, "Leading zero.");
+
+      Offset := 0;
+      Initialize (Context);
+      Parse (Context, Offset, Match, "000.06854");
+      AUnit.Assertions.Assert (Match = Match_Invalid, "Leading zero float.");
 
       Offset := 0;
       Initialize (Context);
