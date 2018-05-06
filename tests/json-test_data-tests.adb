@@ -15,6 +15,10 @@ with System.Assertions;
 --
 --  end read only
 
+with Ada.Direct_IO;
+with Ada.Directories;
+with Ada.Text_IO;
+
 --  begin read only
 --  end read only
 package body JSON.Test_Data.Tests is
@@ -25,6 +29,21 @@ package body JSON.Test_Data.Tests is
 --  This section can be used to add global variables and other elements.
 --
 --  end read only
+
+function Read_File (File_Name : String) return String
+is
+   File_Size : Natural := Natural (Ada.Directories.Size (File_Name));
+   subtype File_String is String (1 .. File_Size);
+   package File_String_IO is new Ada.Direct_IO (File_String);
+
+   File     : File_String_IO.File_Type;
+   Contents : File_String;
+begin
+   File_String_IO.Open (File, File_String_IO.In_File, File_Name);
+   File_String_IO.Read (File, Contents);
+   File_String_IO.Close (File);
+   return Contents;
+end Read_File;
 
 --  begin read only
 --  end read only
@@ -385,8 +404,28 @@ package body JSON.Test_Data.Tests is
          Result : Context_Element_Type;
       begin
          Parse (Context, Offset, Match, Data);
-         AUnit.Assertions.Assert (Match = Match_OK and then Get_Kind (Context) = Kind_Array, "Parse empty array: " & Match'Img);
+         AUnit.Assertions.Assert (Match = Match_OK and then Get_Kind (Context) = Kind_Array, "Parse empty array");
          AUnit.Assertions.Assert (Length (Context) = 0, "Empty array length");
+      end;
+
+      Offset := 0;
+      Initialize (Context);
+      declare
+         Data : String := Read_File ("tests/data/RFC7159_example1.json");
+      begin
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then
+                                  Get_Kind (Context) = Kind_Object, "RFC7159 example #1");
+      end;
+
+      Offset := 0;
+      Initialize (Context);
+      declare
+         Data : String := Read_File ("tests/data/RFC7159_example2.json");
+      begin
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then
+                                  Get_Kind (Context) = Kind_Array, "RFC7159 example #2");
       end;
 
 --  begin read only
