@@ -481,7 +481,143 @@ is
       if Match = Match_OK then
          Offset := Tmp_Offset;
       end if;
-   end;
+   end Parse_Fractional_Part;
+
+   -------------------
+   -- Parse_Integer --
+   -------------------
+
+   procedure Parse_Integer
+     (Offset   : in out Natural;
+      Match    :    out Match_Type;
+      Result   :    out Long_Integer;
+      Negative :    out Boolean;
+      Data     :        String)
+   with
+      Pre => Data'First < Integer'Last - Offset and
+             Offset < Data'Length;
+
+   procedure Parse_Integer
+     (Offset  : in out Natural;
+      Match   :    out Match_Type;
+      Result  :    out Long_Integer;
+      Negative :    out Boolean;
+      Data    :        String)
+   is
+      Leading_Zero : Boolean := False;
+      Tmp_Offset   : Natural := Offset;
+      Num_Matches  : Natural := 0;
+   begin
+      Match  := Match_Invalid;
+      Result := 0;
+
+      Negative := Match_Set (Data, Tmp_Offset, "-");
+      if Negative then
+         Tmp_Offset := Tmp_Offset + 1;
+      end if;
+
+      while Data'First < Integer'Last - Tmp_Offset and
+            Tmp_Offset < Data'Length and
+            Num_Matches < Natural'Last
+      loop
+         -- Valid digit?
+         exit when not Match_Set (Data, Tmp_Offset, "0123456789");
+
+         -- Check for leading '0'
+         if Num_Matches = 0 and Data (Data'First + Tmp_Offset) = '0' then
+            Leading_Zero := True;
+         end if;
+
+         pragma Loop_Invariant (Result >= 0);
+
+         -- Check for overflow
+         if Result >= Long_Integer'Last/10 then
+            return;
+         end if;
+
+         Result := Result * 10;
+         Result := Result + To_Number (Data (Data'First + Tmp_Offset));
+         Tmp_Offset := Tmp_Offset + 1;
+         Num_Matches := Num_Matches + 1;
+      end loop;
+
+      -- No digits found
+      if Num_Matches = 0 then
+         Match := Match_None;
+         return;
+      end if;
+
+      -- Leading zeros found
+      if (Result > 0 and Leading_Zero) or
+         (Result = 0 and Num_Matches > 1)
+      then
+         return;
+      end if;
+
+      Offset := Tmp_Offset;
+      Match  := Match_OK;
+   end Parse_Integer;
+
+   -------------------------
+   -- Parse_Exponent_Part --
+   -------------------------
+
+   procedure Parse_Exponent_Part
+     (Offset   : in out Natural;
+      Match    :    out Match_Type;
+      Result   :    out Long_Integer;
+      Negative :    out Boolean;
+      Data     :        String)
+   with
+      Pre => Data'First < Integer'Last - Offset and Offset < Data'Length,
+      Post => (if Match /= Match_OK then Offset = Offset'Old);
+
+   procedure Parse_Exponent_Part
+     (Offset   : in out Natural;
+      Match    :    out Match_Type;
+      Result   :    out Long_Integer;
+      Negative :    out Boolean;
+      Data     :        String)
+   is
+      Scale            : Long_Integer;
+      Tmp_Offset       : Natural := Offset;
+      Match_Exponent   : Match_Type := Match_None;
+      Integer_Negative : Boolean;
+   begin
+      Result := 0;
+      Negative := False;
+      Match  := Match_None;
+
+      if not Match_Set (Data, Tmp_Offset, "Ee") then
+         return;
+      end if;
+      Tmp_Offset := Tmp_Offset + 1;
+      Match      := Match_Invalid;
+
+      if Match_Set (Data, Tmp_Offset, "+-")
+      then
+         if Data (Data'First + Tmp_Offset) = '-'
+         then
+            Negative := True;
+         end if;
+         Tmp_Offset := Tmp_Offset + 1;
+      end if;
+
+      Parse_Integer (Tmp_Offset, Match_Exponent, Scale, Integer_Negative, Data);
+      if Match_Exponent /= Match_OK
+      then
+         return;
+      end if;
+
+      Result := 1;
+      for I in 2 .. Scale
+      loop
+         Result := Result * 10;
+      end loop;
+
+      Match := Match_OK;
+
+   end Parse_Exponent_Part;
 
    ------------------
    -- Parse_Number --
@@ -507,77 +643,61 @@ is
    is
       Fractional_Component : Float := 0.0;
       Integer_Component    : Long_Integer := 0;
+      Scale                : Long_Integer := 0;
 
-      Negative     : Boolean;
-      Leading_Zero : Boolean := False;
-      Tmp_Offset   : Natural := Offset;
-      Num_Matches  : Natural := 0;
-      Frac_Result  : Match_Type := Match_None;
-
+      Tmp_Offset     : Natural := Offset;
+      Match_Integer  : Match_Type := Match_None;
+      Match_Frac     : Match_Type := Match_None;
+      Match_Exponent : Match_Type := Match_None;
+      Negative       : Boolean;
+      Scale_Negative : Boolean;
    begin
       Match := Match_Invalid;
 
-      Negative := Match_Set (Data, Tmp_Offset, "-");
-      if Negative then
-         Tmp_Offset := Tmp_Offset + 1;
-      end if;
-
-      while Data'First < Integer'Last - Tmp_Offset and
-            Tmp_Offset < Data'Length and
-            Num_Matches < Natural'Last
-      loop
-         -- Valid digit?
-         exit when not Match_Set (Data, Tmp_Offset, "0123456789");
-
-         -- Check for leading '0'
-         if Num_Matches = 0 and Data (Data'First + Tmp_Offset) = '0' then
-            Leading_Zero := True;
-         end if;
-
-         pragma Loop_Invariant (Integer_Component >= 0);
-
-         -- Check for overflow
-         if Integer_Component >= Long_Integer'Last/10 then
-            return;
-         end if;
-
-         Integer_Component := Integer_Component * 10;
-         Integer_Component := Integer_Component + To_Number (Data (Data'First + Tmp_Offset));
-         Tmp_Offset := Tmp_Offset + 1;
-         Num_Matches := Num_Matches + 1;
-      end loop;
-
-      -- No digits found
-      if Num_Matches = 0 then
-         Match := Match_None;
-         return;
-      end if;
-
-      -- Leading zeros found
-      if (Integer_Component > 0 and Leading_Zero) or
-         (Integer_Component = 0 and Num_Matches > 1)
+      Parse_Integer (Tmp_Offset, Match_Integer, Integer_Component, Negative, Data);
+      if Match_Integer /= Match_OK
       then
          return;
       end if;
 
       if Data'First < Integer'Last - Tmp_Offset and Tmp_Offset < Data'Length
       then
-         Parse_Fractional_Part (Tmp_Offset, Frac_Result, Fractional_Component, Data);
+         Parse_Fractional_Part (Tmp_Offset, Match_Frac, Fractional_Component, Data);
       end if;
 
-      if Frac_Result = Match_Invalid or
+      if Match_Frac = Match_Invalid or
          Get_Current_Index (Context) >= Context'Last then
          Match := Match_Invalid;
          return;
       end if;
 
-      -- FIXME: Support exponent as per RFC 7159, section 6
-      if Frac_Result = Match_OK then
+      Parse_Exponent_Part (Tmp_Offset, Match_Exponent, Scale, Scale_Negative, Data);
+      if Match_Exponent = Match_Invalid
+      then
+         Match := Match_Invalid;
+         return;
+      end if;
+
+      --  Convert to float if either we have fractional part or dividing by the
+      --  scale would yield a non-integer number.
+      if Match_Frac = Match_OK or else
+         (Match_Exponent = Match_OK and then
+          (Scale_Negative and Integer_Component mod Scale > 0))
+      then
          declare
             Tmp : Float := Float (Integer_Component) + Fractional_Component;
          begin
             if Negative then
                Tmp := -Tmp;
+            end if;
+            if Match_Exponent = Match_OK
+            then
+               if Scale_Negative
+               then
+                  Tmp := Tmp / Float (Scale);
+               else
+                  Tmp := Tmp * Float (Scale);
+               end if;
             end if;
             Increment_Current_Index (Context);
             Context (Get_Current_Index (Context)) := Float_Element (Tmp);
@@ -585,6 +705,15 @@ is
       else
          if Negative then
             Integer_Component := -Integer_Component;
+         end if;
+         if Match_Exponent = Match_OK
+         then
+            if Scale_Negative
+            then
+               Integer_Component := Integer_Component / Scale;
+            else
+               Integer_Component := Integer_Component * Scale;
+            end if;
          end if;
          Increment_Current_Index (Context);
          Context (Get_Current_Index (Context)) := Integer_Element (Integer_Component);
