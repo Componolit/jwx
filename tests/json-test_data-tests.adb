@@ -168,6 +168,34 @@ end Read_File;
 
       Offset := 0;
       Initialize (Context);
+      Parse (Context, Offset, Match, "1234e10");
+      AUnit.Assertions.Assert (Match = Match_OK and then
+                               (Get_Kind (Context) = Kind_Integer and
+                                Get_Integer (Context) = 12340), "Parse integer with positive exponent.");
+
+      Offset := 0;
+      Initialize (Context);
+      Parse (Context, Offset, Match, "1234E+10");
+      AUnit.Assertions.Assert (Match = Match_OK and then
+                               (Get_Kind (Context) = Kind_Integer and
+                                Get_Integer (Context) = 12340), "Parse integer with positive exponent (2).");
+
+      Offset := 0;
+      Initialize (Context);
+      Parse (Context, Offset, Match, "12345e-10");
+      AUnit.Assertions.Assert (Match = Match_OK and then
+                               (Get_Kind (Context) = Kind_Float and
+                                Get_Float (Context) = 1234.5), "Parse number with negative exponent, resulting in fractional.");
+
+      Offset := 0;
+      Initialize (Context);
+      Parse (Context, Offset, Match, "12340e-10");
+      AUnit.Assertions.Assert (Match = Match_OK and then
+                               (Get_Kind (Context) = Kind_Integer and
+                                Get_Integer (Context) = 1234), "Parse number with negative exponent, resulting in integer.");
+
+      Offset := 0;
+      Initialize (Context);
       Parse (Context, Offset, Match, "   0 ");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Offset = 4 and
