@@ -171,28 +171,35 @@ end Read_File;
       Parse (Context, Offset, Match, "1234e2");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Get_Kind (Context) = Kind_Integer and
-                                Get_Integer (Context) = 12340), "Parse integer with positive exponent:" & Match'Img & " val=" & Get_Integer (Context)'Img);
+                                Get_Integer (Context) = 123400), "Parse integer with positive exponent");
 
       Offset := 0;
       Initialize (Context);
       Parse (Context, Offset, Match, "1234E+2");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Get_Kind (Context) = Kind_Integer and
-                                Get_Integer (Context) = 12340), "Parse integer with positive exponent (2).");
+                                Get_Integer (Context) = 123400), "Parse integer with positive exponent (2).");
+
+      Offset := 0;
+      Initialize (Context);
+      Parse (Context, Offset, Match, "1234E+02");
+      AUnit.Assertions.Assert (Match = Match_OK and then
+                               (Get_Kind (Context) = Kind_Integer and
+                                Get_Integer (Context) = 123400), "Parse integer with positive exponent with leading 0.");
 
       Offset := 0;
       Initialize (Context);
       Parse (Context, Offset, Match, "12345e-2");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Get_Kind (Context) = Kind_Float and
-                                Get_Float (Context) = 1234.5), "Parse number with negative exponent, resulting in fractional.");
+                                Get_Float (Context) = 123.45), "Parse number with negative exponent, resulting in fractional.");
 
       Offset := 0;
       Initialize (Context);
-      Parse (Context, Offset, Match, "12340e-2");
+      Parse (Context, Offset, Match, "12300e-2");
       AUnit.Assertions.Assert (Match = Match_OK and then
                                (Get_Kind (Context) = Kind_Integer and
-                                Get_Integer (Context) = 1234), "Parse number with negative exponent, resulting in integer.");
+                                Get_Integer (Context) = 123), "Parse number with negative exponent, resulting in integer.");
 
       Offset := 0;
       Initialize (Context);
@@ -260,6 +267,12 @@ end Read_File;
                                 Get_Kind (Context) = Kind_Float and
                                 Get_Float (Context) = 0.0), "Parse zero float.");
 
+      Offset := 0;
+      Initialize (Context);
+      Parse (Context, Offset, Match, "123.5e+02");
+      AUnit.Assertions.Assert (Match = Match_OK and then
+                               (Get_Kind (Context) = Kind_Float and
+                                Get_Float (Context) = 12350.0), "Parse float with exponent with leading 0.");
       Offset := 0;
       Initialize (Context);
       Parse (Context, Offset, Match, "000068547758080");

@@ -488,21 +488,23 @@ is
    -------------------
 
    procedure Parse_Integer
-     (Offset   : in out Natural;
-      Match    :    out Match_Type;
-      Result   :    out Long_Integer;
-      Negative :    out Boolean;
-      Data     :        String)
+     (Offset        : in out Natural;
+      Check_Leading :        Boolean;
+      Match         :    out Match_Type;
+      Result        :    out Long_Integer;
+      Negative      :    out Boolean;
+      Data          :        String)
    with
       Pre => Data'First < Integer'Last - Offset and
              Offset < Data'Length;
 
    procedure Parse_Integer
-     (Offset  : in out Natural;
-      Match   :    out Match_Type;
-      Result  :    out Long_Integer;
-      Negative :    out Boolean;
-      Data    :        String)
+     (Offset        : in out Natural;
+      Check_Leading :        Boolean;
+      Match         :    out Match_Type;
+      Result        :    out Long_Integer;
+      Negative      :    out Boolean;
+      Data          :        String)
    is
       Leading_Zero : Boolean := False;
       Tmp_Offset   : Natural := Offset;
@@ -548,8 +550,9 @@ is
       end if;
 
       -- Leading zeros found
-      if (Result > 0 and Leading_Zero) or
-         (Result = 0 and Num_Matches > 1)
+      if Check_Leading and
+         ((Result > 0 and Leading_Zero) or
+          (Result = 0 and Num_Matches > 1))
       then
          return;
       end if;
@@ -603,14 +606,14 @@ is
          Tmp_Offset := Tmp_Offset + 1;
       end if;
 
-      Parse_Integer (Tmp_Offset, Match_Exponent, Scale, Integer_Negative, Data);
+      Parse_Integer (Tmp_Offset, False, Match_Exponent, Scale, Integer_Negative, Data);
       if Match_Exponent /= Match_OK
       then
          return;
       end if;
 
       Result := 1;
-      for I in 2 .. Scale
+      for I in 1 .. Scale
       loop
          Result := Result * 10;
       end loop;
@@ -646,16 +649,13 @@ is
       Scale                : Long_Integer := 0;
 
       Tmp_Offset     : Natural := Offset;
-      Match_Integer  : Match_Type := Match_None;
       Match_Frac     : Match_Type := Match_None;
       Match_Exponent : Match_Type := Match_None;
       Negative       : Boolean;
       Scale_Negative : Boolean;
    begin
-      Match := Match_Invalid;
-
-      Parse_Integer (Tmp_Offset, Match_Integer, Integer_Component, Negative, Data);
-      if Match_Integer /= Match_OK
+      Parse_Integer (Tmp_Offset, True, Match, Integer_Component, Negative, Data);
+      if Match /= Match_OK
       then
          return;
       end if;
@@ -680,7 +680,7 @@ is
 
       --  Convert to float if either we have fractional part or dividing by the
       --  scale would yield a non-integer number.
-      if Match_Frac = Match_OK or else
+      if Match_Frac = Match_OK or
          (Match_Exponent = Match_OK and then
           (Scale_Negative and Integer_Component mod Scale > 0))
       then
