@@ -79,7 +79,7 @@ end Read_File;
 
       Offset  : Natural;
       Match   : Match_Type;
-      Context : Context_Type (Integer range 1..100);
+      Context : Context_Type (Integer range 1..10000);
    begin
 
       Offset := 0;
@@ -411,6 +411,17 @@ end Read_File;
       Offset := 0;
       Initialize (Context);
       declare
+         Data : String := "[{""A"": 42}, {""B"": 17}, {""C"": 9}]";
+         Result : Context_Element_Type;
+      begin
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then Get_Kind (Context) = Kind_Array, "Array of objects");
+         AUnit.Assertions.Assert (Length (Context) = 3, "Array of objects length");
+      end;
+
+      Offset := 0;
+      Initialize (Context);
+      declare
          Data : String := Read_File ("tests/data/RFC7159_example1.json");
       begin
          Parse (Context, Offset, Match, Data);
@@ -426,6 +437,28 @@ end Read_File;
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then
                                   Get_Kind (Context) = Kind_Array, "RFC7159 example #2");
+      end;
+
+      Offset := 0;
+      Initialize (Context);
+      declare
+         Data : String := Read_File ("tests/data/country.json");
+      begin
+         -- Put_Line (Data);
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then
+                                  Get_Kind (Context) = Kind_Object, "crountry example: " & Match'Img & " " & Offset'Img);
+      end;
+
+      Offset := 0;
+      Initialize (Context);
+      declare
+         Data : String := Read_File ("tests/data/countries.json");
+      begin
+         -- Put_Line (Data);
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then
+                                  Get_Kind (Context) = Kind_Array, "countries example: " & Match'Img & " " & Offset'Img);
       end;
 
 --  begin read only
