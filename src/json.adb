@@ -139,13 +139,34 @@ is
        Next_Value     => End_Index,
        Next_Member    => End_Index);
 
+
    -------------------
    -- Context_Valid --
    -------------------
 
-   function Context_Valid (Context : Context_Type) return Boolean is
+   function Context_Valid (Context : Context_Type) return Boolean
+   is
       (Context'Length > 1 and then
        Context (Context'First).Context_Offset in Context'Range);
+
+   -----------------------
+   -- Set_Current_Index --
+   -----------------------
+
+   procedure Set_Current_Index (Context : in out Context_Type;
+                                Index   :        Index_Type)
+   with
+      Pre  => Context_Valid (Context) and
+              Index in Context'Range,
+      Post => Context_Valid (Context);
+
+   procedure Set_Current_Index (Context : in out Context_Type;
+                                Index   :        Index_Type)
+   -- Set current context index
+   is
+   begin
+      Context (Context'First).Context_Offset := Index;
+   end Set_Current_Index;
 
    -----------------------
    -- Get_Current_Index --
@@ -154,7 +175,8 @@ is
    function Get_Current_Index (Context : Context_Type) return Index_Type
    with
       Pre  => Context_Valid (Context),
-      Post => Get_Current_Index'Result in Context'Range;
+      Post => Get_Current_Index'Result in Context'Range and
+              Get_Current_Index'Result = Context (Context'First).Context_Offset;
 
    function Get_Current_Index (Context : Context_Type) return Index_Type
    -- Get current context index
@@ -171,7 +193,8 @@ is
                  Index   : Index_Type := Null_Index) return Context_Element_Type
    -- Return current element of a context
    with
-      Pre => Context_Valid (Context)
+      Pre => Context_Valid (Context) and
+             Index in Context'Range
    is
    begin
       if Index = Null_Index
@@ -185,6 +208,27 @@ is
       end if;
    end Get;
 
+   ---------
+   -- Set --
+   ---------
+
+   procedure Set (Context : in out Context_Type;
+                  Value   :        Context_Element_Type;
+                  Index   :        Index_Type := Null_Index)
+   -- Return current element of a context
+   with
+      Pre => Context_Valid (Context) and
+             Index in Context'Range
+   is
+   begin
+      if Index = Null_Index
+      then
+         Context (Get_Current_Index (Context)) := Value;
+      else
+         Context (Index) := Value;
+      end if;
+   end Set;
+
    -----------------------------
    -- Increment_Current_Index --
    -----------------------------
@@ -193,15 +237,13 @@ is
    with
       Pre => Context_Valid (Context) and then
              Get_Current_Index (Context) < Context'Last,
-      Post => Context_Valid (Context) and then
-              Get_Current_Index (Context) in Context'Range;
+      Post => Context_Valid (Context);
 
    procedure Increment_Current_Index (Context : in out Context_Type)
    -- Increment the current context offset
    is
    begin
-      Context (Context'First).Context_Offset :=
-         Context (Context'First).Context_Offset + 1;
+      Set_Current_Index (Context, Get_Current_Index (Context) + 1);
    end Increment_Current_Index;
 
    -----------
@@ -214,7 +256,7 @@ is
       Post => Context_Valid (Context)
    is
    begin
-      Context (Context'First).Context_Offset := Context'First + 1;
+      Set_Current_Index (Context, Context'First + 1);
    end Reset;
 
    --------------
@@ -340,7 +382,7 @@ is
          (Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "null")
       then
          Increment_Current_Index (Context);
-         Context (Get_Current_Index (Context)) := Null_Element;
+         Set (Context, Null_Element);
          Offset := Offset + 4;
          Match := Match_OK;
       end if;
@@ -375,14 +417,14 @@ is
          (Offset <= Data'Length - 4 and then Data (Base .. Base + 3) = "true")
       then
          Increment_Current_Index (Context);
-         Context (Get_Current_Index (Context)) := Boolean_Element (True);
+         Set (Context, Boolean_Element (True));
          Offset := Offset + 4;
          Match := Match_OK;
       elsif Get_Current_Index (Context) < Context'Last and
             (Offset <= Data'Length - 5 and then Data (Base .. Base + 4) = "false")
       then
          Increment_Current_Index (Context);
-         Context (Get_Current_Index (Context)) := Boolean_Element (False);
+         Set (Context, Boolean_Element (False));
          Offset := Offset + 5;
          Match := Match_OK;
       end if;
@@ -579,7 +621,7 @@ is
    is
       Scale            : Long_Integer;
       Tmp_Offset       : Natural := Offset;
-      Match_Exponent   : Match_Type := Match_None;
+      Match_Exponent   : Match_Type;
       Integer_Negative : Boolean;
    begin
       Result := 0;
@@ -592,6 +634,11 @@ is
       Tmp_Offset := Tmp_Offset + 1;
       Match      := Match_Invalid;
 
+      if not (Data'First + Tmp_Offset in Data'Range)
+      then
+         return;
+      end if;
+
       if Match_Set (Data, Tmp_Offset, "+-")
       then
          if Data (Data'First + Tmp_Offset) = '-'
@@ -602,7 +649,7 @@ is
       end if;
 
       Parse_Integer (Tmp_Offset, False, Match_Exponent, Scale, Integer_Negative, Data);
-      if Match_Exponent /= Match_OK
+      if Match_Exponent /= Match_OK or Integer_Negative
       then
          return;
       end if;
@@ -641,12 +688,12 @@ is
       Data    :        String)
    is
       Fractional_Component : Float := 0.0;
-      Integer_Component    : Long_Integer := 0;
-      Scale                : Long_Integer := 0;
+      Integer_Component    : Long_Integer;
+      Scale                : Long_Integer;
 
       Tmp_Offset     : Natural := Offset;
       Match_Frac     : Match_Type := Match_None;
-      Match_Exponent : Match_Type := Match_None;
+      Match_Exponent : Match_Type;
       Negative       : Boolean;
       Scale_Negative : Boolean;
    begin
@@ -696,7 +743,7 @@ is
                end if;
             end if;
             Increment_Current_Index (Context);
-            Context (Get_Current_Index (Context)) := Float_Element (Tmp);
+            Set (Context, Float_Element (Tmp));
          end;
       else
          if Negative then
@@ -712,7 +759,7 @@ is
             end if;
          end if;
          Increment_Current_Index (Context);
-         Context (Get_Current_Index (Context)) := Integer_Element (Integer_Component);
+         Set (Context, Integer_Element (Integer_Component));
       end if;
 
       Offset := Tmp_Offset;
@@ -780,7 +827,7 @@ is
 
       String_End := Data'First + Tmp_Offset - 1;
       Increment_Current_Index (Context);
-      Context (Get_Current_Index (Context)) := String_Element (String_Start, String_End);
+      Set (Context, String_Element (String_Start, String_End));
       Offset := Tmp_Offset + 1;
       Match := Match_OK;
 
@@ -823,7 +870,7 @@ is
 
       Increment_Current_Index (Context);
       Object_Index := Get_Current_Index (Context);
-      Context (Object_Index) := Object_Element;
+      Set (Context, Object_Element);
       Previous_Member := Object_Index;
 
       Tmp_Offset := Tmp_Offset + 1;
@@ -919,7 +966,7 @@ is
 
       Increment_Current_Index (Context);
       Array_Index := Get_Current_Index (Context);
-      Context (Array_Index) := Array_Element;
+      Set (Context, Array_Element);
       Previous_Element := Array_Index;
 
       Tmp_Offset := Tmp_Offset + 1;
@@ -969,11 +1016,11 @@ is
    -- Initialize --
    ----------------
 
-   procedure Initialize (Context : in out Context_Type)
+   procedure Initialize (Context : out Context_Type)
    is
    begin
       Context := (others => Null_Element);
-      Context (Context'First) := Meta_Element (Context'First);
+      Set (Context, Meta_Element (Context'First), Context'First);
    end Initialize;
 
    --------------------

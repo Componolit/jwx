@@ -12,6 +12,9 @@ package JSON.Test_Data.Tests is
    procedure Test_Next_ddc7a9 (Gnattest_T : in out Test);
    --  json.ads:21:4:Next
 
+   procedure Test_Context_Valid_5ba400 (Gnattest_T : in out Test);
+   --  json.ads:28:4:Context_Valid
+
    procedure Test_Initialize_e84d09 (Gnattest_T : in out Test);
    --  json.ads:31:4:Initialize
 
@@ -22,28 +25,28 @@ package JSON.Test_Data.Tests is
    --  json.ads:47:4:Get_Kind
 
    procedure Test_Get_Boolean_c6b116 (Gnattest_T : in out Test);
-   --  json.ads:53:4:Get_Boolean
+   --  json.ads:54:4:Get_Boolean
 
    procedure Test_Get_Float_919c37 (Gnattest_T : in out Test);
-   --  json.ads:60:4:Get_Float
+   --  json.ads:62:4:Get_Float
 
    procedure Test_Get_Integer_6bf7c7 (Gnattest_T : in out Test);
-   --  json.ads:67:4:Get_Integer
+   --  json.ads:70:4:Get_Integer
 
    procedure Test_Get_String_9018bd (Gnattest_T : in out Test);
-   --  json.ads:74:4:Get_String
+   --  json.ads:78:4:Get_String
 
    procedure Test_Query_Object_fb05bc (Gnattest_T : in out Test);
-   --  json.ads:82:4:Query_Object
+   --  json.ads:87:4:Query_Object
 
    procedure Test_Length_ad1889 (Gnattest_T : in out Test);
-   --  json.ads:91:4:Length
+   --  json.ads:97:4:Length
 
    procedure Test_Pos_087445 (Gnattest_T : in out Test);
-   --  json.ads:98:4:Pos
+   --  json.ads:105:4:Pos
 
    procedure Test_Parse_Internal_558a64 (Gnattest_T : in out Test);
-   --  json.ads:123:4:Parse_Internal
+   --  json.ads:131:4:Parse_Internal
 
 end JSON.Test_Data.Tests;
 --  end read only

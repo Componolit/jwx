@@ -69,6 +69,27 @@ end Read_File;
 
 
 --  begin read only
+   procedure Test_Context_Valid (Gnattest_T : in out Test);
+   procedure Test_Context_Valid_5ba400 (Gnattest_T : in out Test) renames Test_Context_Valid;
+--  id:2.2/5ba40009ae9b6130/Context_Valid/1/0/
+   procedure Test_Context_Valid (Gnattest_T : in out Test) is
+   --  json.ads:28:4:Context_Valid
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      AUnit.Assertions.Assert
+        (Gnattest_Generated.Default_Assert_Value,
+         "Test not implemented.");
+
+--  begin read only
+   end Test_Context_Valid;
+--  end read only
+
+
+--  begin read only
    procedure Test_Initialize (Gnattest_T : in out Test);
    procedure Test_Initialize_e84d09 (Gnattest_T : in out Test) renames Test_Initialize;
 --  id:2.2/e84d09615b851310/Initialize/1/0/
@@ -651,7 +672,7 @@ end Read_File;
    procedure Test_Get_Boolean_c6b116 (Gnattest_T : in out Test) renames Test_Get_Boolean;
 --  id:2.2/c6b116239f93c71b/Get_Boolean/1/0/
    procedure Test_Get_Boolean (Gnattest_T : in out Test) is
-   --  json.ads:53:4:Get_Boolean
+   --  json.ads:54:4:Get_Boolean
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -678,7 +699,7 @@ end Read_File;
    procedure Test_Get_Float_919c37 (Gnattest_T : in out Test) renames Test_Get_Float;
 --  id:2.2/919c374b247739a7/Get_Float/1/0/
    procedure Test_Get_Float (Gnattest_T : in out Test) is
-   --  json.ads:60:4:Get_Float
+   --  json.ads:62:4:Get_Float
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -697,7 +718,7 @@ end Read_File;
    procedure Test_Get_Integer_6bf7c7 (Gnattest_T : in out Test) renames Test_Get_Integer;
 --  id:2.2/6bf7c7ae32d7123b/Get_Integer/1/0/
    procedure Test_Get_Integer (Gnattest_T : in out Test) is
-   --  json.ads:67:4:Get_Integer
+   --  json.ads:70:4:Get_Integer
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -716,7 +737,7 @@ end Read_File;
    procedure Test_Get_String_9018bd (Gnattest_T : in out Test) renames Test_Get_String;
 --  id:2.2/9018bdace6a8b009/Get_String/1/0/
    procedure Test_Get_String (Gnattest_T : in out Test) is
-   --  json.ads:74:4:Get_String
+   --  json.ads:78:4:Get_String
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -735,7 +756,7 @@ end Read_File;
    procedure Test_Query_Object_fb05bc (Gnattest_T : in out Test) renames Test_Query_Object;
 --  id:2.2/fb05bcab011d4ccf/Query_Object/1/0/
    procedure Test_Query_Object (Gnattest_T : in out Test) is
-   --  json.ads:82:4:Query_Object
+   --  json.ads:87:4:Query_Object
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -755,7 +776,7 @@ end Read_File;
    procedure Test_Length_ad1889 (Gnattest_T : in out Test) renames Test_Length;
 --  id:2.2/ad188943243a6018/Length/1/0/
    procedure Test_Length (Gnattest_T : in out Test) is
-   --  json.ads:91:4:Length
+   --  json.ads:97:4:Length
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -774,7 +795,7 @@ end Read_File;
    procedure Test_Pos_087445 (Gnattest_T : in out Test) renames Test_Pos;
 --  id:2.2/087445d09aa20725/Pos/1/0/
    procedure Test_Pos (Gnattest_T : in out Test) is
-   --  json.ads:98:4:Pos
+   --  json.ads:105:4:Pos
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -794,7 +815,7 @@ end Read_File;
    procedure Test_Parse_Internal_558a64 (Gnattest_T : in out Test) renames Test_Parse_Internal;
 --  id:2.2/558a643d7ae30854/Parse_Internal/1/0/
    procedure Test_Parse_Internal (Gnattest_T : in out Test) is
-   --  json.ads:123:4:Parse_Internal
+   --  json.ads:131:4:Parse_Internal
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
