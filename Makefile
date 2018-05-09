@@ -9,8 +9,7 @@ clean:
 	@rm -rf obj adalib
 
 test:
-	@gnattest -Pproj
-	@gprbuild -P obj/gnattest/harness/test_driver.gpr -gnata
-	@obj/gnattest/harness/test_runner
+	@gprbuild -P tests/test.gpr -gnata
+	@obj/test
 
 .PHONY: test
