@@ -1,12 +1,22 @@
 package body JSON
    with SPARK_Mode
 is
+   ----------
+   -- Next --
+   ----------
+
+   function Next (Index : Index_Type) return Index_Type
+   is
+   begin
+      return Index + 1;
+   end Next;
+
    ------------------
    -- Meta_Element --
    ------------------
 
-   function Meta_Element (Initial_Offset : Natural) return Context_Element_Type is
-   -- Construct null element
+   function Meta_Element (Initial_Offset : Index_Type) return Context_Element_Type is
+   -- Construct meta data element
       (Kind           => Kind_Meta,
        Boolean_Value  => False,
        Float_Value    => 0.0,
@@ -14,7 +24,8 @@ is
        String_Start   => 0,
        String_End     => 0,
        Context_Offset => Initial_Offset,
-       Next_Element   => 0);
+       Next_Value     => End_Index,
+       Next_Member    => End_Index);
 
    ------------------
    -- Null_Element --
@@ -29,7 +40,8 @@ is
        String_Start   => 0,
        String_End     => 0,
        Context_Offset => 0,
-       Next_Element   => 0);
+       Next_Value     => End_Index,
+       Next_Member    => End_Index);
 
    ---------------------
    -- Boolean_Element --
@@ -44,7 +56,8 @@ is
        String_Start   => 0,
        String_End     => 0,
        Context_Offset => 0,
-       Next_Element   => 0);
+       Next_Value     => End_Index,
+       Next_Member    => End_Index);
 
    -------------------
    -- Float_Element --
@@ -59,7 +72,8 @@ is
        String_Start   => 0,
        String_End     => 0,
        Context_Offset => 0,
-       Next_Element   => 0);
+       Next_Value     => End_Index,
+       Next_Member    => End_Index);
 
    ---------------------
    -- Integer_Element --
@@ -74,7 +88,8 @@ is
        String_Start   => 0,
        String_End     => 0,
        Context_Offset => 0,
-       Next_Element   => 0);
+       Next_Value     => End_Index,
+       Next_Member    => End_Index);
 
    --------------------
    -- String_Element --
@@ -89,7 +104,8 @@ is
        String_Start   => String_Start,
        String_End     => String_End,
        Context_Offset => 0,
-       Next_Element   => 0);
+       Next_Value     => End_Index,
+       Next_Member    => End_Index);
 
    --------------------
    -- Object_Element --
@@ -104,7 +120,8 @@ is
        String_Start   => 0,
        String_End     => 0,
        Context_Offset => 0,
-       Next_Element   => 0);
+       Next_Value     => End_Index,
+       Next_Member    => End_Index);
 
    -------------------
    -- Array_Element --
@@ -119,7 +136,8 @@ is
        String_Start   => 0,
        String_End     => 0,
        Context_Offset => 0,
-       Next_Element   => 0);
+       Next_Value     => End_Index,
+       Next_Member    => End_Index);
 
    -------------------
    -- Context_Valid --
@@ -133,30 +151,39 @@ is
    -- Get_Current_Index --
    -----------------------
 
-   function Get_Current_Index (Context : Context_Type) return Natural
+   function Get_Current_Index (Context : Context_Type) return Index_Type
    with
       Pre  => Context_Valid (Context),
       Post => Get_Current_Index'Result in Context'Range;
 
-   function Get_Current_Index (Context : Context_Type) return Natural
+   function Get_Current_Index (Context : Context_Type) return Index_Type
    -- Get current context index
    is
    begin
       return Context (Context'First).Context_Offset;
    end Get_Current_Index;
 
-   -----------------
-   -- Get_Current --
-   -----------------
+   ---------
+   -- Get --
+   ---------
 
-   function Get_Current (Context : Context_Type) return Context_Element_Type
+   function Get (Context : Context_Type;
+                 Index   : Index_Type := Null_Index) return Context_Element_Type
    -- Return current element of a context
    with
       Pre => Context_Valid (Context)
    is
    begin
-      return Context (Get_Current_Index (Context));
-   end Get_Current;
+      if Index = Null_Index
+      then
+         return Context (Get_Current_Index (Context));
+      elsif Index = End_Index
+      then
+         return Null_Element;
+      else
+         return Context (Index);
+      end if;
+   end Get;
 
    -----------------------------
    -- Increment_Current_Index --
@@ -177,53 +204,72 @@ is
          Context (Context'First).Context_Offset + 1;
    end Increment_Current_Index;
 
+   -----------
+   -- Reset --
+   -----------
+
+   procedure Reset (Context : in out Context_Type)
+   with
+      Pre  => Context_Valid (Context),
+      Post => Context_Valid (Context)
+   is
+   begin
+      Context (Context'First).Context_Offset := Context'First + 1;
+   end Reset;
+
    --------------
    -- Get_Kind --
    --------------
 
-   function Get_Kind (Element : Context_Element_Type) return Kind_Type
+   function Get_Kind (Context : Context_Type;
+                      Index   : Index_Type := Null_Index) return Kind_Type
    is
    begin
-      return Element.Kind;
+      return Get (Context, Index).Kind;
    end Get_Kind;
 
    -----------------
    -- Get_Boolean --
    -----------------
 
-   function Get_Boolean (Element : Context_Element_Type) return Boolean
+   function Get_Boolean (Context : Context_Type;
+                         Index   : Index_Type := Null_Index) return Boolean
    is
    begin
-      return Element.Boolean_Value;
+      return Get (Context, Index).Boolean_Value;
    end Get_Boolean;
 
    ---------------
    -- Get_Float --
    ---------------
 
-   function Get_Float (Element : Context_Element_Type) return Float
+   function Get_Float (Context : Context_Type;
+                       Index   : Index_Type := Null_Index) return Float
    is
    begin
-      return Element.Float_Value;
+      return Get (Context, Index).Float_Value;
    end Get_Float;
 
    -----------------
    -- Get_Integer --
    -----------------
 
-   function Get_Integer (Element : Context_Element_Type) return Long_Integer
+   function Get_Integer (Context : Context_Type;
+                         Index   : Index_Type := Null_Index) return Long_Integer
    is
    begin
-      return Element.Integer_Value;
+      return Get (Context, Index).Integer_Value;
    end Get_Integer;
 
    ----------------
    -- Get_String --
    ----------------
 
-   function Get_String (Element : Context_Element_Type;
-                        Data    : String) return String
+   function Get_String (Context : Context_Type;
+                        Data    : String;
+                        Index   : Index_Type := Null_Index) return String
    is
+      Element : Context_Element_Type := Get (Context, Index);
    begin
       if Element.String_Start in Data'Range and
          Element.String_End in Data'Range
@@ -232,57 +278,6 @@ is
       else
          return "";
       end if;
-   end Get_String;
-
-   --------------
-   -- Get_Kind --
-   --------------
-
-   function Get_Kind (Context : Context_Type) return Kind_Type
-   is
-   begin
-      return Get_Current (Context).Get_Kind;
-   end Get_Kind;
-
-   -----------------
-   -- Get_Boolean --
-   -----------------
-
-   function Get_Boolean (Context : Context_Type) return Boolean
-   is
-   begin
-      return Get_Current (Context).Get_Boolean;
-   end Get_Boolean;
-
-   ---------------
-   -- Get_Float --
-   ---------------
-
-   function Get_Float (Context : Context_Type) return Float
-   is
-   begin
-      return Get_Current (Context).Get_Float;
-   end Get_Float;
-
-   -----------------
-   -- Get_Integer --
-   -----------------
-
-   function Get_Integer (Context : Context_Type) return Long_Integer
-   is
-   begin
-      return Get_Current (Context).Get_Integer;
-   end Get_Integer;
-
-   ----------------
-   -- Get_String --
-   ----------------
-
-   function Get_String (Context : Context_Type;
-                        Data    : String) return String
-   is
-   begin
-      return Get_Current (Context).Get_String (Data);
    end Get_String;
 
    ----------------------
@@ -393,9 +388,9 @@ is
       end if;
    end Parse_Bool;
 
-   -----------
-   -- Match --
-   -----------
+   ---------------
+   -- Match_Set --
+   ---------------
 
    function Match_Set
      (Data   : String;
@@ -618,6 +613,7 @@ is
          Result := Result * 10;
       end loop;
 
+      Offset := Tmp_Offset;
       Match := Match_OK;
 
    end Parse_Exponent_Part;
@@ -812,11 +808,11 @@ is
       Match   :    out Match_Type;
       Data    :        String)
    is
-      Tmp_Offset   : Natural := Offset;
-      Match_Name   : Match_Type;
-      Match_Member : Match_Type;
-      Object_Index : Natural;
-      Previous_Member : Natural;
+      Tmp_Offset      : Natural := Offset;
+      Match_Name      : Match_Type;
+      Match_Member    : Match_Type;
+      Object_Index    : Index_Type;
+      Previous_Member : Index_Type;
    begin
       Match := Match_None;
 
@@ -848,16 +844,16 @@ is
             exit;
          end if;
 
+         -- Link previous element to this element
+         Context (Previous_Member).Next_Member := Get_Current_Index (Context) + 1;
+         Previous_Member := Get_Current_Index (Context) + 1;
+
          -- Parse member name
          Parse_Whitespace (Tmp_Offset, Data);
          Parse_String (Context, Tmp_Offset, Match_Name, Data);
          if Match_Name /= Match_OK then
             return;
          end if;
-
-         -- Link previous element to this element
-         Context (Previous_Member).Next_Element := Get_Current_Index (Context);
-         Previous_Member := Get_Current_Index (Context);
 
          -- Check for name separator (:)
          Parse_Whitespace (Tmp_Offset, Data);
@@ -867,7 +863,7 @@ is
          Tmp_Offset := Tmp_Offset + 1;
 
          -- Parse member
-         Parse (Context, Tmp_Offset, Match_Member, Data);
+         Parse_Internal (Context, Tmp_Offset, Match_Member, Data);
          if Match_Member /= Match_OK then
             return;
          end if;
@@ -881,8 +877,7 @@ is
 
       end loop;
 
-      Context (Previous_Member).Next_Element := 0;
-      Context (Context'First).Context_Offset := Object_Index;
+      Context (Previous_Member).Next_Member := End_Index;
       Offset := Tmp_Offset;
       Match := Match_OK;
 
@@ -912,8 +907,8 @@ is
    is
       Tmp_Offset       : Natural := Offset;
       Match_Element    : Match_Type;
-      Array_Index      : Natural;
-      Previous_Element : Natural;
+      Array_Index      : Index_Type;
+      Previous_Element : Index_Type;
    begin
       Match := Match_None;
 
@@ -944,15 +939,15 @@ is
             exit;
          end if;
 
+         -- Link previous object to this element
+         Context (Previous_Element).Next_Value := Get_Current_Index (Context) + 1;
+         Previous_Element := Get_Current_Index (Context) + 1;
+
          -- Parse member
-         Parse (Context, Tmp_Offset, Match_Element, Data);
+         Parse_Internal (Context, Tmp_Offset, Match_Element, Data);
          if Match_Element /= Match_OK then
             return;
          end if;
-
-         -- Link previous object to this element
-         Context (Previous_Element).Next_Element := Get_Current_Index (Context);
-         Previous_Element := Get_Current_Index (Context);
 
          Parse_Whitespace (Tmp_Offset, Data);
 
@@ -964,8 +959,7 @@ is
 
       end loop;
 
-      Context (Previous_Element).Next_Element := 0;
-      Context (Context'First).Context_Offset := Array_Index;
+      Context (Previous_Element).Next_Value := End_Index;
       Offset := Tmp_Offset;
       Match := Match_OK;
 
@@ -982,11 +976,11 @@ is
       Context (Context'First) := Meta_Element (Context'First);
    end Initialize;
 
-   -----------
-   -- Parse --
-   -----------
+   --------------------
+   -- Parse_Internal --
+   --------------------
 
-   procedure Parse
+   procedure Parse_Internal
      (Context : in out Context_Type;
       Offset  : in out Natural;
       Match   :    out Match_Type;
@@ -1024,6 +1018,21 @@ is
             end if;
          end if;
       end if;
+   end Parse_Internal;
+
+   -----------
+   -- Parse --
+   -----------
+
+ procedure Parse
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Match_Type;
+      Data    :        String)
+   is
+   begin
+      Parse_Internal (Context, Offset, Match, Data);
+      Reset (Context);
    end Parse;
 
    ------------------
@@ -1032,38 +1041,38 @@ is
 
    function Query_Object (Context  : Context_Type;
                           Data     : String;
-                          Name     : String) return Context_Element_Type
+                          Name     : String;
+                          Index    : Index_Type := Null_Index) return Index_Type
    is
-      Element       : Context_Element_Type := Get_Current (Context);
-      Element_Index : Natural;
+      I : Index_Type := Index;
    begin
-      while Element.Next_Element /= 0
       loop
-         Element_Index := Element.Next_Element;
-         Element       := Context (Element_Index);
+         I := Get (Context, I).Next_Member;
+         exit when I = End_Index;
 
-         if Element.Get_Kind = Kind_String and then
-            Element.Get_String (Data) = Name
+         if Get_Kind (Context, I) = Kind_String and then
+            Get_String (Context, Data, I) = Name
          then
             -- Value object are stored next to member names
-            return Context (Element_Index + 1);
+            return Next (I);
          end if;
       end loop;
-      return Null_Element;
+      return End_Index;
    end Query_Object;
 
    ------------
    -- Length --
    ------------
 
-   function Length (Context : Context_Type) return Natural
+   function Length (Context : Context_Type;
+                    Index   : Index_Type := Null_Index) return Natural
    is
-      Element : Context_Element_Type := Get_Current (Context);
+      Element : Context_Element_Type := Get (Context, Index);
       Count   : Natural := 0;
    begin
       loop
-         exit when Element.Next_Element = 0;
-         Element := Context (Element.Next_Element);
+         exit when Element.Next_Value = End_Index;
+         Element := Context (Element.Next_Value);
          Count := Count + 1;
       end loop;
       return Count;
@@ -1074,20 +1083,23 @@ is
    ---------
 
    function Pos (Context  : Context_Type;
-                 Position : Natural) return Context_Element_Type
+                 Position : Natural;
+                 Index    : Index_Type := Null_Index) return Index_Type
    is
-      Element : Context_Element_Type := Get_Current (Context);
-      Count   : Natural := 0;
+      Count      : Natural := 0;
+      Last_Index : Index_Type := Index;
+      Element    : Context_Element_Type := Get (Context, Last_Index);
    begin
       loop
          exit when Count = Position;
-         if Element.Next_Element = 0
+         if Element.Next_Value = End_Index
          then
-            return Null_Element;
+            return End_Index;
          end if;
-         Element := Context (Element.Next_Element);
-         Count := Count + 1;
+         Last_Index := Element.Next_Value;
+         Element    := Get (Context, Element.Next_Value);
+         Count      := Count + 1;
       end loop;
-      return Element;
+      return Last_Index;
    end Pos;
 end JSON;

@@ -12,34 +12,15 @@ is
                       Kind_Meta);
 
    type Match_Type is (Match_OK, Match_None, Match_Invalid);
-
    type Context_Element_Type is tagged private;
 
-   -- Return kind of an element
-   function Get_Kind (Element : Context_Element_Type) return Kind_Type;
+   type Index_Type is new Natural;
+   Null_Index : constant Index_Type;
 
-   -- Return boolean from element
-   function Get_Boolean (Element : Context_Element_Type) return Boolean
-   with
-      Pre'Class => Element.Get_Kind = Kind_Boolean;
+   -- Return next index
+   function Next (Index : Index_Type) return Index_Type;
 
-   -- Return float from element
-   function Get_Float (Element : Context_Element_Type) return Float
-   with
-      Pre'Class => Element.Get_Kind = Kind_Float;
-
-   -- Return integer from element
-   function Get_Integer (Element : Context_Element_Type) return Long_Integer
-   with
-      Pre'Class => Element.Get_Kind = Kind_Integer;
-
-   -- Return string from element
-   function Get_String (Element : Context_Element_Type;
-                        Data    : String) return String
-   with
-      Pre'Class => Element.Get_Kind = Kind_String;
-
-   type Context_Type is array (Natural range <>) of Context_Element_Type;
+   type Context_Type is array (Index_Type range <>) of Context_Element_Type;
 
    -- Predicate stating that context is initialized
    function Context_Valid (Context : Context_Type) return Boolean
@@ -63,57 +44,68 @@ is
              Offset < Data'Length;
 
    -- Return kind of current element of a context
-   function Get_Kind (Context : Context_Type) return Kind_Type
+   function Get_Kind (Context : Context_Type;
+                      Index   : Index_Type := Null_Index) return Kind_Type
    with
       Pre => Context_Valid (Context);
 
    -- Return value of a boolean context element
-   function Get_Boolean (Context : Context_Type) return Boolean
+   function Get_Boolean (Context : Context_Type;
+                         Index   : Index_Type := Null_Index) return Boolean
    with
       Pre => Context_Valid (Context) and then
-             Get_Kind (Context) = Kind_Boolean;
+             Get_Kind (Context, Index) = Kind_Boolean;
 
    -- Return value of float context element
-   function Get_Float (Context : Context_Type) return Float
+   function Get_Float (Context : Context_Type;
+                       Index   : Index_Type := Null_Index) return Float
    with
       Pre => Context_Valid (Context) and then
-             Get_Kind (Context) = Kind_Float;
+             Get_Kind (Context, Index) = Kind_Float;
 
    -- Return value of integer context element
-   function Get_Integer (Context : Context_Type) return Long_Integer
+   function Get_Integer (Context : Context_Type;
+                         Index   : Index_Type := Null_Index) return Long_Integer
    with
       Pre => Context_Valid (Context) and then
-             Get_Kind (Context) = Kind_Integer;
+             Get_Kind (Context, Index) = Kind_Integer;
 
    -- Return value of a string context element
    function Get_String (Context : Context_Type;
-                        Data    : String) return String
+                        Data    : String;
+                        Index   : Index_Type := Null_Index) return String
    with
       Pre => Context_Valid (Context) and then
-             Get_Kind (Context) = Kind_String;
+             Get_Kind (Context, Index) = Kind_String;
 
-   -- Query an object by name
+   -- Query object
    function Query_Object (Context : Context_Type;
                           Data    : String;
-                          Name   : String) return Context_Element_Type
-   with
-      Pre'Class => Context_Valid (Context) and then
-                   Get_Kind (Context) = Kind_Object;
-
-   -- Return length of an array
-   function Length (Context : Context_Type) return Natural
+                          Name    : String;
+                          Index   : Index_Type := Null_Index) return Index_Type
    with
       Pre => Context_Valid (Context) and then
-             Get_Kind (Context) = Kind_Array;
+             Get_Kind (Context, Index) = Kind_Object;
+
+   -- Return length of an array
+   function Length (Context : Context_Type;
+                    Index   : Index_Type := Null_Index) return Natural
+   with
+      Pre => Context_Valid (Context) and then
+             Get_Kind (Context, Index) = Kind_Array;
 
    -- Return object at given position of an array
    function Pos (Context  : Context_Type;
-                 Position : Natural) return Context_Element_Type
+                 Position : Natural;
+                 Index    : Index_Type := Null_Index) return Index_Type
    with
-      Pre'Class => Context_Valid (Context) and then
-                   Get_Kind (Context) = Kind_Array;
+      Pre => Context_Valid (Context) and then
+             Get_Kind (Context, Index) = Kind_Array;
 
 private
+
+   Null_Index : constant Index_Type := Index_Type'First;
+   End_Index  : constant Index_Type := Index_Type'Last;
 
    type Context_Element_Type is
    tagged record
@@ -123,8 +115,15 @@ private
       Integer_Value  : Long_Integer := 0;
       String_Start   : Integer      := 0;
       String_End     : Integer      := 0;
-      Context_Offset : Natural      := 0;
-      Next_Element   : Natural      := 0;
+      Context_Offset : Index_Type   := 0;
+      Next_Value     : Index_Type   := 0;
+      Next_Member    : Index_Type   := 0;
    end record;
+
+   procedure Parse_Internal
+     (Context : in out Context_Type;
+      Offset  : in out Natural;
+      Match   :    out Match_Type;
+      Data    :        String);
 
 end JSON;

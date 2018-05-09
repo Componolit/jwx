@@ -49,11 +49,31 @@ end Read_File;
 --  end read only
 
 --  begin read only
+   procedure Test_Next (Gnattest_T : in out Test);
+   procedure Test_Next_ddc7a9 (Gnattest_T : in out Test) renames Test_Next;
+--  id:2.2/ddc7a95fae1b9e96/Next/1/0/
+   procedure Test_Next (Gnattest_T : in out Test) is
+   --  json.ads:21:4:Next
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      AUnit.Assertions.Assert (Next (42) = 43, "Next.");
+      AUnit.Assertions.Assert (Next (100) /= Next (1000), "not Next.");
+
+--  begin read only
+   end Test_Next;
+--  end read only
+
+
+--  begin read only
    procedure Test_Initialize (Gnattest_T : in out Test);
    procedure Test_Initialize_e84d09 (Gnattest_T : in out Test) renames Test_Initialize;
 --  id:2.2/e84d09615b851310/Initialize/1/0/
    procedure Test_Initialize (Gnattest_T : in out Test) is
-   --  json.ads:50:4:Initialize
+   --  json.ads:31:4:Initialize
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -72,14 +92,14 @@ end Read_File;
    procedure Test_Parse_f44d29 (Gnattest_T : in out Test) renames Test_Parse;
 --  id:2.2/f44d29aaedc5307b/Parse/1/0/
    procedure Test_Parse (Gnattest_T : in out Test) is
-   --  json.ads:56:4:Parse
+   --  json.ads:37:4:Parse
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
 
       Offset  : Natural;
       Match   : Match_Type;
-      Context : Context_Type (Integer range 1..10000);
+      Context : Context_Type (Index_Type range 1..100000);
    begin
 
       Offset := 0;
@@ -349,45 +369,45 @@ end Read_File;
       Initialize (Context);
       declare
          Data : String := " { ""precision"": ""zip"", ""Latitude"":  37.7668, ""Longitude"": -122.3959, ""Address"":   """", ""City"":      ""SAN FRANCISCO"", ""State"":     ""CA"", ""Zip"":       ""94107"", ""Country"":   ""US"" }";
-         Result : Context_Element_Type;
+         Result : Index_Type;
       begin
          Parse (Context, Offset, Match, Data);
-         AUnit.Assertions.Assert (Match = Match_OK and then Get_Kind (Context) = Kind_Object, "Parse simple object");
+         AUnit.Assertions.Assert (Match = Match_OK and then Get_Kind (Context, 2) = Kind_Object, "Parse simple object: " & Get_Kind (Context, 2)'Img);
 
          Result := Query_Object (Context, Data, "precision");
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
-                                  Result.Get_String (Data) = "zip", "Query string from simple object");
+         AUnit.Assertions.Assert (Get_Kind (Context, Result) = Kind_String and then
+                                  Get_String (Context, Data, Result) = "zip", "Query string from simple object (1): " & Get_Kind (Context, Result)'Img);
 
          Result := Query_Object (Context, Data, "Latitude");
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_Float and then
-                                  Result.Get_Float = 37.7668, "Query float from simple object");
+         AUnit.Assertions.Assert (Get_Kind (Context, Result) = Kind_Float and then
+                                  Get_Float (Context, Result) = 37.7668, "Query float from simple object");
 
          Result := Query_Object (Context, Data, "Longitude");
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_Float and then
-                                  Result.Get_Float = -122.3959, "Query negative float from simple object");
+         AUnit.Assertions.Assert (Get_Kind (Context, Result) = Kind_Float and then
+                                  Get_Float (Context, Result) = -122.3959, "Query negative float from simple object");
 
          Result := Query_Object (Context, Data, "Address");
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
-                                  Result.Get_String (Data) = "", "Query empty string from simple object");
+         AUnit.Assertions.Assert (Get_Kind (Context, Result) = Kind_String and then
+                                  Get_String (Context, Data, Result) = "", "Query empty string from simple object");
 
          Result := Query_Object (Context, Data, "City");
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
-                                  Result.Get_String (Data) = "SAN FRANCISCO", "Query string from simple object");
+         AUnit.Assertions.Assert (Get_Kind (Context, Result) = Kind_String and then
+                                  Get_String (Context, Data, Result) = "SAN FRANCISCO", "Query string from simple object (2)");
 
          Result := Query_Object (Context, Data, "State");
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
-                                  Result.Get_String (Data) = "CA", "Query string from simple object");
+         AUnit.Assertions.Assert (Get_Kind (Context, Result) = Kind_String and then
+                                  Get_String (Context, Data, Result) = "CA", "Query string from simple object (3)");
 
          Result := Query_Object (Context, Data, "Zip");
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
-                                  Result.Get_String (Data) = "94107", "Query digit-only string from simple object");
+         AUnit.Assertions.Assert (Get_Kind (Context, Result) = Kind_String and then
+                                  Get_String (Context, Data, Result) = "94107", "Query digit-only string from simple object");
 
          Result := Query_Object (Context, Data, "Country");
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_String and then
-                                  Result.Get_String (Data) = "US", "Query string from simple object");
+         AUnit.Assertions.Assert (Get_Kind (Context, Result) = Kind_String and then
+                                  Get_String (Context, Data, Result) = "US", "Query string from simple object (4)");
 
          Result := Query_Object (Context, Data, "Does-not-exist");
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_Null, "Query non-existing member from simple object");
+         AUnit.Assertions.Assert (Result = End_Index, "Query non-existing member from simple object");
       end;
 
       Offset := 0;
@@ -399,21 +419,23 @@ end Read_File;
       Initialize (Context);
       declare
          Data : String := "  [116, 943, 234, 38793] ";
-         Result : Context_Element_Type;
+         Result : Index_Type;
       begin
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then Get_Kind (Context) = Kind_Array, "Parse simple array");
 
-         AUnit.Assertions.Assert (Length (Context) = 4, "Simple array length");
+         AUnit.Assertions.Assert (Length (Context) = 4, "Simple array length: " & Length (Context)'Img);
 
          Result := Pos (Context, 2);
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_Integer and then Result.Get_Integer = 943, "Get simple array element");
+         AUnit.Assertions.Assert (Get_Kind (Context, Result) = Kind_Integer and then
+                                  Get_Integer (Context, Result) = 943, "Get simple array element");
 
          Result := Pos (Context, 4);
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_Integer and then Result.Get_Integer = 38793, "Get simple array element");
+         AUnit.Assertions.Assert (Get_Kind (Context, Result) = Kind_Integer and then
+                                  Get_Integer (Context, Result) = 38793, "Get simple array element");
 
          Result := Pos (Context, 7);
-         AUnit.Assertions.Assert (Result.Get_Kind = Kind_Null, "Out of bounds array access");
+         AUnit.Assertions.Assert (Result = End_Index, "Out of bounds array access");
       end;
 
       Offset := 0;
@@ -432,10 +454,10 @@ end Read_File;
 
          AUnit.Assertions.Assert (Length (Context) = 4, "Mixed array length");
 
-         AUnit.Assertions.Assert (Pos (Context, 1).Get_Integer = 116, "Get mixed array integer element");
-         AUnit.Assertions.Assert (Pos (Context, 2).Get_Float = -4.5, "Get mixed array float element");
-         AUnit.Assertions.Assert (Pos (Context, 3).Get_String (Data) = "baz", "Get mixed array string element");
-         AUnit.Assertions.Assert (Pos (Context, 4).Get_Boolean = true, "Get mixed array boolean element");
+         AUnit.Assertions.Assert (Get_Integer (Context, Pos (Context, 1)) = 116, "Get mixed array integer element");
+         AUnit.Assertions.Assert (Get_Float (Context, Pos (Context, 2)) = -4.5, "Get mixed array float element");
+         AUnit.Assertions.Assert (Get_String (Context, Data, Pos (Context, 3)) = "baz", "Get mixed array string element");
+         AUnit.Assertions.Assert (Get_Boolean (Context, Pos (Context, 4)) = true, "Get mixed array boolean element");
       end;
 
       Offset := 0;
@@ -452,8 +474,7 @@ end Read_File;
       Offset := 0;
       Initialize (Context);
       declare
-         Data : String := "[{""A"": 42}, {""B"": 17}, {""C"": 9}]";
-         Result : Context_Element_Type;
+         Data : String := "[{""A"": 42}, {""B"": {""D"": 234}}, {""C"": 9}]";
       begin
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then Get_Kind (Context) = Kind_Array, "Array of objects");
@@ -484,22 +505,121 @@ end Read_File;
       Initialize (Context);
       declare
          Data : String := Read_File ("tests/data/country.json");
+         Result : Index_Type;
       begin
-         -- Put_Line (Data);
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then
-                                  Get_Kind (Context) = Kind_Object, "crountry example: " & Match'Img & " " & Offset'Img);
+                                  Get_Kind (Context) = Kind_Object, "country example");
+
+         Result := Query_Object (Context, Data, "area");
+         AUnit.Assertions.Assert (Result /= Null_Index and  then
+                                  (Get_Kind (Context, Result) = Kind_Float and then
+                                   Get_Float (Context, Result) = 1246700.0), "country query area");
+      end;
+
+      Offset := 0;
+      Initialize (Context);
+      declare
+         Data : String := "[{""area"": 123.0}, {""area"": 200.5}]";
+         Result : Index_Type;
+      begin
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then
+                                  Get_Kind (Context) = Kind_Array, "recusive objects");
+
+         Result := Pos (Context, 1);
+         AUnit.Assertions.Assert (Result /= Null_Index and then
+                                  Get_Kind (Context, Result) = Kind_Object, "recursive objects");
+
+         Result := Query_Object (Context, Data, "area", Result);
+         AUnit.Assertions.Assert (Result /= End_Index and  then
+                                  (Get_Kind (Context, Result) = Kind_Float and then
+                                   Get_Float (Context, Result) = 123.0), "recursive object query area");
+      end;
+
+      Offset := 0;
+      Initialize (Context);
+      declare
+         Data : String := Read_File ("tests/data/two_countries.json");
+         Result : Index_Type;
+      begin
+         Parse (Context, Offset, Match, Data);
+         AUnit.Assertions.Assert (Match = Match_OK and then
+                                  Get_Kind (Context) = Kind_Array, "two countries example");
+
+         Result := Pos (Context, 1);
+         AUnit.Assertions.Assert (Result /= Null_Index and then
+                                  Get_Kind (Context, Result) = Kind_Object, "two countries array access");
+
+         Result := Query_Object (Context, Data, "area", Result);
+         AUnit.Assertions.Assert (Result /= Null_Index and  then
+                                  (Get_Kind (Context, Result) = Kind_Float and then
+                                   Get_Float (Context, Result) = 1246700.0), "two countries query area: " & Get_Float (Context, Result)'Img);
       end;
 
       Offset := 0;
       Initialize (Context);
       declare
          Data : String := Read_File ("tests/data/countries.json");
+         Result : Index_Type;
       begin
-         -- Put_Line (Data);
          Parse (Context, Offset, Match, Data);
          AUnit.Assertions.Assert (Match = Match_OK and then
-                                  Get_Kind (Context) = Kind_Array, "countries example: " & Match'Img & " " & Offset'Img);
+                                  Get_Kind (Context) = Kind_Array, "Countries example");
+
+         Result := Pos (Context, 4);
+         AUnit.Assertions.Assert (Result /= Null_Index and then
+                                  Get_Kind (Context, Result) = Kind_Object, "Countries example array");
+
+         Result := Query_Object (Context, Data, "area", Result);
+         AUnit.Assertions.Assert (Result /= Null_Index and  then
+                                  (Get_Kind (Context, Result) = Kind_Integer and then
+                                   Get_Integer (Context, Result) = 83600), "Query area: " & Result'Img);
+
+         -- France
+         declare
+            France, AltSpellings, Translations, German, Japanese : Index_Type;
+         begin
+            France := Pos (Context, 97);
+            AUnit.Assertions.Assert (France /= Null_Index and then
+                                     Get_Kind (Context, France) = Kind_Object, "Get France from array");
+
+            --  alternaive spellings
+            AltSpellings := Query_Object (Context, Data, "altSpellings", France);
+            AUnit.Assertions.Assert (Result /= Null_Index and  then
+                                     Get_Kind (Context, AltSpellings) = Kind_Array, "Get altSpellings of France");
+
+            Result := Pos (Context, 3, AltSpellings);
+            AUnit.Assertions.Assert (Result /= Null_Index and  then
+                                     (Get_Kind (Context, Result) = Kind_String and then
+                                      Get_String (Context, Data, Result) = "République française"), "Get third alt spelling of France");
+
+            --  What's France in other languages?
+            Translations := Query_Object (Context, Data, "translations", France);
+            AUnit.Assertions.Assert (Result /= Null_Index and  then
+                                     Get_Kind (Context, Translations) = Kind_Object, "Get translations of France");
+
+            --  What's France in German?
+            German := Query_Object (Context, Data, "deu", Translations);
+            AUnit.Assertions.Assert (German /= Null_Index and  then
+                                     Get_Kind (Context, German) = Kind_Object, "Get German translations of France");
+
+            Result := Query_Object (Context, Data, "common", German);
+            AUnit.Assertions.Assert (Result /= Null_Index and  then
+                                     (Get_Kind (Context, Result) = Kind_String and then
+                                      Get_String (Context, Data, Result) = "Frankreich"), "Get common German translations of France");
+
+            --  What's France in Japanese?
+            Japanese := Query_Object (Context, Data, "jpn", Translations);
+            AUnit.Assertions.Assert (Japanese /= Null_Index and  then
+                                     Get_Kind (Context, Japanese) = Kind_Object, "Get Japanese translations of France");
+
+            Result := Query_Object (Context, Data, "official", Japanese);
+            AUnit.Assertions.Assert (Result /= Null_Index and  then
+                                     (Get_Kind (Context, Result) = Kind_String and then
+                                      Get_String (Context, Data, Result) = "フランス共和国"), "Get official Japanese translations of France");
+         end;
+
       end;
 
 --  begin read only
@@ -508,11 +628,11 @@ end Read_File;
 
 
 --  begin read only
-   procedure Test_1_Get_Kind (Gnattest_T : in out Test);
-   procedure Test_Get_Kind_4c1c6f (Gnattest_T : in out Test) renames Test_1_Get_Kind;
---  id:2.2/4c1c6fe2e8fca998/Get_Kind/1/0/
-   procedure Test_1_Get_Kind (Gnattest_T : in out Test) is
-   --  json.ads:66:4:Get_Kind
+   procedure Test_Get_Kind (Gnattest_T : in out Test);
+   procedure Test_Get_Kind_96a9a3 (Gnattest_T : in out Test) renames Test_Get_Kind;
+--  id:2.2/96a9a319bcd5a1ae/Get_Kind/1/0/
+   procedure Test_Get_Kind (Gnattest_T : in out Test) is
+   --  json.ads:47:4:Get_Kind
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -522,23 +642,23 @@ end Read_File;
       null;
 
 --  begin read only
-   end Test_1_Get_Kind;
+   end Test_Get_Kind;
 --  end read only
 
 
 --  begin read only
-   procedure Test_1_Get_Boolean (Gnattest_T : in out Test);
-   procedure Test_Get_Boolean_4d5fb0 (Gnattest_T : in out Test) renames Test_1_Get_Boolean;
---  id:2.2/4d5fb04694b2c853/Get_Boolean/1/0/
-   procedure Test_1_Get_Boolean (Gnattest_T : in out Test) is
-   --  json.ads:71:4:Get_Boolean
+   procedure Test_Get_Boolean (Gnattest_T : in out Test);
+   procedure Test_Get_Boolean_c6b116 (Gnattest_T : in out Test) renames Test_Get_Boolean;
+--  id:2.2/c6b116239f93c71b/Get_Boolean/1/0/
+   procedure Test_Get_Boolean (Gnattest_T : in out Test) is
+   --  json.ads:53:4:Get_Boolean
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
 
       Offset  : Natural;
       Match   : Match_Type;
-      Context : Context_Type (Integer range 1..10);
+      Context : Context_Type (Index_Type range 1..10);
    begin
 
       Offset := 0;
@@ -549,35 +669,16 @@ end Read_File;
                                Get_Boolean (Context) = true, "Parse true");
 
 --  begin read only
-   end Test_1_Get_Boolean;
+   end Test_Get_Boolean;
 --  end read only
 
 
 --  begin read only
-   procedure Test_1_Get_Float (Gnattest_T : in out Test);
-   procedure Test_Get_Float_492cca (Gnattest_T : in out Test) renames Test_1_Get_Float;
---  id:2.2/492cca72be95f3c3/Get_Float/1/0/
-   procedure Test_1_Get_Float (Gnattest_T : in out Test) is
-   --  json.ads:77:4:Get_Float
---  end read only
-
-      pragma Unreferenced (Gnattest_T);
-
-   begin
-
-      null;
-
---  begin read only
-   end Test_1_Get_Float;
---  end read only
-
-
---  begin read only
-   procedure Test_1_Get_Integer (Gnattest_T : in out Test);
-   procedure Test_Get_Integer_127000 (Gnattest_T : in out Test) renames Test_1_Get_Integer;
---  id:2.2/127000ceacbb4664/Get_Integer/1/0/
-   procedure Test_1_Get_Integer (Gnattest_T : in out Test) is
-   --  json.ads:83:4:Get_Integer
+   procedure Test_Get_Float (Gnattest_T : in out Test);
+   procedure Test_Get_Float_919c37 (Gnattest_T : in out Test) renames Test_Get_Float;
+--  id:2.2/919c374b247739a7/Get_Float/1/0/
+   procedure Test_Get_Float (Gnattest_T : in out Test) is
+   --  json.ads:60:4:Get_Float
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -587,16 +688,16 @@ end Read_File;
       null;
 
 --  begin read only
-   end Test_1_Get_Integer;
+   end Test_Get_Float;
 --  end read only
 
 
 --  begin read only
-   procedure Test_1_Get_String (Gnattest_T : in out Test);
-   procedure Test_Get_String_db6fb3 (Gnattest_T : in out Test) renames Test_1_Get_String;
---  id:2.2/db6fb3c6ae402a77/Get_String/1/0/
-   procedure Test_1_Get_String (Gnattest_T : in out Test) is
-   --  json.ads:89:4:Get_String
+   procedure Test_Get_Integer (Gnattest_T : in out Test);
+   procedure Test_Get_Integer_6bf7c7 (Gnattest_T : in out Test) renames Test_Get_Integer;
+--  id:2.2/6bf7c7ae32d7123b/Get_Integer/1/0/
+   procedure Test_Get_Integer (Gnattest_T : in out Test) is
+   --  json.ads:67:4:Get_Integer
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -606,16 +707,55 @@ end Read_File;
       null;
 
 --  begin read only
-   end Test_1_Get_String;
+   end Test_Get_Integer;
+--  end read only
+
+
+--  begin read only
+   procedure Test_Get_String (Gnattest_T : in out Test);
+   procedure Test_Get_String_9018bd (Gnattest_T : in out Test) renames Test_Get_String;
+--  id:2.2/9018bdace6a8b009/Get_String/1/0/
+   procedure Test_Get_String (Gnattest_T : in out Test) is
+   --  json.ads:74:4:Get_String
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      null;
+
+--  begin read only
+   end Test_Get_String;
+--  end read only
+
+
+--  begin read only
+   procedure Test_Query_Object (Gnattest_T : in out Test);
+   procedure Test_Query_Object_fb05bc (Gnattest_T : in out Test) renames Test_Query_Object;
+--  id:2.2/fb05bcab011d4ccf/Query_Object/1/0/
+   procedure Test_Query_Object (Gnattest_T : in out Test) is
+   --  json.ads:82:4:Query_Object
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      --  Tested in Parse test
+      AUnit.Assertions.Assert (True, "Test not implemented.");
+
+--  begin read only
+   end Test_Query_Object;
 --  end read only
 
 
 --  begin read only
    procedure Test_Length (Gnattest_T : in out Test);
-   procedure Test_Length_ba239d (Gnattest_T : in out Test) renames Test_Length;
---  id:2.2/ba239ddf8f6431d6/Length/1/0/
+   procedure Test_Length_ad1889 (Gnattest_T : in out Test) renames Test_Length;
+--  id:2.2/ad188943243a6018/Length/1/0/
    procedure Test_Length (Gnattest_T : in out Test) is
-   --  json.ads:104:4:Length
+   --  json.ads:91:4:Length
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -626,6 +766,46 @@ end Read_File;
 
 --  begin read only
    end Test_Length;
+--  end read only
+
+
+--  begin read only
+   procedure Test_Pos (Gnattest_T : in out Test);
+   procedure Test_Pos_087445 (Gnattest_T : in out Test) renames Test_Pos;
+--  id:2.2/087445d09aa20725/Pos/1/0/
+   procedure Test_Pos (Gnattest_T : in out Test) is
+   --  json.ads:98:4:Pos
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      -- Tested in Parse test
+      AUnit.Assertions.Assert (True, "Test not implemented.");
+
+--  begin read only
+   end Test_Pos;
+--  end read only
+
+
+--  begin read only
+   procedure Test_Parse_Internal (Gnattest_T : in out Test);
+   procedure Test_Parse_Internal_558a64 (Gnattest_T : in out Test) renames Test_Parse_Internal;
+--  id:2.2/558a643d7ae30854/Parse_Internal/1/0/
+   procedure Test_Parse_Internal (Gnattest_T : in out Test) is
+   --  json.ads:123:4:Parse_Internal
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      -- Tested in Parse test
+      AUnit.Assertions.Assert (True, "Test not implemented.");
+
+--  begin read only
+   end Test_Parse_Internal;
 --  end read only
 
 --  begin read only
