@@ -1,7 +1,7 @@
 generic
 
    Data         : String;
-   Context_Size : Natural := Data'Length/3 + 1;
+   Context_Size : Natural := Data'Length/3 + 2;
 
 package JSON
    with SPARK_Mode
@@ -19,11 +19,9 @@ is
    type Match_Type is (Match_OK,
                        Match_None,
                        Match_Invalid,
-                       Match_Out_Of_Memory,
-                       Match_End_Of_Input,
-                       Match_Overflow);
+                       Match_Out_Of_Memory);
 
-   type Index_Type is new Natural range 0 .. Context_Size;
+   type Index_Type is new Natural range 1 .. Context_Size;
    Null_Index : constant Index_Type;
    End_Index  : constant Index_Type;
 
