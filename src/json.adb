@@ -1,6 +1,23 @@
 package body JSON
    with SPARK_Mode
 is
+   ---------------------
+   -- Invalid_Element --
+   ---------------------
+
+   Invalid_Element : Context_Element_Type :=
+   -- Construct invalid element
+      (Kind           => Kind_Invalid,
+       Boolean_Value  => False,
+       Float_Value    => 0.0,
+       Integer_Value  => 0,
+       String_Start   => 0,
+       String_End     => 0,
+       Next_Value     => End_Index,
+       Next_Member    => End_Index);
+
+   Context : Context_Type := (others => Invalid_Element);
+
    ------------------
    -- Null_Element --
    ------------------
@@ -15,8 +32,6 @@ is
        String_End     => 0,
        Next_Value     => End_Index,
        Next_Member    => End_Index);
-
-   Context : Context_Type := (others => Null_Element);
 
    ---------------------
    -- Boolean_Element --
@@ -82,7 +97,7 @@ is
    -- Object_Element --
    --------------------
 
-   function Object_Element return Context_Element_Type is
+   Object_Element : Context_Element_Type :=
    -- Construct object element
       (Kind           => Kind_Object,
        Boolean_Value  => False,
@@ -97,7 +112,7 @@ is
    -- Array_Element --
    -------------------
 
-   function Array_Element return Context_Element_Type is
+   Array_Element : Context_Element_Type :=
    -- Construct array element
       (Kind           => Kind_Array,
        Boolean_Value  => False,
@@ -107,7 +122,6 @@ is
        String_End     => 0,
        Next_Value     => End_Index,
        Next_Member    => End_Index);
-
 
    ---------
    -- Get --
@@ -122,7 +136,7 @@ is
          return Context (Context_Index);
       elsif Index = End_Index
       then
-         return Null_Element;
+         return Invalid_Element;
       else
          return Context (Index);
       end if;
@@ -152,7 +166,7 @@ is
    procedure Reset
    is
    begin
-      Context_Index := Context_Index + 1;
+      Context_Index := Context'First;
    end Reset;
 
    --------------

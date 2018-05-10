@@ -11,7 +11,4 @@ package JWX_JSON_Tests is
    function Name (T : Test_Case) return Message_String;
    -- Provide name identifying the test case
 
-   -- Test Routines
-   procedure Test_Parse_True (T : in out Test_Cases.Test_Case'Class);
-
 end JWX_JSON_Tests;

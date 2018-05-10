@@ -1,13 +1,14 @@
 generic
 
-   Context_Size : Natural;
    Data         : String;
+   Context_Size : Natural := Data'Length/3 + 1;
 
 package JSON
    with SPARK_Mode
 is
 
-   type Kind_Type is (Kind_Null,
+   type Kind_Type is (Kind_Invalid,
+                      Kind_Null,
                       Kind_Boolean,
                       Kind_Float,
                       Kind_Integer,
@@ -24,6 +25,7 @@ is
 
    type Index_Type is new Natural range 0 .. Context_Size;
    Null_Index : constant Index_Type;
+   End_Index  : constant Index_Type;
 
    -- Parse a JSON file
    function Parse return Match_Type;

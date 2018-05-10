@@ -4,11 +4,11 @@ package Base64
     with SPARK_Mode
 is
 
-type Byte is mod 2**8
-   with Size => 8;
+   type Byte is mod 2**8
+      with Size => 8;
 
-type Byte_Array is array (Natural range <>) of Byte
-   with Pack;
+   type Byte_Array is array (Natural range <>) of Byte
+      with Pack;
 
    procedure Decode
        (Encoded :        String;
