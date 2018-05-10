@@ -75,23 +75,4 @@ private
    Null_Index : constant Index_Type := Index_Type'First;
    End_Index  : constant Index_Type := Index_Type'Last;
 
-   type Context_Element_Type is
-   tagged record
-      Kind           : Kind_Type    := Kind_Null;
-      Boolean_Value  : Boolean      := False;
-      Float_Value    : Float        := 0.0;
-      Integer_Value  : Long_Integer := 0;
-      String_Start   : Integer      := 0;
-      String_End     : Integer      := 0;
-      Next_Value     : Index_Type   := 0;
-      Next_Member    : Index_Type   := 0;
-   end record;
-
-   type Context_Type is array (Index_Type) of Context_Element_Type;
-
-   Context_Index : Index_Type;
-   Offset        : Natural := Data'First;
-
-   function Parse_Internal return Match_Type;
-
 end JSON;
