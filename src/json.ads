@@ -4,7 +4,10 @@ generic
    Context_Size : Natural := Data'Length/3 + 2;
 
 package JSON
-   with SPARK_Mode
+   with
+      SPARK_Mode,
+      Abstract_State => State,
+      Initializes    => State
 is
 
    type Kind_Type is (Kind_Invalid,
@@ -26,7 +29,7 @@ is
    End_Index  : constant Index_Type;
 
    -- Parse a JSON file
-   function Parse return Match_Type;
+   procedure Parse (Match : out Match_Type);
 
    -- Return kind of current element of a context
    function Get_Kind (Index : Index_Type := Null_Index) return Kind_Type;

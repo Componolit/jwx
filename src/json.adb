@@ -1,5 +1,7 @@
 package body JSON
-   with SPARK_Mode
+   with
+      SPARK_Mode,
+      Refined_State => (State => (Context, Context_Index, Offset))
 is
    type Context_Element_Type is
    tagged record
@@ -18,13 +20,13 @@ is
    Context_Index : Index_Type;
    Offset        : Natural := 0;
 
-   function Parse_Internal return Match_Type;
+   procedure Parse_Internal (Match : out Match_Type);
 
    ---------------------
    -- Invalid_Element --
    ---------------------
 
-   Invalid_Element : Context_Element_Type :=
+   Invalid_Element : constant Context_Element_Type :=
    -- Construct invalid element
       (Kind           => Kind_Invalid,
        Boolean_Value  => False,
@@ -41,7 +43,7 @@ is
    -- Null_Element --
    ------------------
 
-   Null_Element : Context_Element_Type :=
+   Null_Element : constant Context_Element_Type :=
    -- Construct null element
       (Kind           => Kind_Null,
        Boolean_Value  => False,
@@ -116,7 +118,7 @@ is
    -- Object_Element --
    --------------------
 
-   Object_Element : Context_Element_Type :=
+   Object_Element : constant Context_Element_Type :=
    -- Construct object element
       (Kind           => Kind_Object,
        Boolean_Value  => False,
@@ -131,7 +133,7 @@ is
    -- Array_Element --
    -------------------
 
-   Array_Element : Context_Element_Type :=
+   Array_Element : constant Context_Element_Type :=
    -- Construct array element
       (Kind           => Kind_Array,
        Boolean_Value  => False,
@@ -271,62 +273,71 @@ is
    -- Parse_Null --
    ----------------
 
-   function Parse_Null return Match_Type
+   procedure Parse_Null (Match : out Match_Type)
    is
-      Base : Natural := Data'First + Offset;
+      Base : Natural;
    begin
+      Match := Match_None;
 
       if Context_Index >= Context'Last
       then
-         return Match_Out_Of_Memory;
+         Match := Match_Out_Of_Memory;
+         return;
       end if;
 
       if Offset > Data'Length - 4
       then
-         return Match_None;
+         Match := Match_None;
+         return;
       end if;
 
+      Base := Data'First + Offset;
       if Data (Base .. Base + 3) = "null"
       then
          Set (Null_Element);
          Context_Index := Context_Index + 1;
          Offset := Offset + 4;
-         return Match_OK;
+         Match := Match_OK;
       end if;
 
-      return Match_None;
    end Parse_Null;
 
    ----------------
    -- Parse_Bool --
    ----------------
 
-   function Parse_Bool return Match_Type
+   procedure Parse_Bool (Match : out Match_Type)
    is
-      Base : Natural := Data'First + Offset;
+      Base : Natural;
    begin
+      Match := Match_None;
 
       if Context_Index >= Context'Last
       then
-         return Match_Out_Of_Memory;
+         Match := Match_Out_Of_Memory;
+         return;
       end if;
 
       if Offset > Data'Length - 4
       then
-         return Match_None;
+         Match := Match_None;
+         return;
       end if;
 
+      Base := Data'First + Offset;
       if Data (Base .. Base + 3) = "true"
       then
          Set (Boolean_Element (True));
          Context_Index := Context_Index + 1;
          Offset := Offset + 4;
-         return Match_OK;
+         Match := Match_OK;
+         return;
       end if;
 
       if Offset > Data'Length - 5
       then
-         return Match_None;
+         Match := Match_None;
+         return;
       end if;
 
       if Data (Base .. Base + 4) = "false"
@@ -334,18 +345,18 @@ is
          Set (Boolean_Element (False));
          Context_Index := Context_Index + 1;
          Offset := Offset + 5;
-         return Match_OK;
+         Match := Match_OK;
       end if;
 
-      return Match_None;
    end Parse_Bool;
 
    ---------------
    -- Match_Set --
    ---------------
 
-   function Match_Set (Set : String) return Boolean;
-   --   Post => (if Match_Set'Result then (for some E of Set => E = Data (Data'First + Offset)));
+   function Match_Set (Set : String) return Boolean
+   with
+      Post => (if Match_Set'Result then (for some E of Set => E = Data (Data'First + Offset)));
 
    function Match_Set (Set : String) return Boolean
    is
@@ -369,7 +380,8 @@ is
       is (Character'Pos (Value) - Character'Pos ('0'))
    with
       Pre  => Value >= '0' and Value <= '9',
-      Post => To_Number'Result < 10;
+      Post => To_Number'Result >=  0 and
+              To_Number'Result <  10;
 
    ---------------------------
    -- Parse_Fractional_Part --
@@ -380,15 +392,17 @@ is
       Result  : out Float)
    with
       Pre => Data'First < Integer'Last - Offset and Offset < Data'Length,
-      Post => (if Match /= Match_OK then Offset = Offset'Old);
+      Post =>
+         (if Match /= Match_OK then Offset = Offset'Old) and
+         Result >= 0.0 and
+         Result <  1.0;
 
    procedure Parse_Fractional_Part
      (Match   :    out Match_Type;
       Result  :    out Float)
    is
       Divisor     : Long_Integer := 10;
-      Old_Offset  : Natural := Offset;
-      Num_Matches : Natural := 0;
+      Old_Offset  : constant Natural := Offset;
    begin
       Result := 0.0;
       Match  := Match_None;
@@ -403,7 +417,7 @@ is
       loop
 
          if Data'First > Integer'Last - Offset or
-            Offset > Data'Length
+            Data'First > Data'Last - Offset
          then
             if Match /= Match_OK then
                Offset := Old_Offset;
@@ -411,7 +425,7 @@ is
             return;
          end if;
          
-         if Divisor = 0 or
+         if Divisor <= 0 or
             Divisor >= Long_Integer'Last/10
          then
             Match := Match_Invalid;
@@ -431,7 +445,7 @@ is
             Float (To_Number (Data (Data'First + Offset))) / Float (Divisor);
          Divisor := Divisor * 10;
          Offset  := Offset + 1;
-         Match      := Match_OK;
+         Match   := Match_OK;
       end loop;
 
    end Parse_Fractional_Part;
@@ -445,16 +459,32 @@ is
       Match         :    out Match_Type;
       Result        :    out Long_Integer;
       Negative      :    out Boolean)
+   with
+      Post => Result >= 0;
+
+   procedure Parse_Integer
+     (Check_Leading :        Boolean;
+      Match         :    out Match_Type;
+      Result        :    out Long_Integer;
+      Negative      :    out Boolean)
    is
       Leading_Zero : Boolean := False;
       Num_Matches  : Natural := 0;
-      Old_Offset   : Natural := Offset;
+      Old_Offset   : constant Natural := Offset;
    begin
-      Match  := Match_Invalid;
-      Result := 0;
+      Match    := Match_Invalid;
+      Negative := False;
+      Result   := 0;
+
+      if Offset > Data'Length
+      then
+         Match := Match_Invalid;
+         return;
+      end if;
 
       Negative := Match_Set ("-");
-      if Negative then
+      if Negative
+      then
          Offset := Offset + 1;
       end if;
 
@@ -474,14 +504,17 @@ is
             Offset >= Data'Length;
 
          -- Check for leading '0'
-         if Num_Matches = 0 and Data (Data'First + Offset) = '0' then
+         if Num_Matches = 0 and
+            Data (Data'First + Offset) = '0'
+         then
             Leading_Zero := True;
          end if;
 
          pragma Loop_Invariant (Result >= 0);
 
          -- Check for overflow
-         if Result >= Long_Integer'Last/10 then
+         if Result >= Long_Integer'Last/10
+         then
             Match := Match_Invalid;
             Offset := Old_Offset;
             return;
@@ -494,7 +527,8 @@ is
       end loop;
 
       -- No digits found
-      if Num_Matches = 0 then
+      if Num_Matches = 0
+      then
          Match  := Match_None;
          Offset := Old_Offset;
          return;
@@ -520,17 +554,25 @@ is
      (Match    :    out Match_Type;
       Result   :    out Long_Integer;
       Negative :    out Boolean)
+   with
+      Post => (if Match = Match_OK then Result > 0);
+
+   procedure Parse_Exponent_Part
+     (Match    :    out Match_Type;
+      Result   :    out Long_Integer;
+      Negative :    out Boolean)
    is
       Scale            : Long_Integer;
       Match_Exponent   : Match_Type;
       Integer_Negative : Boolean;
-      Old_Offset       : Natural := Offset;
+      Old_Offset       : constant Natural := Offset;
    begin
       Result   := 0;
       Negative := False;
       Match    := Match_None;
 
-      if not Match_Set ("Ee") then
+      if not Match_Set ("Ee")
+      then
          return;
       end if;
       Offset := Offset + 1;
@@ -573,7 +615,7 @@ is
    -- Parse_Number --
    ------------------
 
-   function Parse_Number return Match_Type
+   procedure Parse_Number (Match : out Match_Type)
    is
       Fractional_Component : Float := 0.0;
       Integer_Component    : Long_Integer;
@@ -588,7 +630,8 @@ is
       Parse_Integer (True, Match_Int, Integer_Component, Negative);
       if Match_Int /= Match_OK
       then
-         return Match_Int;
+         Match := Match_Int;
+         return;
       end if;
 
       if Data'First < Integer'Last - Offset and Offset < Data'Length
@@ -598,18 +641,21 @@ is
 
       if Context_Index >= Context'Last
       then
-         return Match_Out_Of_Memory;
+         Match := Match_Out_Of_Memory;
+         return;
       end if;
 
       if Match_Frac = Match_Invalid
       then
-         return Match_Invalid;
+         Match := Match_Invalid;
+         return;
       end if;
 
       Parse_Exponent_Part (Match_Exponent, Scale, Scale_Negative);
       if Match_Exponent = Match_Invalid
       then
-         return Match_Invalid;
+         Match := Match_Invalid;
+         return;
       end if;
 
       --  Convert to float if either we have fractional part or dividing by the
@@ -618,6 +664,14 @@ is
          (Match_Exponent = Match_OK and then
           (Scale_Negative and Integer_Component mod Scale > 0))
       then
+         pragma Assert (Fractional_Component >= 0.0);
+         pragma Assert (Fractional_Component <  1.0);
+         if Float (Integer_Component) >= Float'Last
+         then
+            Match := Match_Invalid;
+            return;
+         end if;
+
          declare
             Tmp : Float := Float (Integer_Component) + Fractional_Component;
          begin
@@ -652,7 +706,7 @@ is
       end if;
 
       Context_Index := Context_Index + 1;
-      return Match_OK;
+      Match := Match_OK;
 
    end Parse_Number;
 
@@ -660,16 +714,26 @@ is
    -- Parse_String --
    ------------------
 
-   function Parse_String return Match_Type
+   procedure Parse_String (Match : out Match_Type)
+   with
+      Global => (In_Out => (Context,
+                            Context_Index,
+                            Offset),
+                 Input =>  (
+                            Data
+                            ));
+
+   procedure Parse_String (Match : out Match_Type)
    is
       String_Start : Natural;
       String_End   : Natural;
       Escaped      : Boolean := False;
-      Old_Offset   : Natural := Offset;
+      Old_Offset   : constant Natural := Offset;
    begin
       -- Check for starting "
       if not Match_Set ("""") then
-         return Match_None;
+         Match := Match_None;
+         return;
       end if;
 
       Offset := Offset + 1;
@@ -681,7 +745,8 @@ is
             Offset > Data'Length
          then
             Offset := Old_Offset;
-            return Match_Invalid;
+            Match  := Match_Invalid;
+            return;
          end if;
 
          exit when not Escaped and Match_Set ("""");
@@ -693,19 +758,22 @@ is
          Offset > Data'Length
       then
          Offset := Old_Offset;
-         return Match_Invalid;
+         Match  := Match_Invalid;
+         return;
       end if;
 
       if Context_Index >= Context'Last
       then
          Offset := Old_Offset;
-         return Match_Out_Of_Memory;
+         Match  := Match_Out_Of_Memory;
+         return;
       end if;
 
       if not Match_Set ("""")
       then
          Offset := Old_Offset;
-         return Match_Invalid;
+         Match  := Match_Invalid;
+         return;
       end if;
       Offset := Offset + 1;
 
@@ -713,7 +781,7 @@ is
 
       Set (String_Element (String_Start, String_End));
       Context_Index := Context_Index + 1;
-      return Match_OK;
+      Match := Match_OK;
 
    end Parse_String;
 
@@ -721,21 +789,25 @@ is
    -- Parse_Object --
    ------------------
 
-   function Parse_Object return Match_Type
+   procedure Parse_Object (Match : out Match_Type)
    is
       Object_Index    : Index_Type;
       Previous_Member : Index_Type;
-      Old_Offset      : Natural := Offset;
+      Result          : Match_Type;
+      Match_Member    : Match_Type;
+      Old_Offset      : constant Natural := Offset;
    begin
 
       if Context_Index >= Context'Last
       then
-         return Match_Out_Of_Memory;
+         Match := Match_Out_Of_Memory;
+         return;
       end if;
 
       -- Check for starting {
       if not Match_Set ("{") then
-         return Match_None;
+         Match := Match_None;
+         return;
       end if;
 
       Object_Index := Context_Index;
@@ -750,7 +822,8 @@ is
             Offset > Data'Length
          then
             Offset := Old_Offset;
-            return Match_Invalid;
+            Match := Match_Invalid;
+            return;
          end if;
 
          -- Check for ending '}'
@@ -767,23 +840,28 @@ is
 
          -- Parse member name
          Skip_Whitespace;
-         if Parse_String /= Match_OK then
+         Parse_String (Result);
+         if Result /= Match_OK then
             Offset := Old_Offset;
-            return Match_Invalid;
+            Match := Match_Invalid;
+            return;
          end if;
 
          -- Check for name separator (:)
          Skip_Whitespace;
          if not Match_Set (":") then
             Offset := Old_Offset;
-            return Match_Invalid;
+            Match := Match_Invalid;
+            return;
          end if;
          Offset := Offset + 1;
 
          -- Parse member
-         if Parse_Internal /= Match_OK then
+         Parse_Internal (Match_Member);
+         if Match_Member /= Match_OK then
             Offset := Old_Offset;
-            return Match_Invalid;
+            Match := Match_Invalid;
+            return;
          end if;
 
          Skip_Whitespace;
@@ -796,7 +874,7 @@ is
       end loop;
 
       Context (Previous_Member).Next_Member := End_Index;
-      return Match_OK;
+      Match := Match_OK;
 
    end Parse_Object;
 
@@ -804,21 +882,24 @@ is
    -- Parse_Array --
    ------------------
 
-   function Parse_Array return Match_Type
+   procedure Parse_Array (Match : out Match_Type)
    is
       Array_Index      : Index_Type;
       Previous_Element : Index_Type;
-      Old_Offset       : Natural := Offset;
+      Match_Element    : Match_Type;
+      Old_Offset       : constant Natural := Offset;
    begin
 
       if Context_Index >= Context'Last
       then
-         return Match_Out_Of_Memory;
+         Match := Match_Out_Of_Memory;
+         return;
       end if;
 
       -- Check for starting [
       if not Match_Set ("[") then
-         return Match_None;
+         Match := Match_None;
+         return;
       end if;
 
       Array_Index := Context_Index;
@@ -833,7 +914,8 @@ is
             Offset >= Data'Length
          then
             Offset := Old_Offset;
-            return Match_Invalid;
+            Match := Match_Invalid;
+            return;
          end if;
 
          -- Check for ending ']'
@@ -848,10 +930,12 @@ is
          Context (Previous_Element).Next_Value := Context_Index;
          Previous_Element := Context_Index;
 
-         -- Parse member
-         if Parse_Internal /= Match_OK then
+         -- Parse element
+         Parse_Internal (Match_Element);
+         if Match_Element /= Match_OK then
             Offset := Old_Offset;
-            return Match_Invalid;
+            Match := Match_Invalid;
+            return;
          end if;
 
          Skip_Whitespace;
@@ -864,7 +948,7 @@ is
       end loop;
 
       Context (Previous_Element).Next_Value := End_Index;
-      return Match_OK;
+      Match := Match_OK;
 
    end Parse_Array;
 
@@ -872,50 +956,46 @@ is
    -- Parse_Internal --
    --------------------
 
-   function Parse_Internal return Match_Type
+   procedure Parse_Internal (Match : out Match_Type)
    is
-      Match : Match_Type := Match_Invalid;
    begin
       Skip_Whitespace;
 
-      Match := Parse_Null;
+      Parse_Null (Match);
       if Match = Match_None
       then
-         Match := Parse_Bool;
+         Parse_Bool (Match);
          if Match = Match_None
          then
-            Match := Parse_Number;
+            Parse_Number (Match);
             if Match = Match_None
             then
-               Match := Parse_String;
+               Parse_String (Match);
                if Match = Match_None
                then
-                  Match := Parse_Object;
+                  Parse_Object (Match);
                   if Match = Match_None
                   then
-                     Match := Parse_Array;
-                     if Match = Match_None
-                     then
-                        return Match_None;
-                     end if;
+                     Parse_Array (Match);
                   end if;
                end if;
             end if;
          end if;
       end if;
-      return Match;
    end Parse_Internal;
 
    -----------
    -- Parse --
    -----------
 
-   function Parse return Match_Type
+   procedure Parse (Match : out Match_Type)
    is
-      Match : Match_Type := Parse_Internal;
    begin
-      Reset;
-      return Match;
+      Parse_Internal (Match);
+      if Context_Index > Context'First
+      then
+         Reset;
+      end if;
    end Parse;
 
    ------------------
@@ -951,7 +1031,10 @@ is
       Count   : Natural := 0;
    begin
       loop
-         exit when Element.Next_Value = End_Index;
+         exit when
+            Count >= Natural'Last or
+            Element.Next_Value = End_Index;
+
          Element := Context (Element.Next_Value);
          Count := Count + 1;
       end loop;
@@ -971,10 +1054,17 @@ is
    begin
       loop
          exit when Count = Position;
+
          if Element.Next_Value = End_Index
          then
             return End_Index;
          end if;
+
+         if Count >= Natural'Last
+         then
+            return End_Index;
+         end if;
+
          Last_Index := Element.Next_Value;
          Element    := Get (Element.Next_Value);
          Count      := Count + 1;
