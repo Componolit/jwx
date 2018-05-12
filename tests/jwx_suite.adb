@@ -1,4 +1,15 @@
---  Import tests and sub-suites to run
+--
+-- \brief  JWX test suite
+-- \author Alexander Senier
+-- \date   2018-05-12
+--
+-- Copyright (C) 2018 Componolit GmbH
+--
+-- This file is part of JWX, which is distributed under the terms of the
+-- GNU Affero General Public License version 3.
+--
+
+-- Import tests and sub-suites to run
 with JWX_JSON_Tests;
 with JWX_Base64_Tests;
 
