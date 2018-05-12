@@ -1,4 +1,4 @@
-package body JSON
+package body JWX.JSON
    with
       SPARK_Mode,
       Refined_State => (State => (Context, Context_Index, Offset))
@@ -1074,4 +1074,4 @@ is
 
 begin
    Reset;
-end JSON;
+end JWX.JSON;

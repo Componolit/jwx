@@ -3,7 +3,7 @@ generic
    Data         : String;
    Context_Size : Natural := Data'Length/3 + 2;
 
-package JSON
+package JWX.JSON
    with
       SPARK_Mode,
       Abstract_State => State,
@@ -76,4 +76,4 @@ private
    Null_Index : constant Index_Type := Index_Type'First;
    End_Index  : constant Index_Type := Index_Type'Last;
 
-end JSON;
+end JWX.JSON;

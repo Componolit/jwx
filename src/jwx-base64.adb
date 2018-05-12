@@ -1,4 +1,4 @@
-package body Base64
+package body JWX.Base64
     with SPARK_Mode
 is
 
@@ -182,4 +182,4 @@ is
       Length := (3 * Last_Input_Block_Offset) + Num_Last_Block_Bytes;
    end Decode;
 
-end Base64;
+end JWX.Base64;

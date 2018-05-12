@@ -1,6 +1,7 @@
 with AUnit.Assertions; use AUnit.Assertions;
-with JSON;
+with JWX.JSON;
 with JWX_Test_Utils; use JWX_Test_Utils;
+use JWX;
 
 package body JWX_JSON_Tests is
 

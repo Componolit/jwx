@@ -1,4 +1,4 @@
-with BASE64; use BASE64;
+with JWX.BASE64; use JWX.BASE64;
 
 package JWX_Test_Utils
 is

@@ -1,5 +1,6 @@
 with AUnit.Assertions; use AUnit.Assertions;
-with BASE64; use BASE64;
+with JWX.BASE64;
+use JWX;
 with JWX_Test_Utils; use JWX_Test_Utils;
 
 package body JWX_BASE64_Tests is

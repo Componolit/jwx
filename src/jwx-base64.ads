@@ -1,6 +1,6 @@
 -- RFC4648 decoding
 
-package Base64
+package JWX.Base64
     with SPARK_Mode
 is
 
@@ -20,4 +20,4 @@ is
              Result'Length >= 3*(Encoded'Length/4);
    -- Decode Base64 encoded string into byte array
 
-end Base64;
+end JWX.Base64;
