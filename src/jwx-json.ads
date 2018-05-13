@@ -11,8 +11,8 @@
 
 generic
 
-   Data         : String;
-   Context_Size : Natural := Data'Length/3 + 2;
+   Data_Length  : Natural;
+   Context_Size : Natural := Data_Length/3 + 2;
 
 package JWX.JSON
    with
@@ -40,7 +40,8 @@ is
    End_Index  : constant Index_Type;
 
    -- Parse a JSON file
-   procedure Parse (Match : out Match_Type);
+   procedure Parse (Input : String;
+                    Match : out Match_Type);
 
    -- Return kind of current element of a context
    function Get_Kind (Index : Index_Type := Null_Index) return Kind_Type;
@@ -53,7 +54,8 @@ is
    -- Return value of float context element
    function Get_Float (Index : Index_Type := Null_Index) return Float
    with
-      Pre => Get_Kind (Index) = Kind_Float;
+      Pre => Get_Kind (Index) = Kind_Float or
+             Get_Kind (Index) = Kind_Integer;
 
    -- Return value of integer context element
    function Get_Integer (Index : Index_Type := Null_Index) return Long_Integer

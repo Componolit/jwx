@@ -11,9 +11,10 @@
 
 package body Proof_JSON
 is
-   procedure Do_Parse (Match : out P.Match_Type)
+   procedure Do_Parse (Data  : String;
+                       Match : out P.Match_Type)
    is
    begin
-      P.Parse (Match);
+      P.Parse (Data, Match);
    end Do_Parse;
 end Proof_JSON;

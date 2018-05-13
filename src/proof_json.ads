@@ -1,18 +1,20 @@
-package body Proof_JSON
-is
-   procedure Do_Parse (Match : out P.Match_Type)
-   is
-   begin
-      P.Parse (Match);
-   end Do_Parse;
-end Proof_JSON;
+--
+-- \brief  Helper package for proving generic JWX.JSON
+-- \author Alexander Senier
+-- \date   2018-05-12
+--
+-- Copyright (C) 2018 Componolit GmbH
+--
+-- This file is part of JWX, which is distributed under the terms of the
+-- GNU Affero General Public License version 3.
+--
+
 with JWX.JSON;
 
 package Proof_JSON
 is
-   Data : constant String (1..100) := (others => 'x');
-   package P is new JWX.JSON (Data);
-
-   procedure Do_Parse (Match : out P.Match_Type);
+   package P is new JWX.JSON (100);
+   procedure Do_Parse (Data  : String;
+                       Match : out P.Match_Type);
 
 end Proof_JSON;
