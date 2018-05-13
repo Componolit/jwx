@@ -1059,6 +1059,25 @@ is
       return End_Index;
    end Query_Object;
 
+   --------------
+   -- Elements --
+   --------------
+
+   function Elements (Index : Index_Type := Null_Index) return Natural
+   is
+      I     : Index_Type := Index;
+      Count : Natural := 0;
+   begin
+      loop
+         I := Get (I).Next_Member;
+         exit when
+            Count >= Natural'Last or
+            I = End_Index;
+         Count := Count + 1;
+      end loop;
+      return Count;
+   end Elements;
+
    ------------
    -- Length --
    ------------

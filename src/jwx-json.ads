@@ -73,6 +73,11 @@ is
    with
       Pre => Get_Kind (Index) = Kind_Object;
 
+   -- Return number of elements of an object
+   function Elements (Index : Index_Type := Null_Index) return Natural
+   with
+      Pre => Get_Kind (Index) = Kind_Object;
+
    -- Return length of an array
    function Length (Index : Index_Type := Null_Index) return Natural
    with

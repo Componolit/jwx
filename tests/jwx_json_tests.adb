@@ -517,6 +517,8 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Object, "Invalid kind: " & Get_Kind'Img);
 
+		Assert (Elements = 8, "Invalid number of elements: " & Elements'Img);
+
       Result := Query_Object ("precision");
 		Assert (Get_Kind (Result) = Kind_String, "Invalid kind: " & Get_Kind (Result)'Img);
 		Assert (Get_String (Result) = "zip", "Invalid string: " & Get_String (Result));
@@ -565,6 +567,7 @@ package body JWX_JSON_Tests is
       Parse (Data, Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Object, "Invalid kind: " & Get_Kind'Img);
+		Assert (Elements = 0, "Invalid number of elements: " & Elements'Img);
 	end Test_Parse_Empty_Object;
 
    ---------------------------------------------------------------------------
@@ -716,6 +719,7 @@ package body JWX_JSON_Tests is
       Parse (Data, Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Object, "Invalid kind: " & Get_Kind'Img);
+		Assert (Elements = 20, "Invalid number of elements: " & Elements'Img);
 
       Result := Query_Object ("area");
 		Assert (Get_Kind (Result) = Kind_Float, "Invalid kind: " & Get_Kind'Img);
@@ -737,6 +741,7 @@ package body JWX_JSON_Tests is
 
       Result := Pos (1);
 		Assert (Get_Kind (Result) = Kind_Object, "Invalid kind: " & Get_Kind'Img);
+		Assert (Elements (Result) = 1, "Invalid number of elements: " & Elements (Result)'Img);
 
       Result := Query_Object ("area", Result);
 		Assert (Get_Kind (Result) = Kind_Float, "Invalid kind: " & Get_Kind'Img);
@@ -759,6 +764,7 @@ package body JWX_JSON_Tests is
       Result := Pos (1);
 		Assert (Result /= Null_Index, "Element not found");
 		Assert (Get_Kind (Result) = Kind_Object, "Invalid kind: " & Get_Kind'Img);
+		Assert (Elements (Result) = 20, "Invalid number of elements: " & Elements (Result)'Img);
 
       Result := Query_Object ("area", Result);
 		Assert (Result /= Null_Index, "Element not found");
@@ -782,6 +788,7 @@ package body JWX_JSON_Tests is
       Result := Pos (4);
 		Assert (Result /= Null_Index, "Element not found");
 		Assert (Get_Kind (Result) = Kind_Object, "Invalid kind: " & Get_Kind'Img);
+		Assert (Elements (Result) = 20, "Invalid number of elements: " & Elements (Result)'Img);
 
       Result := Query_Object ("area", Result);
 		Assert (Result /= Null_Index, "Element not found");
