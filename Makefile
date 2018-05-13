@@ -12,4 +12,8 @@ test:
 	@gprbuild -P tests/test.gpr -gnata
 	@obj/test
 
+example:
+	@gprbuild -P doc/example.gpr
+	@obj/example
+
 .PHONY: test
