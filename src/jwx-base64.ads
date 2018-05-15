@@ -9,24 +9,26 @@
 -- GNU Affero General Public License version 3.
 --
 
+with JWX;
+
 package JWX.Base64
     with SPARK_Mode
 is
 
-   type Byte is mod 2**8
-      with Size => 8;
-
-   type Byte_Array is array (Natural range <>) of Byte
-      with Pack;
+   type Padding_Kind is (Padding_Implicit, Padding_Explicit);
 
    procedure Decode
        (Encoded :        String;
         Length  :    out Natural;
-        Result  : in out Byte_Array)
-   with
-      Pre => Encoded'Length >= 4 and
-             Encoded'Length mod 4 = 0 and
-             Result'Length >= 3*(Encoded'Length/4);
+        Result  : in out JWX.Byte_Array;
+        Padding :        Padding_Kind := Padding_Explicit);
    -- Decode Base64 encoded string into byte array
+
+   procedure Decode_Url
+       (Encoded :        String;
+        Length  :    out Natural;
+        Result  : in out JWX.Byte_Array;
+        Padding :        Padding_Kind := Padding_Explicit);
+   -- Decode Base64URL encoded string into byte array
 
 end JWX.Base64;

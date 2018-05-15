@@ -11,4 +11,12 @@
 
 package JWX
 is
+   type UInt6 is mod 2**6
+      with Size => 6;
+
+   type Byte is mod 2**8
+      with Size => 8;
+
+   type Byte_Array is array (Natural range <>) of Byte
+      with Pack;
 end JWX;

@@ -9,6 +9,7 @@
 -- GNU Affero General Public License version 3.
 --
 
+with JWX;
 with JWX.BASE64; use JWX.BASE64;
 
 package JWX_Test_Utils
@@ -17,10 +18,10 @@ is
 
    procedure To_Byte_Array
       (Data   :        String;
-       Result : in out Byte_Array);
+       Result : in out JWX.Byte_Array);
 
    procedure To_String
-      (Data   :        Byte_Array;
+      (Data   :        JWX.Byte_Array;
        Result : in out String);
 
 end JWX_Test_Utils;

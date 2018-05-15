@@ -28,7 +28,7 @@ is
 
    procedure To_Byte_Array
       (Data   :        String;
-       Result : in out Byte_Array)
+       Result : in out JWX.Byte_Array)
    is
    begin
       for I in 0 .. Data'Length - 1
@@ -42,7 +42,7 @@ is
    ---------------
 
    procedure To_String
-      (Data   :        Byte_Array;
+      (Data   :        JWX.Byte_Array;
        Result : in out String)
    is
    begin
