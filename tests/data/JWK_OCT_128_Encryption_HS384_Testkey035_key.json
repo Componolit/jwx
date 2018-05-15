@@ -1,0 +1,8 @@
+Contains the shared key.
+{
+  "kty": "oct",
+  "use": "enc",
+  "kid": "Testkey035",
+  "k": "StnB7RTFNLhK7s0GHLfDAQ",
+  "alg": "HS384"
+}

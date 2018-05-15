@@ -1,0 +1,14 @@
+{
+  "keys": [
+    {
+      "kty": "EC",
+      "d": "y3c2tKFeWQYtyvRs6mwZvj3EHFY31pfbQzX0miNml_Y",
+      "use": "enc",
+      "crv": "P-256",
+      "kid": "Testkey023",
+      "x": "zTwZXe8a7z3B89zqMFXsPQCC25O1EdjyDxnyXCL3h2g",
+      "y": "y16Mc3F5b33aD4_kc_-DnIIlsalMetv_IxFI7a3xgLQ",
+      "alg": "ES384"
+    }
+  ]
+}

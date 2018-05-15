@@ -1,0 +1,9 @@
+{
+  "kty": "EC",
+  "use": "enc",
+  "crv": "P-384",
+  "kid": "Testkey025",
+  "x": "XdX7Qc5T0z-PQzUV8SHRGPC44ZptC70c_ahc4b7IUiiEYRPKGJuhw0OGhlFNoM1w",
+  "y": "N7MxRiQ3PW_pR0yGdGmMnBo6EwvdVoFb37_8Ccgo5numsCQbdcwsGSamHDW9puPX",
+  "alg": "ES256"
+}

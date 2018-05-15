@@ -1,0 +1,13 @@
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "d": "o1ww50boRmzgqsjP_ZGAmCMaPwMp0KKYUj6nSEtDH3E-pn86j2qJpBZsBmbgo5_ut9AOpZFbvn-Jy8Ef44ZlVc-yV43-dnzO_kcY11_AFoOFsZBakGcRvY4vy3vvRNfw0kGc4r6OkkQ4Eids88TLb51ZqBMjtMD0y4Ikut4CSCcEJjKJn4BSDO8uFFppTgIDGSjbxuzeDdhzyjCS3bry5J3w8LFL9wdqXfq8_Jp4-Movaa6Q1r_NteaJTcU1r8iFt7-Vr2UrOycGkyVMrk1zyDgb8XP-rQPqdYKDJhm_rRRYR-g3JNHV_Hq5fv0Udwa94v3CnP4vCyKl-EkJrOY6YQ",
+      "e": "AQAB",
+      "use": "sig",
+      "kid": "Testkey001",
+      "alg": "RS256",
+      "n": "usjp6EGZY1O0G2BMEB8Bf8MN73aMa387SiCTPZoO7fd4QjwfCzKN7uc698k4i7Vw4WHnUUcneP05KByQnz48x0qY1XSWsgqwpb7FItlK5Gxahy11bDVIokmcX30PYGNtcX_0uodMovqte2t24XMFla_8vK2qw7LmiQD5h0LUf7aanmY_GhF5MbO1vs6_xybSXQdu1Txm2D9In11O4YkcV12H6bjlZXASd7QJpnhYReVne2dLo38PNubumIil-EQAm2MZVvDrjf5MC4UxICLGvS_dmCk5ZKF23vGsaJWQjp4BIzO0aVhwLReZJF5DfqhS_68iETVf5i6VbCcwBa7EmQ"
+    }
+  ]
+}

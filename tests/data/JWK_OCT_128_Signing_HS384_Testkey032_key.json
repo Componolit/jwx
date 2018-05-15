@@ -1,0 +1,7 @@
+{
+  "kty": "oct",
+  "use": "sig",
+  "kid": "Testkey032",
+  "k": "zfXOyyci7XP3Nco5Lkwonw",
+  "alg": "HS384"
+}

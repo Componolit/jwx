@@ -1,0 +1,10 @@
+{
+  "kty": "EC",
+  "d": "ANkTqJtjNfSYkPTeG3-DxrN3x3xls4hItdajFu5rvUkXfoSBGOctKPaaCAsFrSjYdY8Jv_q6y_OB4YWojwC1raCb",
+  "use": "sig",
+  "crv": "P-521",
+  "kid": "Testkey020",
+  "x": "AIO1IjEZxgpjVBVF9u2Og-L3KzQwqBG6APgaZ29-yN7k-pmMrXHgqglFHNrYCL5-LTCcuWawFLCtFQtru30_PtiW",
+  "y": "AahwDUxR904wgYiRo3IPK74PBNf-YHNYC68Kn59zsyZ1lSbMoRhZMfEwSe17-k7K1EBlCeI6DGKhV9WHT_gSJpgl",
+  "alg": "ES384"
+}

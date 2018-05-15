@@ -1,0 +1,11 @@
+{
+  "keys": [
+    {
+      "kty": "oct",
+      "use": "enc",
+      "kid": "Testkey034",
+      "k": "rS6J1vNX8bOlyVtAqxxDwg",
+      "alg": "HS256"
+    }
+  ]
+}

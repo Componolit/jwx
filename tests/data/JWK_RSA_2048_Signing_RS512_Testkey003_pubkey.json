@@ -1,0 +1,8 @@
+{
+  "kty": "RSA",
+  "e": "AQAB",
+  "use": "sig",
+  "kid": "Testkey003",
+  "alg": "RS512",
+  "n": "pLaaS5alh1rU8M2-YTHTNwo3tdALUXwvhbbcOsrWlboBIx0_-g5M5NAdMCVIqB-55_ya3UfQvj6dU4X1EJtY1jkWZ3ADjvt1bFi87TsdQnwwAXtqEryF14sAhV4AxR6rvBWVPh3TX42zHctpT3Wz9Aa9TWqaayl4_U1qQFQsYxKyl_JspiLkqXT_qiKHKPcUO2cj6We3t4v3Gw9wUa7ezBvXb2ThGMG9EwZI42Cqc0kemyE6hAZKJSJu0-nuIAC9IytJ1-hbZyI0AD1UACGkZ2AX8sIfgtJBwUNeaiRo0f-PJHfV_EdafM7x3gJqeF7spmrg-Nj3rCL3uRe9dHzcow"
+}

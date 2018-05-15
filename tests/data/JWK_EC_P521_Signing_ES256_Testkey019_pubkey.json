@@ -1,0 +1,9 @@
+{
+  "kty": "EC",
+  "use": "sig",
+  "crv": "P-521",
+  "kid": "Testkey019",
+  "x": "ADdu8CDWbesXl7o3TazzMq5fiaYs6u3-mlrBiXAjve8JdYoGM1gMpMLeo8vsRDRrI2NhEln50bfJdCdMs8lOpMN5",
+  "y": "AU-SRvsxNeJ-PpGNUWOHBsN04T7fNU_bEYbe2sfJPNAqGN1AXsEXKCfBG_dw55OPWk_OXTTc6t1_XeOXGTOXuu9E",
+  "alg": "ES256"
+}

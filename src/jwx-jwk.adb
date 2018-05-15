@@ -21,7 +21,10 @@ package body JWX.JWK
                                   Key_ID,
                                   Key_Curve,
                                   Key_X,
-                                  Key_Y))
+                                  Key_Y,
+                                  Key_D,
+                                  Key_Use,
+                                  Key_Alg))
 is
 
    package Key_Data is new JSON (4096);
@@ -31,6 +34,9 @@ is
    Key_ID    : Key_Data.Index_Type := Key_Data.End_Index;
    Key_X     : Key_Data.Index_Type := Key_Data.End_Index;
    Key_Y     : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_D     : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Use   : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Alg   : Key_Data.Index_Type := Key_Data.End_Index;
 
    -----------------
    -- Validate_EC --
@@ -45,12 +51,6 @@ is
       use Key_Data;
       Crv, Y : Index_Type;
    begin
-      --  EC key has 5 elements
-      if Elements /= 5
-      then
-         return False;
-      end if;
-
       --  Retrieve curve type 'crv'
       Crv := Query_Object ("crv");
       if Get_String (Crv) = "P-256"
@@ -77,6 +77,9 @@ is
       if Key_Y = End_Index then
          return False;
       end if;
+
+      --  Check for 'd' (optional)
+      Key_D := Query_Object ("d");
 
       case Key_Curve is
          when Curve_P256 =>
@@ -143,6 +146,12 @@ is
       else
          return;
       end if;
+
+      --  Retrieve key usage 'use'
+      Key_Use := Query_Object ("use");
+
+      --  Algortihm 'alg'
+      Key_Alg := Query_Object ("alg");
 
       -- Revieve curve
       case Key_Kind is
@@ -212,5 +221,111 @@ is
                          Result  => Value,
                          Padding => Base64.Padding_Implicit);
    end Y;
+
+
+   -----------------
+   -- Private_Key --
+   -----------------
+
+   function Private_Key return Boolean
+   is
+      use Key_Data;
+   begin
+      case Key_Kind is
+         when Kind_EC =>      return Key_D /= Key_Data.End_Index;
+         when Kind_Invalid => return False;
+      end case;
+   end Private_Key;
+
+   -----------
+   -- Usage --
+   -----------
+
+   function Usage return Use_Type
+   is
+      use Key_Data;
+   begin
+      if Key_Use = End_Index
+      then
+         return Use_Unknown;
+      end if;
+
+      if Get_String (Key_Use) = "enc"
+      then
+         return Use_Encrypt;
+      elsif Get_String (Key_Use) = "sig"
+      then
+         return Use_Sign;
+      end if;
+
+      return Use_Unknown;
+   end Usage;
+
+   ---------------
+   -- Algorithm --
+   ---------------
+
+   function Algorithm return Alg_Type
+   is
+      use Key_Data;
+   begin
+      if Key_Alg = End_Index
+      then
+         return Alg_Invalid;
+      end if;
+
+      if Get_String (Key_Alg) = "none"
+      then
+         return Alg_None;
+      elsif Get_String (Key_Alg) = "HS256"
+      then
+         return Alg_HS256;
+      elsif Get_String (Key_Alg) = "HS384"
+      then
+         return Alg_HS384;
+      elsif Get_String (Key_Alg) = "HS512"
+      then
+         return Alg_HS512;
+      elsif Get_String (Key_Alg) = "HS256"
+      then
+         return Alg_HS256;
+      elsif Get_String (Key_Alg) = "RS384"
+      then
+         return Alg_RS384;
+      elsif Get_String (Key_Alg) = "RS512"
+      then
+         return Alg_RS512;
+      elsif Get_String (Key_Alg) = "ES256"
+      then
+         return Alg_ES256;
+      elsif Get_String (Key_Alg) = "ES384"
+      then
+         return Alg_ES384;
+      elsif Get_String (Key_Alg) = "ES512"
+      then
+         return Alg_ES512;
+      elsif Get_String (Key_Alg) = "PS256"
+      then
+         return Alg_PS256;
+      elsif Get_String (Key_Alg) = "PS384"
+      then
+         return Alg_PS384;
+      elsif Get_String (Key_Alg) = "PS512"
+      then
+         return Alg_PS512;
+      else
+         return Alg_Invalid;
+      end if;
+   end Algorithm;
+
+   -----------
+   -- Curve --
+   -----------
+
+   function Curve return EC_Curve_Type
+   is
+   begin
+      return Key_Curve;
+   end Curve;
 
 end JWX.JWK;

@@ -1,0 +1,10 @@
+{
+  "kty": "EC",
+  "d": "P9F1koNIsY2tJ16jtAS5EZEmQY5YoslO8TQUURwfg9EHOmpobib5eIdaVu6S4BtI",
+  "use": "enc",
+  "crv": "P-384",
+  "kid": "Testkey027",
+  "x": "DZ3zXSc-VwabzIpphn2Fc2Lg-BmSb7lamejTJ3YNDb4SPEabjRLeuCY-zOnWd9M5",
+  "y": "wSKeDYanfNe_evsDlSbHy8OlZBZqnWjXJzpjib5_G_Gkyy2vQ7_dtvV7wUDV7xJ0",
+  "alg": "ES512"
+}
