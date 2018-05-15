@@ -10,8 +10,7 @@
 --
 
 with JWX.JSON;
-with Ada.Text_IO;
-use Ada.Text_IO;
+with JWX.Base64;
 
 package body JWX.JWK
    with
@@ -20,7 +19,9 @@ package body JWX.JWK
                                   Key_Valid,
                                   Key_Kind,
                                   Key_ID,
-                                  Key_Curve))
+                                  Key_Curve,
+                                  Key_X,
+                                  Key_Y))
 is
 
    package Key_Data is new JSON (4096);
@@ -28,6 +29,8 @@ is
    Key_Kind  : Kind_Type := Kind_Invalid;
    Key_Curve : EC_Curve_Type := Curve_Invalid;
    Key_ID    : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_X     : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Y     : Key_Data.Index_Type := Key_Data.End_Index;
 
    -----------------
    -- Validate_EC --
@@ -40,7 +43,7 @@ is
    function Valid_EC return Boolean
    is
       use Key_Data;
-      Crv, X, Y : Index_Type;
+      Crv, Y : Index_Type;
    begin
       --  EC key has 5 elements
       if Elements /= 5
@@ -64,33 +67,33 @@ is
       end if;
 
       --  Check for 'x'
-      X := Query_Object ("x");
-      if X = End_Index then
+      Key_X := Query_Object ("x");
+      if Key_X = End_Index then
          return False;
       end if;
 
       --  Check for 'y'
-      Y := Query_Object ("y");
-      if Y = End_Index then
+      Key_Y := Query_Object ("y");
+      if Key_Y = End_Index then
          return False;
       end if;
 
       case Key_Curve is
          when Curve_P256 =>
-            if Get_String (X)'Length /= 43 or
-               Get_String (Y)'Length /= 43
+            if Get_String (Key_X)'Length /= 43 or
+               Get_String (Key_Y)'Length /= 43
             then
                return False;
             end if;
          when Curve_P384 =>
-            if Get_String (X)'Length /= 64 or
-               Get_String (Y)'Length /= 64
+            if Get_String (Key_X)'Length /= 64 or
+               Get_String (Key_Y)'Length /= 64
             then
                return False;
             end if;
          when Curve_P521 =>
-            if Get_String (X)'Length /= 88 or
-               Get_String (Y)'Length /= 88
+            if Get_String (Key_X)'Length /= 88 or
+               Get_String (Key_Y)'Length /= 88
             then
                return False;
             end if;
@@ -177,5 +180,37 @@ is
    begin
       return Get_String (Key_ID);
    end ID;
+
+   -------
+   -- X --
+   -------
+
+   procedure X (Value  : out Byte_Array;
+                Length : out Natural)
+   is
+      use JWX;
+      use Key_Data;
+   begin
+      Base64.Decode_Url (Encoded => Get_String (Key_X),
+                         Length  => Length,
+                         Result  => Value,
+                         Padding => Base64.Padding_Implicit);
+   end X;
+
+   -------
+   -- Y --
+   -------
+
+   procedure Y (Value  : out Byte_Array;
+                Length : out Natural)
+   is
+      use JWX;
+      use Key_Data;
+   begin
+      Base64.Decode_Url (Encoded => Get_String (Key_Y),
+                         Length  => Length,
+                         Result  => Value,
+                         Padding => Base64.Padding_Implicit);
+   end Y;
 
 end JWX.JWK;

@@ -39,4 +39,16 @@ is
    with
       Pre => Valid;
 
+   --  Return X coordinate of EC key
+   procedure X (Value  : out Byte_Array;
+                Length : out Natural)
+   with
+      Pre => Kind = Kind_EC;
+
+   --  Return Y coordinate of EC key
+   procedure Y (Value  : out Byte_Array;
+                Length : out Natural)
+   with
+      Pre => Kind = Kind_EC;
+
 end JWX.JWK;

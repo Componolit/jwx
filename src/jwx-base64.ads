@@ -20,14 +20,14 @@ is
    procedure Decode
        (Encoded :        String;
         Length  :    out Natural;
-        Result  : in out JWX.Byte_Array;
+        Result  :    out JWX.Byte_Array;
         Padding :        Padding_Kind := Padding_Explicit);
    -- Decode Base64 encoded string into byte array
 
    procedure Decode_Url
        (Encoded :        String;
         Length  :    out Natural;
-        Result  : in out JWX.Byte_Array;
+        Result  :    out JWX.Byte_Array;
         Padding :        Padding_Kind := Padding_Explicit);
    -- Decode Base64URL encoded string into byte array
 

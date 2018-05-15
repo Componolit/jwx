@@ -115,13 +115,13 @@ is
    procedure Decode_Gen
      (Encoded :        String;
       Length  :    out Natural;
-      Result  : in out JWX.Byte_Array;
+      Result  :    out JWX.Byte_Array;
       Padding :        Padding_Kind);
 
    procedure Decode_Gen
      (Encoded :        String;
       Length  :    out Natural;
-      Result  : in out JWX.Byte_Array;
+      Result  :    out JWX.Byte_Array;
       Padding :        Padding_Kind)
    is
       B0, B1, B2, B3 : UInt6;
@@ -228,7 +228,7 @@ is
    procedure Decode
        (Encoded :        String;
         Length  :    out Natural;
-        Result  : in out JWX.Byte_Array;
+        Result  :    out JWX.Byte_Array;
         Padding :        Padding_Kind := Padding_Explicit) renames Decode_Default_Inst;
 
    ----------------
@@ -240,7 +240,7 @@ is
    procedure Decode_Url
        (Encoded :        String;
         Length  :    out Natural;
-        Result  : in out JWX.Byte_Array;
+        Result  :    out JWX.Byte_Array;
         Padding :        Padding_Kind := Padding_Explicit) renames Decode_Url_Inst;
 
 end JWX.Base64;
