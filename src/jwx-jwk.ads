@@ -17,7 +17,8 @@ package JWX.JWK
       Initializes    => State
 is
    type Kind_Type is (Kind_Invalid,
-                      Kind_EC);
+                      Kind_EC,
+                      Kind_RSA);
 
    type Use_Type is (Use_Unknown,
                      Use_Sign,

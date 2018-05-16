@@ -56,6 +56,29 @@ package body JWX_JWK_Tests is
 
    --------------------------------------------------------------------------------------------------------------------
 
+   procedure Test_RSA
+      (Input_File : String;
+       Key_ID     : String;
+       Priv       : Boolean;
+       Usg        : Key.Use_Type;
+       Alg        : Key.Alg_Type)
+   is
+      use Key;
+      Data : String := Read_File (Input_File);
+   begin
+      Parse (Data);
+      Assert (Valid, "Key invalid");
+      Assert (Kind = Kind_RSA, "Invalid kind: " & Kind'Img);
+      Assert (ID = Key_ID, "Invalid key ID: " & ID);
+
+      Assert (Private_Key = Priv, "Wrong key type: Private=" & Private_Key'Img);
+      Assert (Usage = Usg, "Wrong usage type: " & Usage'Img);
+      Assert (Algorithm = Alg, "Wrong algorithm: " & Algorithm'Img);
+      Assert (False, "Unfinished");
+   end Test_RSA;
+
+   --------------------------------------------------------------------------------------------------------------------
+
    procedure Test_Parse_RFC7517_Vector_1 (T : in out Test_Cases.Test_Case'Class)
    is
       use Key;
@@ -113,12 +136,27 @@ package body JWX_JWK_Tests is
 
    --------------------------------------------------------------------------------------------------------------------
 
+   procedure Test_Parse_Testkey004_Keypair (T : in out Test_Cases.Test_Case'Class)
+   is
+      use Key;
+   begin
+      Test_RSA (Input_File => "tests/data/JWK_RSA_2048_Encryption_RS256_Testkey004_keypair.json",
+                Key_ID     => "Testkey004",
+                Priv       => True,
+                Usg        => Use_Encrypt,
+                Alg        => Alg_RS256);
+
+   end Test_Parse_Testkey004_Keypair;
+
+   --------------------------------------------------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
       Register_Routine (T, Test_Parse_RFC7517_Vector_1'Access, "RFC7517 Vector #1");
       Register_Routine (T, Test_Parse_Testkey013_Pubkey'Access, "Testkey013 pubkey");
       Register_Routine (T, Test_Parse_Testkey013_Keypair'Access, "Testkey013 keypair");
+      Register_Routine (T, Test_Parse_Testkey004_Keypair'Access, "Testkey004 keypair");
    end Register_Tests;
 
    --------------------------------------------------------------------------------------------------------------------

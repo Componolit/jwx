@@ -107,6 +107,21 @@ is
       return True;
    end Valid_EC;
 
+   ------------------
+   -- Validate_RSA --
+   ------------------
+
+   function Valid_RSA return Boolean
+   with
+      Pre => Key_Kind = Kind_RSA;
+
+   function Valid_RSA return Boolean
+   is
+      use Key_Data;
+   begin
+      return False;
+   end Valid_RSA;
+
    -----------
    -- Parse --
    -----------
@@ -157,6 +172,11 @@ is
       case Key_Kind is
          when Kind_EC =>
             if not Valid_EC
+            then
+               return;
+            end if;
+         when Kind_RSA =>
+            if not Valid_RSA
             then
                return;
             end if;
@@ -232,7 +252,8 @@ is
       use Key_Data;
    begin
       case Key_Kind is
-         when Kind_EC =>      return Key_D /= Key_Data.End_Index;
+         when Kind_EC      => return Key_D /= Key_Data.End_Index;
+         when Kind_RSA     => return False;
          when Kind_Invalid => return False;
       end case;
    end Private_Key;
