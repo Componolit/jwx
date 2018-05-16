@@ -97,6 +97,25 @@ is
    with
       Pre => Kind = Kind_EC;
 
+   --  Return modulus N of RSA key
+   procedure N (Value  : out Byte_Array;
+                Length : out Natural)
+   with
+      Pre => Kind = Kind_RSA;
+
+   --  Return exponent E of RSA key
+   procedure E (Value  : out Byte_Array;
+                Length : out Natural)
+   with
+      Pre => Kind = Kind_RSA;
+
+   --  Return D value of RSA (private exponent) or EC key (private key)
+   procedure D (Value  : out Byte_Array;
+                Length : out Natural)
+   with
+      Pre => Kind = Kind_EC or
+             Kind = Kind_RSA;
+
    --  Is this a keyset
    function Keyset return Boolean
    with

@@ -26,6 +26,8 @@ package body JWX.JWK
                                   Key_X,
                                   Key_Y,
                                   Key_D,
+                                  Key_N,
+                                  Key_E,
                                   Key_Use,
                                   Key_Alg))
 is
@@ -41,6 +43,8 @@ is
    Key_X      : Key_Data.Index_Type := Key_Data.End_Index;
    Key_Y      : Key_Data.Index_Type := Key_Data.End_Index;
    Key_D      : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_N      : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_E      : Key_Data.Index_Type := Key_Data.End_Index;
    Key_Use    : Key_Data.Index_Type := Key_Data.End_Index;
    Key_Alg    : Key_Data.Index_Type := Key_Data.End_Index;
 
@@ -125,7 +129,22 @@ is
    is
       use Key_Data;
    begin
-      return False;
+      --  Check for 'n'
+      Key_N := Query_Object ("n", Key_Index);
+      if Key_N = End_Index then
+         return False;
+      end if;
+
+      --  Check for 'e'
+      Key_E := Query_Object ("e", Key_Index);
+      if Key_E = End_Index then
+         return False;
+      end if;
+
+      --  Check for 'd' (optional)
+      Key_D := Query_Object ("d", Key_Index);
+
+      return True;
    end Valid_RSA;
 
    ---------------
@@ -140,6 +159,7 @@ is
       Key_Valid := False;
       Key_Array := End_Index;
       Key_Index := End_Index;
+
       Parse (Input, Match);
       if Match /= Match_OK
       then
@@ -211,6 +231,53 @@ is
                          Padding => Base64.Padding_Implicit);
    end Y;
 
+   -------
+   -- N --
+   -------
+
+   procedure N (Value  : out Byte_Array;
+                Length : out Natural)
+   is
+      use JWX;
+      use Key_Data;
+   begin
+      Base64.Decode_Url (Encoded => Get_String (Key_N),
+                         Length  => Length,
+                         Result  => Value,
+                         Padding => Base64.Padding_Implicit);
+   end N;
+
+   -------
+   -- E --
+   -------
+
+   procedure E (Value  : out Byte_Array;
+                Length : out Natural)
+   is
+      use JWX;
+      use Key_Data;
+   begin
+      Base64.Decode_Url (Encoded => Get_String (Key_E),
+                         Length  => Length,
+                         Result  => Value,
+                         Padding => Base64.Padding_Implicit);
+   end E;
+
+   -------
+   -- D --
+   -------
+
+   procedure D (Value  : out Byte_Array;
+                Length : out Natural)
+   is
+      use JWX;
+      use Key_Data;
+   begin
+      Base64.Decode_Url (Encoded => Get_String (Key_D),
+                         Length  => Length,
+                         Result  => Value,
+                         Padding => Base64.Padding_Implicit);
+   end D;
 
    -----------------
    -- Private_Key --
@@ -221,9 +288,8 @@ is
       use Key_Data;
    begin
       case Key_Kind is
-         when Kind_EC      => return Key_D /= Key_Data.End_Index;
-         when Kind_RSA     => return False;
-         when Kind_Invalid => return False;
+         when Kind_EC | Kind_RSA => return Key_D /= Key_Data.End_Index;
+         when Kind_Invalid       => return False;
       end case;
    end Private_Key;
 
@@ -276,9 +342,9 @@ is
       elsif Get_String (Key_Alg) = "HS512"
       then
          return Alg_HS512;
-      elsif Get_String (Key_Alg) = "HS256"
+      elsif Get_String (Key_Alg) = "RS256"
       then
-         return Alg_HS256;
+         return Alg_RS256;
       elsif Get_String (Key_Alg) = "RS384"
       then
          return Alg_RS384;
@@ -394,6 +460,9 @@ is
       if Get_String (Kty) = "EC"
       then
          Key_Kind := Kind_EC;
+      elsif Get_String (Kty) = "RSA"
+      then
+         Key_Kind := Kind_RSA;
       else
          return;
       end if;
@@ -402,7 +471,7 @@ is
       Key_Use := Query_Object ("use", Key_Index);
 
       --  Algortihm 'alg'
-      Key_Alg := Query_Object ("alg");
+      Key_Alg := Query_Object ("alg", Key_Index);
 
       -- Revieve curve
       case Key_Kind is
