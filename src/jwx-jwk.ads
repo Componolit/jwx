@@ -18,7 +18,8 @@ package JWX.JWK
 is
    type Kind_Type is (Kind_Invalid,
                       Kind_EC,
-                      Kind_RSA);
+                      Kind_RSA,
+                      Kind_OCT);
 
    type Use_Type is (Use_Unknown,
                      Use_Sign,
@@ -115,6 +116,12 @@ is
    with
       Pre => Kind = Kind_EC or
              Kind = Kind_RSA;
+
+   --  Return K value of a plain secret key
+   procedure K (Value  : out Byte_Array;
+                Length : out Natural)
+   with
+      Pre => Kind = Kind_OCT;
 
    --  Is this a keyset
    function Keyset return Boolean

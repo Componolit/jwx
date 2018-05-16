@@ -28,6 +28,7 @@ package body JWX.JWK
                                   Key_D,
                                   Key_N,
                                   Key_E,
+                                  Key_K,
                                   Key_Use,
                                   Key_Alg))
 is
@@ -45,6 +46,7 @@ is
    Key_D      : Key_Data.Index_Type := Key_Data.End_Index;
    Key_N      : Key_Data.Index_Type := Key_Data.End_Index;
    Key_E      : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_K      : Key_Data.Index_Type := Key_Data.End_Index;
    Key_Use    : Key_Data.Index_Type := Key_Data.End_Index;
    Key_Alg    : Key_Data.Index_Type := Key_Data.End_Index;
 
@@ -146,6 +148,26 @@ is
 
       return True;
    end Valid_RSA;
+
+   ---------------
+   -- Valid_Oct --
+   ---------------
+
+   function Valid_Oct return Boolean
+   with
+      Pre => Key_Kind = Kind_OCT;
+
+   function Valid_Oct return Boolean
+   is
+      use Key_Data;
+   begin
+      --  Check for 'k'
+      Key_K := Query_Object ("k", Key_Index);
+      if Key_K = End_Index then
+         return False;
+      end if;
+      return True;
+   end Valid_Oct;
 
    ---------------
    -- Load_Keys --
@@ -279,6 +301,22 @@ is
                          Padding => Base64.Padding_Implicit);
    end D;
 
+   -------
+   -- K --
+   -------
+
+   procedure K (Value  : out Byte_Array;
+                Length : out Natural)
+   is
+      use JWX;
+      use Key_Data;
+   begin
+      Base64.Decode_Url (Encoded => Get_String (Key_K),
+                         Length  => Length,
+                         Result  => Value,
+                         Padding => Base64.Padding_Implicit);
+   end K;
+
    -----------------
    -- Private_Key --
    -----------------
@@ -289,6 +327,7 @@ is
    begin
       case Key_Kind is
          when Kind_EC | Kind_RSA => return Key_D /= Key_Data.End_Index;
+         when Kind_OCT           => return True;
          when Kind_Invalid       => return False;
       end case;
    end Private_Key;
@@ -463,6 +502,9 @@ is
       elsif Get_String (Kty) = "RSA"
       then
          Key_Kind := Kind_RSA;
+      elsif Get_String (Kty) = "oct"
+      then
+         Key_Kind := Kind_OCT;
       else
          return;
       end if;
@@ -482,6 +524,11 @@ is
             end if;
          when Kind_RSA =>
             if not Valid_RSA
+            then
+               return;
+            end if;
+         when Kind_OCT =>
+            if not Valid_Oct
             then
                return;
             end if;

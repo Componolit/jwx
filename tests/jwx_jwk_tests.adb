@@ -118,6 +118,38 @@ package body JWX_JWK_Tests is
 
    --------------------------------------------------------------------------------------------------------------------
 
+   procedure Test_Oct
+      (Input_File : String;
+       Key_ID     : String;
+       Usg        : Key.Use_Type;
+       Alg        : Key.Alg_Type;
+       K_Ref      : Byte_Array)
+   is
+      use Key;
+      Data : String := Read_File (Input_File);
+      K_Val : Byte_Array (1 .. K_Ref'Length);
+      K_Length : Natural;
+   begin
+      Load_Keys (Data);
+      Assert (Loaded, "Invalid key file");
+
+      Select_Key;
+      Assert (Valid, "Key invalid");
+      Assert (Kind = Kind_Oct, "Invalid kind: " & Kind'Img);
+      Assert (ID = Key_ID, "Invalid key ID: " & ID);
+
+      Assert (Private_Key, "OCT must be private");
+
+      K (K_Val, K_Length);
+      Assert (K_Length = K_Ref'Length, "Wrong K size: " & K_Length'Img);
+      Assert (K_Val (1 .. K_Length) = K_Ref, "Invalid K");
+
+      Assert (Usage = Usg, "Wrong usage type: " & Usage'Img);
+      Assert (Algorithm = Alg, "Wrong algorithm: " & Algorithm'Img);
+   end Test_Oct;
+
+   --------------------------------------------------------------------------------------------------------------------
+
    procedure Test_Parse_RFC7517_Vector_1 (T : in out Test_Cases.Test_Case'Class)
    is
       use Key;
@@ -226,6 +258,20 @@ package body JWX_JWK_Tests is
 
    --------------------------------------------------------------------------------------------------------------------
 
+   procedure Test_Parse_Testkey033_Keyset (T : in out Test_Cases.Test_Case'Class)
+   is
+      use Key;
+   begin
+      Test_Oct (Input_File => "tests/data/JWK_OCT_128_Signing_HS512_Testkey033_keyset.json",
+                Key_ID     => "Testkey033",
+                K_Ref      => (062, 028, 173, 034, 215, 007, 204, 249, 087, 122, 135, 146, 147, 118, 003, 047),
+                Usg        => Use_Sign,
+                Alg        => Alg_HS512);
+
+   end Test_Parse_Testkey033_Keyset;
+
+   --------------------------------------------------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -233,6 +279,7 @@ package body JWX_JWK_Tests is
       Register_Routine (T, Test_Parse_Testkey013_Pubkey'Access, "Testkey013 pubkey");
       Register_Routine (T, Test_Parse_Testkey013_Keypair'Access, "Testkey013 keypair");
       Register_Routine (T, Test_Parse_Testkey004_Keypair'Access, "Testkey004 keypair");
+      Register_Routine (T, Test_Parse_Testkey033_Keyset'Access, "Testkey033 keyset");
    end Register_Tests;
 
    --------------------------------------------------------------------------------------------------------------------
