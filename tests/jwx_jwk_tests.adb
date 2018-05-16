@@ -35,7 +35,8 @@ package body JWX_JWK_Tests is
       Y_Val : Byte_Array (1 .. Y_Ref'Length);
       Y_Length : Natural;
    begin
-      Parse (Data);
+      Load_Keys (Data);
+      Select_Key;
       Assert (Valid, "Key invalid");
       Assert (Kind = Kind_EC, "Invalid kind: " & Kind'Img);
       Assert (ID = Key_ID, "Invalid key ID: " & ID);
@@ -66,7 +67,8 @@ package body JWX_JWK_Tests is
       use Key;
       Data : String := Read_File (Input_File);
    begin
-      Parse (Data);
+      Load_Keys (Data);
+      Select_Key;
       Assert (Valid, "Key invalid");
       Assert (Kind = Kind_RSA, "Invalid kind: " & Kind'Img);
       Assert (ID = Key_ID, "Invalid key ID: " & ID);

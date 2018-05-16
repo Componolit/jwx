@@ -16,7 +16,10 @@ package body JWX.JWK
    with
       SPARK_Mode,
       Refined_State => (State => (Key_Data.State,
+                                  Key_Loaded,
                                   Key_Valid,
+                                  Key_Index,
+                                  Key_Array,
                                   Key_Kind,
                                   Key_ID,
                                   Key_Curve,
@@ -28,15 +31,18 @@ package body JWX.JWK
 is
 
    package Key_Data is new JSON (4096);
-   Key_Valid : Boolean := False;
-   Key_Kind  : Kind_Type := Kind_Invalid;
-   Key_Curve : EC_Curve_Type := Curve_Invalid;
-   Key_ID    : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_X     : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_Y     : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_D     : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_Use   : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_Alg   : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Valid  : Boolean := False;
+   Key_Loaded : Boolean := False;
+   Key_Kind   : Kind_Type := Kind_Invalid;
+   Key_Curve  : EC_Curve_Type := Curve_Invalid;
+   Key_Index  : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Array  : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_ID     : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_X      : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Y      : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_D      : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Use    : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Alg    : Key_Data.Index_Type := Key_Data.End_Index;
 
    -----------------
    -- Validate_EC --
@@ -49,10 +55,10 @@ is
    function Valid_EC return Boolean
    is
       use Key_Data;
-      Crv, Y : Index_Type;
+      Crv : Index_Type;
    begin
       --  Retrieve curve type 'crv'
-      Crv := Query_Object ("crv");
+      Crv := Query_Object ("crv", Key_Index);
       if Get_String (Crv) = "P-256"
       then
          Key_Curve := Curve_P256;
@@ -67,19 +73,19 @@ is
       end if;
 
       --  Check for 'x'
-      Key_X := Query_Object ("x");
+      Key_X := Query_Object ("x", Key_Index);
       if Key_X = End_Index then
          return False;
       end if;
 
       --  Check for 'y'
-      Key_Y := Query_Object ("y");
+      Key_Y := Query_Object ("y", Key_Index);
       if Key_Y = End_Index then
          return False;
       end if;
 
       --  Check for 'd' (optional)
-      Key_D := Query_Object ("d");
+      Key_D := Query_Object ("d", Key_Index);
 
       case Key_Curve is
          when Curve_P256 =>
@@ -122,76 +128,39 @@ is
       return False;
    end Valid_RSA;
 
-   -----------
-   -- Parse --
-   -----------
+   ---------------
+   -- Load_Keys --
+   ---------------
 
-   procedure Parse (Input : String)
+   procedure Load_Keys (Input : String)
    is
       use Key_Data;
       Match : Match_Type;
-      Kty   : Index_Type;
    begin
       Key_Valid := False;
+      Key_Array := End_Index;
+      Key_Index := End_Index;
       Parse (Input, Match);
       if Match /= Match_OK
       then
+         Key_Loaded := False;
          return;
       end if;
+      Key_Loaded := True;
 
-      --  Key must be an object
-      if Get_Kind /= Kind_Object
-      then
-         return;
-      end if; 
-
-      --  Retrieve key id 'kid'
-      Key_ID := Query_Object ("kid");
-      if Key_ID = End_Index or else
-         Get_Kind (Key_ID) /= Kind_String
-      then
-         return;
-      end if;
-
-      --  Retrieve key type 'kty'
-      Kty := Query_Object ("kty");
-      if Get_String (Kty) = "EC"
-      then
-         Key_Kind := Kind_EC;
-      else
-         return;
-      end if;
-
-      --  Retrieve key usage 'use'
-      Key_Use := Query_Object ("use");
-
-      --  Algortihm 'alg'
-      Key_Alg := Query_Object ("alg");
-
-      -- Revieve curve
-      case Key_Kind is
-         when Kind_EC =>
-            if not Valid_EC
-            then
-               return;
-            end if;
-         when Kind_RSA =>
-            if not Valid_RSA
-            then
-               return;
-            end if;
-         when Kind_Invalid =>
-            return;
-      end case;
-      Key_Valid := True;
-         
-   end Parse;
+   end Load_Keys;
 
    -----------
    -- Valid --
    -----------
 
    function Valid return Boolean is (Key_Valid);
+
+   ------------
+   -- Loaded --
+   ------------
+
+   function Loaded return Boolean is (Key_Loaded);
 
    ----------
    -- Kind --
@@ -348,5 +317,110 @@ is
    begin
       return Key_Curve;
    end Curve;
+
+   ------------
+   -- Keyset --
+   ------------
+
+   function Keyset return Boolean
+   is
+      use Key_Data;
+   begin
+      return Key_Index /= Null_Index;
+   end Keyset;
+
+   --------------
+   -- Num_Keys --
+   --------------
+
+   function Num_Keys return Natural
+   is
+      use Key_Data;
+   begin
+      if Key_Index = Null_Index
+      then
+         return 1;
+      else
+         return Length (Key_Array);
+      end if;
+   end Num_Keys;
+
+   ----------------
+   -- Select_Key --
+   ----------------
+
+   procedure Select_Key (Index : Positive := 1)
+   is
+      use Key_Data;
+      Kty  : Index_Type;
+   begin
+      Key_Valid := False;
+
+      --  Key must be an object
+      if Get_Kind /= Kind_Object
+      then
+         return;
+      end if;
+
+      --  Check whether this is a single key or a key set
+      Key_Array := Query_Object ("keys");
+      if Key_Array = End_Index
+      then
+         --  There is only on key - using anything but 1 here is invalid
+         if Index /= 1
+         then
+            return;
+         end if;
+         Key_Index := Null_Index;
+      else
+         Key_Index := Pos (Index, Key_Array);
+         if Key_Index = End_Index
+         then
+            --  Key not found at given Index
+            return;
+         end if;
+      end if;
+
+      --  Retrieve key id 'kid'
+      Key_ID := Query_Object ("kid", Key_Index);
+      if Key_ID = End_Index or else
+         Get_Kind (Key_ID) /= Kind_String
+      then
+         return;
+      end if;
+
+      --  Retrieve key type 'kty'
+      Kty := Query_Object ("kty", Key_Index);
+      if Get_String (Kty) = "EC"
+      then
+         Key_Kind := Kind_EC;
+      else
+         return;
+      end if;
+
+      --  Retrieve key usage 'use'
+      Key_Use := Query_Object ("use", Key_Index);
+
+      --  Algortihm 'alg'
+      Key_Alg := Query_Object ("alg");
+
+      -- Revieve curve
+      case Key_Kind is
+         when Kind_EC =>
+            if not Valid_EC
+            then
+               return;
+            end if;
+         when Kind_RSA =>
+            if not Valid_RSA
+            then
+               return;
+            end if;
+         when Kind_Invalid =>
+            return;
+      end case;
+      Key_Valid := True;
+
+   end Select_Key;
 
 end JWX.JWK;

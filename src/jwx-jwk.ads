@@ -44,13 +44,18 @@ is
                           Curve_P384,
                           Curve_P521);
 
-   --  Parse a JWK
-   procedure Parse (Input : String);
+   --  Key object loaded
+   function Loaded return Boolean;
+
+   --  Load a JSON object containing a JWK or JWK set
+   procedure Load_Keys (Input : String)
+   with
+      Post => Loaded;
    
    --  Valid key
    function Valid return Boolean;
 
-   --  Valid key
+   --  Kind
    function Kind return Kind_Type
    with
       Pre => Valid;
@@ -91,5 +96,20 @@ is
    function Curve return EC_Curve_Type
    with
       Pre => Kind = Kind_EC;
+
+   --  Is this a keyset
+   function Keyset return Boolean
+   with
+      Pre => Loaded;
+
+   --  Number of keys in key set
+   function Num_Keys return Natural
+   with
+      Pre => Loaded;
+
+   --  Select a key
+   procedure Select_Key (Index : Positive := 1)
+   with
+      Pre => Loaded;
 
 end JWX.JWK;
