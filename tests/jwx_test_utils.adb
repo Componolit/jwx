@@ -22,34 +22,4 @@ is
       return Contents;
    end Read_File;
 
-   -------------------
-   -- To_Byte_Array --
-   -------------------
-
-   procedure To_Byte_Array
-      (Data   :        String;
-       Result : in out JWX.Byte_Array)
-   is
-   begin
-      for I in 0 .. Data'Length - 1
-      loop
-         Result (Result'First + I) := Character'Pos (Data (Data'First + I));
-      end loop;
-   end To_Byte_Array;
-
-   ---------------
-   -- To_String --
-   ---------------
-
-   procedure To_String
-      (Data   :        JWX.Byte_Array;
-       Result : in out String)
-   is
-   begin
-      for I in 0 .. Data'Length - 1
-      loop
-         Result (Result'First + I) := Character'Val (Data (Data'First + I));
-      end loop;
-   end To_String;
-
 end JWX_Test_Utils;

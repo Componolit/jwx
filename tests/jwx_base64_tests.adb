@@ -11,6 +11,7 @@
 
 with AUnit.Assertions; use AUnit.Assertions;
 with JWX.BASE64;
+with JWX.Util;
 use JWX;
 with JWX_Test_Utils; use JWX_Test_Utils;
 
@@ -27,7 +28,7 @@ package body JWX_BASE64_Tests is
       S : String_Type;
    begin
       Decode (Encoded => Input, Length => L, Result => R);
-      To_String (R, S);
+      Util.To_String (R, S);
       Assert (L > 0, "Too short: " & L'Img);
       Assert (S(1..L) = Output, "Invalid result: " & S(1..L));
    end Test_Vector;
@@ -106,7 +107,7 @@ package body JWX_BASE64_Tests is
       S : String_Type;
    begin
       Decode (Encoded => Input, Length => L, Result => R, Padding => Padding_Implicit);
-      To_String (R, S);
+      Util.To_String (R, S);
       Assert (L > 0, "Too short: " & L'Img);
       Assert (S(1..L) = Output, "Invalid result: " & S(1..L));
    end Test_Vector_Implicit;
@@ -185,7 +186,7 @@ package body JWX_BASE64_Tests is
       S : String_Type;
    begin
       Decode_Url (Encoded => Input, Length => L, Result => R);
-      To_String (R, S);
+      Util.To_String (R, S);
       Assert (L > 0, "Too short: " & L'Img);
       Assert (S(1..L) = Output, "Invalid result: " & S(1..L));
    end Test_Vector_Url;
