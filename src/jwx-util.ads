@@ -16,11 +16,11 @@ package JWX.Util
       SPARK_Mode
 is
    procedure To_Byte_Array
-      (Data   :        String;
-       Result : in out JWX.Byte_Array);
+      (Data   :     String;
+       Result : out JWX.Byte_Array);
 
    procedure To_String
-      (Data   :        JWX.Byte_Array;
-       Result : in out String);
+      (Data   :     JWX.Byte_Array;
+       Result : out String);
 
 end JWX.Util;

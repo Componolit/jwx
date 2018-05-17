@@ -18,14 +18,15 @@ is
    -------------------
 
    procedure To_Byte_Array
-      (Data   :        String;
-       Result : in out JWX.Byte_Array)
+      (Data   :     String;
+       Result : out JWX.Byte_Array)
    is
    begin
       for I in 0 .. Data'Length - 1
       loop
          Result (Result'First + I) := Character'Pos (Data (Data'First + I));
       end loop;
+      --  FIXME: Zero out remaining result
    end To_Byte_Array;
 
    ---------------
@@ -33,14 +34,15 @@ is
    ---------------
 
    procedure To_String
-      (Data   :        JWX.Byte_Array;
-       Result : in out String)
+      (Data   :     JWX.Byte_Array;
+       Result : out String)
    is
    begin
       for I in 0 .. Data'Length - 1
       loop
          Result (Result'First + I) := Character'Val (Data (Data'First + I));
       end loop;
+      --  FIXME: Zero out remaining result
    end To_String;
 
 end JWX.Util;
