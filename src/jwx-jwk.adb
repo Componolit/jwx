@@ -54,15 +54,18 @@ is
    -- Validate_EC --
    -----------------
 
-   function Valid_EC return Boolean
+   procedure Valid_EC (Valid : out Boolean)
    with
       Pre => Key_Kind = Kind_EC;
 
-   function Valid_EC return Boolean
+   procedure Valid_EC (Valid : out Boolean)
    is
       use Key_Data;
       Crv : Index_Type;
    begin
+
+      Valid := False;
+
       --  Retrieve curve type 'crv'
       Crv := Query_Object ("crv", Key_Index);
       if Get_String (Crv) = "P-256"
@@ -75,19 +78,19 @@ is
       then
          Key_Curve := Curve_P521;
       else
-         return False;
+         return;
       end if;
 
       --  Check for 'x'
       Key_X := Query_Object ("x", Key_Index);
       if Key_X = End_Index then
-         return False;
+         return;
       end if;
 
       --  Check for 'y'
       Key_Y := Query_Object ("y", Key_Index);
       if Key_Y = End_Index then
-         return False;
+         return;
       end if;
 
       --  Check for 'd' (optional)
@@ -98,75 +101,80 @@ is
             if Get_String (Key_X)'Length /= 43 or
                Get_String (Key_Y)'Length /= 43
             then
-               return False;
+               return;
             end if;
          when Curve_P384 =>
             if Get_String (Key_X)'Length /= 64 or
                Get_String (Key_Y)'Length /= 64
             then
-               return False;
+               return;
             end if;
          when Curve_P521 =>
             if Get_String (Key_X)'Length /= 88 or
                Get_String (Key_Y)'Length /= 88
             then
-               return False;
+               return;
             end if;
          when Curve_Invalid =>
-            return False;
+            return;
       end case;
 
-      return True;
+      Valid := True;
    end Valid_EC;
 
    ------------------
    -- Validate_RSA --
    ------------------
 
-   function Valid_RSA return Boolean
+   procedure Valid_RSA (Valid : out Boolean)
    with
       Pre => Key_Kind = Kind_RSA;
 
-   function Valid_RSA return Boolean
+   procedure Valid_RSA (Valid : out Boolean)
    is
       use Key_Data;
    begin
+      Valid := False;
+
       --  Check for 'n'
       Key_N := Query_Object ("n", Key_Index);
       if Key_N = End_Index then
-         return False;
+         return;
       end if;
 
       --  Check for 'e'
       Key_E := Query_Object ("e", Key_Index);
       if Key_E = End_Index then
-         return False;
+         return;
       end if;
 
       --  Check for 'd' (optional)
       Key_D := Query_Object ("d", Key_Index);
 
-      return True;
+      Valid := True;
    end Valid_RSA;
 
    ---------------
    -- Valid_Oct --
    ---------------
 
-   function Valid_Oct return Boolean
+   procedure Valid_Oct (Valid : out Boolean)
    with
       Pre => Key_Kind = Kind_OCT;
 
-   function Valid_Oct return Boolean
+   procedure Valid_Oct (Valid : out Boolean)
    is
       use Key_Data;
    begin
+      Valid := False;
+
       --  Check for 'k'
       Key_K := Query_Object ("k", Key_Index);
       if Key_K = End_Index then
-         return False;
+         return;
       end if;
-      return True;
+
+      Valid := True;
    end Valid_Oct;
 
    ---------------
@@ -457,7 +465,8 @@ is
    procedure Select_Key (Index : Positive := 1)
    is
       use Key_Data;
-      Kty  : Index_Type;
+      Kty   : Index_Type;
+      Valid : Boolean := False;
    begin
       Key_Valid := False;
 
@@ -518,17 +527,20 @@ is
       -- Revieve curve
       case Key_Kind is
          when Kind_EC =>
-            if not Valid_EC
+            Valid_EC (Valid);
+            if not Valid
             then
                return;
             end if;
          when Kind_RSA =>
-            if not Valid_RSA
+            Valid_RSA (Valid);
+            if not Valid
             then
                return;
             end if;
          when Kind_OCT =>
-            if not Valid_Oct
+            Valid_Oct (Valid);
+            if not Valid
             then
                return;
             end if;
