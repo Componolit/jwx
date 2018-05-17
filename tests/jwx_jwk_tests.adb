@@ -26,7 +26,7 @@ package body JWX_JWK_Tests is
        D_Ref      : Byte_Array;
        Priv       : Boolean;
        Usg        : Key.Use_Type;
-       Alg        : Key.Alg_Type;
+       Alg        : Alg_Type;
        Crv        : Key.EC_Curve_Type)
    is
       use Key;
@@ -73,7 +73,7 @@ package body JWX_JWK_Tests is
        Key_ID     : String;
        Priv       : Boolean;
        Usg        : Key.Use_Type;
-       Alg        : Key.Alg_Type;
+       Alg        : Alg_Type;
        N_Ref      : Byte_Array;
        E_Ref      : Byte_Array;
        D_Ref      : Byte_Array)
@@ -122,7 +122,7 @@ package body JWX_JWK_Tests is
       (Input_File : String;
        Key_ID     : String;
        Usg        : Key.Use_Type;
-       Alg        : Key.Alg_Type;
+       Alg        : Alg_Type;
        K_Ref      : Byte_Array)
    is
       use Key;

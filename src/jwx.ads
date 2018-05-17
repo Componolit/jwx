@@ -19,4 +19,23 @@ is
 
    type Byte_Array is array (Natural range <>) of Byte
       with Pack;
+
+   type Alg_Type is (Alg_Invalid,
+                     Alg_None,
+                     Alg_HS256,
+                     Alg_HS384,
+                     Alg_HS512,
+                     Alg_RS256,
+                     Alg_RS384,
+                     Alg_RS512,
+                     Alg_ES256,
+                     Alg_ES384,
+                     Alg_ES512,
+                     Alg_PS256,
+                     Alg_PS384,
+                     Alg_PS512);
+
+   -- Convert a algorithm string to Alg_Type
+   function Algorithm (Alg_String : String) return Alg_Type;
+
 end JWX;

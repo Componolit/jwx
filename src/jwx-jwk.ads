@@ -24,21 +24,6 @@ is
                      Use_Sign,
                      Use_Encrypt);
 
-   type Alg_Type is (Alg_Invalid,
-                     Alg_None,
-                     Alg_HS256,
-                     Alg_HS384,
-                     Alg_HS512,
-                     Alg_RS256,
-                     Alg_RS384,
-                     Alg_RS512,
-                     Alg_ES256,
-                     Alg_ES384,
-                     Alg_ES512,
-                     Alg_PS256,
-                     Alg_PS384,
-                     Alg_PS512);
-
    type EC_Curve_Type is (Curve_Invalid,
                           Curve_P256,
                           Curve_P384,

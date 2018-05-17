@@ -376,48 +376,7 @@ is
          return Alg_Invalid;
       end if;
 
-      if Get_String (Key_Alg) = "none"
-      then
-         return Alg_None;
-      elsif Get_String (Key_Alg) = "HS256"
-      then
-         return Alg_HS256;
-      elsif Get_String (Key_Alg) = "HS384"
-      then
-         return Alg_HS384;
-      elsif Get_String (Key_Alg) = "HS512"
-      then
-         return Alg_HS512;
-      elsif Get_String (Key_Alg) = "RS256"
-      then
-         return Alg_RS256;
-      elsif Get_String (Key_Alg) = "RS384"
-      then
-         return Alg_RS384;
-      elsif Get_String (Key_Alg) = "RS512"
-      then
-         return Alg_RS512;
-      elsif Get_String (Key_Alg) = "ES256"
-      then
-         return Alg_ES256;
-      elsif Get_String (Key_Alg) = "ES384"
-      then
-         return Alg_ES384;
-      elsif Get_String (Key_Alg) = "ES512"
-      then
-         return Alg_ES512;
-      elsif Get_String (Key_Alg) = "PS256"
-      then
-         return Alg_PS256;
-      elsif Get_String (Key_Alg) = "PS384"
-      then
-         return Alg_PS384;
-      elsif Get_String (Key_Alg) = "PS512"
-      then
-         return Alg_PS512;
-      else
-         return Alg_Invalid;
-      end if;
+      return Algorithm (Get_String (Key_Alg));
    end Algorithm;
 
    -----------
