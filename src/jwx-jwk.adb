@@ -14,7 +14,6 @@ with JWX.Base64;
 
 package body JWX.JWK
    with
-      SPARK_Mode,
       Refined_State => (State => (Key_Data.State,
                                   Key_Loaded,
                                   Key_Valid,

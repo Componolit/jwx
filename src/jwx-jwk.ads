@@ -12,7 +12,6 @@
 generic
 package JWX.JWK
    with
-      SPARK_Mode,
       Abstract_State => State,
       Initializes    => State
 is

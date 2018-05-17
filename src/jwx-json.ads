@@ -16,7 +16,6 @@ generic
 
 package JWX.JSON
    with
-      SPARK_Mode,
       Abstract_State => State,
       Initializes    => State
 is

@@ -11,7 +11,6 @@
 
 package body JWX.JSON
    with
-      SPARK_Mode,
       Refined_State => (State => (Context, Context_Index, Offset, Data, Input_Length))
 is
    type Context_Element_Type is
