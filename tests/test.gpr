@@ -1,4 +1,5 @@
 with "aunit";
+with "libsparkcrypto";
 
 project Test is
 

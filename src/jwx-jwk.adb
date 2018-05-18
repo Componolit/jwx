@@ -455,11 +455,6 @@ is
 
       --  Retrieve key id 'kid'
       Key_ID := Query_Object ("kid", Key_Index);
-      if Key_ID = End_Index or else
-         Get_Kind (Key_ID) /= Kind_String
-      then
-         return;
-      end if;
 
       --  Retrieve key type 'kty'
       Kty := Query_Object ("kty", Key_Index);
