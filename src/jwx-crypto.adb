@@ -1,8 +1,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with JWX.JWK;
 with JWX.Base64;
-
-use JWX;
+with JWX.LSC;
 
 with LSC.Types;
 with LSC.SHA256;
@@ -13,39 +12,6 @@ use type Interfaces.Unsigned_64;
 
 package body JWX.Crypto
 is
-   ----------------------------------------
-   -- JWX_Byte_Array_To_LSC_Word32_Array --
-   ----------------------------------------
-
-   procedure JWX_Byte_Array_To_LSC_Word32_Array
-      (Input  :     JWX.Byte_Array;
-       Output : out LSC.Types.Word32_Array_Type)
-   is
-      Value : LSC.Types.Byte_Array32_Type;
-   begin
-      for I in 1 .. Input'Length/4
-      loop
-         for J in 0 .. 3
-         loop
-            Value (LSC.Types.Index (J)) :=
-               (if I + J in Input'Range then LSC.Types.Byte (Input (I + J)) else 0);
-         end loop;
-         Output (LSC.Types.Index (I)) := LSC.Types.Byte_Array32_To_Word32 (Value);
-      end loop;
-   end JWX_Byte_Array_To_LSC_Word32_Array;
-
-   ----------------------------------------
-   -- JWX_Byte_Array_To_LSC_Message_Type --
-   ----------------------------------------
-
-   procedure JWX_Byte_Array_To_LSC_Message_Type
-      (Input  :     JWX.Byte_Array;
-       Output : out LSC.SHA256.Message_Type)
-   is
-   begin
-      Output := (others => (others => 0));
-   end JWX_Byte_Array_To_LSC_Message_Type;
-
    -----------------------
    -- Valid_HMAC_SHA256 --
    -----------------------
@@ -56,8 +22,8 @@ is
       Payload_Raw : JWX.Byte_Array (1 .. (Payload'Length/4 + 1) * 3);
       Auth_Raw    : JWX.Byte_Array (1 .. (Key'Length/4 + 1) * 3);
 
-      Payload_LSC : LSC.SHA256.Message_Type (1 .. Payload_Raw'Length/64);
-      Auth_LSC    : LSC.HMAC_SHA256.Auth_Type;
+      Payload_LSC : Standard.LSC.SHA256.Message_Type (1 .. Payload_Raw'Length/64);
+      Auth_LSC    : Standard.LSC.HMAC_SHA256.Auth_Type;
 
       Payload_Length : Natural;
       Auth_Length    : Natural;
@@ -87,8 +53,8 @@ is
       end if;
 
       --  Convert payload into LSC compatible format
-      JWX_Byte_Array_To_LSC_Message_Type
-         (Input  => Payload_Raw (Payload_Raw'First .. Payload_RAw'First + Payload_Length),
+      LSC.JWX_Byte_Array_To_LSC_SHA256_Message
+         (Input  => Payload_Raw (Payload_Raw'First .. Payload_Raw'First + Payload_Length),
           Output => Payload_LSC);
 
       --  Decode authenticator
