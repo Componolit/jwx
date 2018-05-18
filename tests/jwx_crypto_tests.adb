@@ -18,10 +18,15 @@ with JWX_Test_Utils; use JWX_Test_Utils;
 use JWX;
 with LSC.Types;
 with LSC.SHA256;
+with LSC.HMAC_SHA256;
 with LSC.Byteorder32;
+
+with Interfaces;
 
 package body JWX_Crypto_Tests
 is
+
+   subtype MT is LSC.SHA256.Message_Type (1 .. 4);
 
    function M (Item : LSC.Types.Word32) return LSC.Types.Word32
    is
@@ -76,8 +81,6 @@ is
       use JWX.LSC;
       use JWX.Util;
 
-      subtype MT is LSC.SHA256.Message_Type (1 .. 4);
-
       Expected : MT := (
       LSC.SHA256.Block_Type'(
          M (16#1d68a3cd#), M (16#6b07a7e3#), M (16#3ce93a05#), M (16#f89defe5#),
@@ -112,12 +115,44 @@ is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_HMAC_SHA256 (T : in out Test_Cases.Test_Case'Class)
+   is
+      use JWX.Util;
+      use JWX.LSC;
+      use SC.Types;
+      use type Interfaces.Unsigned_64;
+
+      Key_Input : String := Read_File ("tests/data/hmac_sha256-key-1.dat");
+      Key_BA    : JWX.Byte_Array (1 .. Key_Input'Length);
+      Key       : SC.SHA256.Block_Type;
+
+      Msg_Input : String := Read_File ("tests/data/hmac_sha256-message-1.dat");
+      Msg_BA    : JWX.Byte_Array (1 .. Msg_Input'Length);
+      Msg       : MT;
+
+      Auth          : SC.HMAC_SHA256.Auth_Type;
+      Expected_Auth : JWX.Byte_Array := (16#15#, 16#66#, 16#78#, 16#70#, 16#c4#, 16#95#, 16#7c#, 16#0f#,
+                                         16#46#, 16#de#, 16#0f#, 16#26#, 16#c1#, 16#98#, 16#04#, 16#ae#);
+   begin
+      To_Byte_Array (Key_Input, Key_BA);
+      JWX_Byte_Array_To_LSC_Word32_Array (Key_BA, Key);
+
+      To_Byte_Array (Msg_Input, Msg_BA);
+      JWX_Byte_Array_To_LSC_SHA256_Message (Msg_BA, Msg);
+
+      JWX_Byte_Array_To_LSC_Word32_Array (Expected_Auth, Auth);
+      Assert (Auth = SC.HMAC_SHA256.Authenticate (Key, Msg, Msg_Input'Length * 8), "Auth failed");
+
+   end Test_HMAC_SHA256;
+
+   ---------------------------------------------------------------------------
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
       Register_Routine (T, Test_Block_Type_Conversion_1'Access, "Block conversion 1");
       Register_Routine (T, Test_Block_Type_Conversion_2'Access, "Block conversion 2");
       Register_Routine (T, Test_Message_Type_Conversion_1'Access, "Message conversion 1");
+      Register_Routine (T, Test_HMAC_SHA256'Access, "HMAC-SHA256");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
