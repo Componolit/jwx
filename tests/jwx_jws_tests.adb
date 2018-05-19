@@ -28,10 +28,27 @@ package body JWX_JWS_Tests is
       Assert (Result = Result_OK, "Validation failed: " & Result'Img);
    end Test_Parse_RFC7515_Vector_1;
 
+   --------------------------------------------------------------------------------------------------------------------
+
+   procedure Test_Parse_RFC7515_Vector_1_Invalid (T : in out Test_Cases.Test_Case'Class)
+   is
+      use JWS;
+      Result : Result_Type;
+   begin
+      Validate_Compact (Data     => Read_File ("tests/data/JWS_RFC7515_example_2.dat"),
+                        Key_Data => Read_File ("tests/data/JWS_RFC7515_example_1_key.json"),
+                        Result   => Result);
+
+      Assert (Result /= Result_OK, "Validation must fail");
+   end Test_Parse_RFC7515_Vector_1_Invalid;
+
+   --------------------------------------------------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
       Register_Routine (T, Test_Parse_RFC7515_Vector_1'Access, "RFC7515 Vector #1");
+      Register_Routine (T, Test_Parse_RFC7515_Vector_1_Invalid'Access, "RFC7515 Vector #1 invalid");
    end Register_Tests;
 
    --------------------------------------------------------------------------------------------------------------------

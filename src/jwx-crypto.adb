@@ -2,6 +2,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with JWX.JWK;
 with JWX.Base64;
 with JWX.LSC;
+with JWX.Util;
 
 with LSC.Types;
 with LSC.SHA256;
@@ -19,14 +20,21 @@ is
    function Valid_HMAC_SHA256 return Boolean
    is
       package K is new JWX.JWK;
-      Payload_Raw : JWX.Byte_Array (1 .. (Payload'Length/4 + 1) * 3);
-      Auth_Raw    : JWX.Byte_Array (1 .. (Key'Length/4 + 1) * 3);
+      Payload_Raw : JWX.Byte_Array (1 .. Payload'Length);
+      Key_Raw     : JWX.Byte_Array (1 .. (Key'Length/4 + 1) * 3);
+      Auth_Raw    : JWX.Byte_Array (1 .. 32);
 
-      Payload_LSC : Standard.LSC.SHA256.Message_Type (1 .. Payload_Raw'Length/64);
-      Auth_LSC    : Standard.LSC.HMAC_SHA256.Auth_Type;
+      Payload_LSC : Standard.LSC.SHA256.Message_Type (1 .. (Payload_Raw'Length - 1) / 64 + 1);
+      Auth_Input  : Standard.LSC.SHA256.SHA256_Hash_Type;
+      Auth_Calc   : Standard.LSC.SHA256.SHA256_Hash_Type;
+      Key_LSC     : Standard.LSC.SHA256.Block_Type;
 
-      Payload_Length : Natural;
       Auth_Length    : Natural;
+      Key_Length     : Natural;
+
+      use JWX.LSC;
+      use SC.Types;
+      use Interfaces;
    begin
       -- Parse key
       K.Load_Keys (Key);
@@ -42,19 +50,23 @@ is
          return False;
       end if;
 
-      --  Decode payload
-      Base64.Decode_Url (Encoded => Payload,
-                         Length  => Payload_Length,
-                         Result  => Payload_Raw,
-                         Padding => Base64.Padding_Implicit);
-      if Payload_Length = 0
+      K.K (Key_Raw, Key_Length);
+      if Key_Length = 0
       then
          return False;
       end if;
 
+      --  Convert key into LSC compatible format
+      LSC.JWX_Byte_Array_To_LSC_Word32_Array
+         (Input  => Key_Raw (Key_Raw'First .. Key_Raw'First + Key_Length),
+          Output => Key_LSC);
+
+      --  Convert string to JWX byte array
+      JWX.Util.To_Byte_Array (Payload, Payload_Raw);
+
       --  Convert payload into LSC compatible format
       LSC.JWX_Byte_Array_To_LSC_SHA256_Message
-         (Input  => Payload_Raw (Payload_Raw'First .. Payload_Raw'First + Payload_Length),
+         (Input  => Payload_Raw,
           Output => Payload_LSC);
 
       --  Decode authenticator
@@ -62,9 +74,25 @@ is
                          Length  => Auth_Length,
                          Result  => Auth_Raw,
                          Padding => Base64.Padding_Implicit);
-      if Auth_Length = 0
+      if Auth_Length /= 32
       then
          return False;
+      end if;
+
+      --  Convert authenticator LSC compatible format
+      LSC.JWX_Byte_Array_To_LSC_Word32_Array
+         (Input  => Auth_Raw,
+          Output => Auth_Input);
+
+      Auth_Calc := SC.HMAC_SHA256.Pseudorandom
+         (Key     => Key_LSC,
+          Message => Payload_LSC,
+          Length  => Unsigned_64 (Payload'Length) * 8);
+
+      --  Validate
+      if Auth_Input = Auth_Calc
+      then
+         return True;
       end if;
 
       return False;

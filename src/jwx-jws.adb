@@ -139,13 +139,14 @@ is
       Alg := Algorithm (JOSE.Get_String (JOSE_Alg));
 
       declare
-         package L is new JWX.Crypto (Payload => Data (JOSE_End + 1 .. Payload_End - 1),
+         package L is new JWX.Crypto (Payload => Data (Data'First .. Payload_End - 1),
                                       Auth    => Data (Payload_End + 1 .. Data'Last - 1),
                                       Key     => Key_Data);
       begin
          if L.Valid (Alg)
          then
             Result := Result_OK;
+            return;
          end if;
       end;
 
