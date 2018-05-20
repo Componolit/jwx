@@ -96,6 +96,16 @@ is
       return False;
    end Valid_HMAC_SHA256;
 
+   -----------------------
+   -- Valid_HMAC_SHA256 --
+   -----------------------
+
+   function Valid_ECDSA_P256_SHA256 return Boolean
+   is
+   begin
+      return False;
+   end Valid_ECDSA_P256_SHA256;
+
    -----------
    -- Valid --
    -----------
@@ -105,7 +115,8 @@ is
    begin
       case Alg is
          when Alg_HS256 => return Valid_HMAC_SHA256;
-         when others => return False;
+         when Alg_ES256 => return Valid_ECDSA_P256_SHA256;
+         when others    => return False;
       end case;
    end Valid;
 
