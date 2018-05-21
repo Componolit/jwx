@@ -15,6 +15,7 @@ with JWX.Util;
 with JWX.JWK;
 with JWX.Crypto;
 with JWX.JWSCS;
+with JWX.JOSE;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with LSC.HMAC_SHA256;
@@ -35,14 +36,6 @@ is
    is
       use JWX.Base64;
 
-      package JOSE is new JWX.JSON (10000);
-      use type JOSE.Match_Type;
-      use type JOSE.Index_Type;
-      Match_JOSE  : JOSE.Match_Type;
-      JOSE_Alg    : JOSE.Index_Type;
-      Alg         : Alg_Type;
-      JOSE_Length : Natural;
-
       package Token is new JWX.JWSCS (Data);
    begin
       Result := Result_Invalid;
@@ -53,44 +46,21 @@ is
       end if;
 
       declare
-         Jose_Data   : JWX.Byte_Array (1 .. 100);
-         Jose_Text   : String (1 .. Jose_Data'Length);
-      begin
+         Jose_Data       : constant String := Token.Jose_Data;
+         Signature_Input : constant String := Token.Signature_Input;
+         Signature       : constant String := Token.Signature;
 
-         -- Decode JOSE header
-         Decode_Url (Encoded => Token.JOSE_Data,
-                     Length  => JOSE_Length,
-                     Result  => JOSE_Data,
-                     Padding => Padding_Implicit);
-         if JOSE_Length = 0
-         then
-            return;
-         end if;
-
-         -- Parse JOSE header
-         Util.To_String (Data   => JOSE_Data (JOSE_Data'First .. JOSE_Data'First + JOSE_Length - 1),
-                         Result => JOSE_Text);
-         JOSE.Parse (JOSE_Text, Match_JOSE);
-         if Match_JOSE /= JOSE.Match_OK
-         then
-            return;
-         end if;
-      end;
-
-      JOSE_Alg := JOSE.Query_Object ("alg");
-      if JOSE_Alg = JOSE.End_Index
-      then
-         return;
-      end if;
-
-      Alg := Algorithm (JOSE.Get_String (JOSE_Alg));
-
-      declare
-         package L is new JWX.Crypto (Payload => Token.Signature_Input,
-                                      Auth    => Token.Signature,
+         package J is new JWX.JOSE (Jose_Data);
+         package L is new JWX.Crypto (Payload => Signature_Input,
+                                      Auth    => Signature,
                                       Key     => Key_Data);
       begin
-         if L.Valid (Alg)
+         if not J.Valid
+         then
+            return;
+         end if;
+
+         if L.Valid (J.Algorithm)
          then
             Result := Result_OK;
             return;
