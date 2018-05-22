@@ -13,13 +13,14 @@ use type Interfaces.Unsigned_64;
 
 package body JWX.Crypto
 is
+   package K is new JWX.JWK;
+
    -----------------------
    -- Valid_HMAC_SHA256 --
    -----------------------
 
    function Valid_HMAC_SHA256 return Boolean
    is
-      package K is new JWX.JWK;
       Payload_Raw : JWX.Byte_Array (1 .. Payload'Length);
       Key_Raw     : JWX.Byte_Array (1 .. (Key'Length/4 + 1) * 3);
       Auth_Raw    : JWX.Byte_Array (1 .. 32);
@@ -36,9 +37,6 @@ is
       use SC.Types;
       use Interfaces;
    begin
-      -- Parse key
-      K.Load_Keys (Key);
-      K.Select_Key;
       if not K.Valid
       then
          return False;
@@ -111,5 +109,8 @@ is
       end case;
    end Valid;
 
+begin
+   K.Load_Keys (Key);
+   K.Select_Key;
 end JWX.Crypto;
 
