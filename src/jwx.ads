@@ -17,7 +17,9 @@ is
    type Byte is mod 2**8
       with Size => 8;
 
-   type Byte_Array is array (Natural range <>) of Byte
+   subtype Array_Index is Natural range Natural'First .. Natural'Last - 1;
+
+   type Byte_Array is array (Array_Index range <>) of Byte
       with Pack;
 
    type Alg_Type is (Alg_Invalid,

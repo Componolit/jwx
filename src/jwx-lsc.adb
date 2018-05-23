@@ -17,13 +17,17 @@ is
       use SC.Types;
       Value : Byte_Array32_Type;
    begin
+      Output := (others => 0);
       for O in Output'Range
       loop
+         Value := (others => 0);
          for J in Value'Range
          loop
             declare
-               Pos : Integer :=
-                  Integer (Input'First) + Offset + Integer ((O - Output'First)) * Value'Length + Integer ((J - Value'First));
+               Pos : constant Integer :=
+                  Input'First + Offset +
+                  Integer ((O - Output'First)) * Value'Length +
+                  Integer ((J - Value'First));
             begin
                Value (J) := Types.Byte ((if Pos in Input'Range then Input (Pos) else 0));
             end;
@@ -44,9 +48,13 @@ is
       use SC.Types;
       use SC.SHA256;
    begin
+      Output := (others => (others => 0));
       for O in Output'Range
       loop
-         JWX_Byte_Array_To_LSC_Word32_Array (Input, Output (O), (Integer (O) - Integer (Output'First)) * 4 * Block_Type'Length);
+         JWX_Byte_Array_To_LSC_Word32_Array
+            (Input  => Input,
+             Output => Output (O),
+             Offset => 64 * Integer (O - Output'First));
       end loop;
    end JWX_Byte_Array_To_LSC_SHA256_Message;
 

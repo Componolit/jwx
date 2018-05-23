@@ -1,6 +1,8 @@
 with LSC.Types;
 with LSC.SHA256;
 
+use type LSC.SHA256.Message_Index;
+
 package JWX.LSC
 with
    SPARK_Mode => On
@@ -11,11 +13,16 @@ is
    procedure JWX_Byte_Array_To_LSC_Word32_Array
       (Input  :     JWX.Byte_Array;
        Output : out SC.Types.Word32_Array_Type;
-       Offset :     Natural := 0);
+       Offset :     Natural := 0)
+   with
+      Pre => Input'First < Integer'Last - Offset - 4 * Output'Length;
 
    --  Convert JWX byte array to LSC SHA256 message
    procedure JWX_Byte_Array_To_LSC_SHA256_Message
       (Input  :     JWX.Byte_Array;
-       Output : out SC.SHA256.Message_Type);
+       Output : out SC.SHA256.Message_Type)
+   with
+      Pre => (Input'Length > 0 and
+              Output'Last / 64 <= SC.SHA256.Message_Index (Integer'Last));
 
 end JWX.LSC;
