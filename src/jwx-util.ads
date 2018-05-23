@@ -17,10 +17,14 @@ package JWX.Util
 is
    procedure To_Byte_Array
       (Data   :     String;
-       Result : out JWX.Byte_Array);
+       Result : out JWX.Byte_Array)
+   with
+      Pre => Result'Length >= Data'Length;
 
    procedure To_String
       (Data   :     JWX.Byte_Array;
-       Result : out String);
+       Result : out String)
+   with
+      Pre => Result'Length >= Data'Length;
 
 end JWX.Util;

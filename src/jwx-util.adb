@@ -22,11 +22,11 @@ is
        Result : out JWX.Byte_Array)
    is
    begin
+      Result := (others => 0);
       for I in 0 .. Data'Length - 1
       loop
          Result (Result'First + I) := Character'Pos (Data (Data'First + I));
       end loop;
-      --  FIXME: Zero out remaining result
    end To_Byte_Array;
 
    ---------------
@@ -38,11 +38,11 @@ is
        Result : out String)
    is
    begin
+      Result := (others => Character'Val (0));
       for I in 0 .. Data'Length - 1
       loop
          Result (Result'First + I) := Character'Val (Data (Data'First + I));
       end loop;
-      --  FIXME: Zero out remaining result
    end To_String;
 
 end JWX.Util;
