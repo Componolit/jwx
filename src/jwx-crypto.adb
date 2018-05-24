@@ -9,7 +9,7 @@ with LSC.SHA256;
 with LSC.HMAC_SHA256;
 
 with Interfaces;
-use type Interfaces.Unsigned_64;
+use type LSC.SHA256.Message_Index;
 
 package body JWX.Crypto
 is
@@ -85,7 +85,7 @@ is
       Auth_Calc := SC.HMAC_SHA256.Pseudorandom
          (Key     => Key_LSC,
           Message => Payload_LSC,
-          Length  => Unsigned_64 (Payload'Length) * 8);
+          Length  => SC.SHA256.Message_Index (Payload'Length) * 8);
 
       --  Validate
       if Auth_Input = Auth_Calc
