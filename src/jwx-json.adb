@@ -13,16 +13,25 @@ package body JWX.JSON
    with
       Refined_State => (State => (Context, Context_Index, Offset, Data, Input_Length))
 is
-   type Context_Element_Type is
-   tagged record
-      Kind           : Kind_Type    := Kind_Null;
-      Boolean_Value  : Boolean      := False;
-      Float_Value    : Float        := 0.0;
-      Integer_Value  : Long_Integer := 0;
-      String_Start   : Integer      := 0;
-      String_End     : Integer      := 0;
-      Next_Value     : Index_Type   := Null_Index;
-      Next_Member    : Index_Type   := Null_Index;
+   type Context_Element_Type (Kind : Kind_Type := Kind_Invalid) is
+   record
+      Next_Member : Index_Type := Null_Index;
+      Next_Value  : Index_Type := Null_Index;
+      case Kind is
+         when Kind_Null
+            | Kind_Invalid
+            | Kind_Object
+            | Kind_Array => null;
+         when Kind_Boolean =>
+            Boolean_Value  : Boolean      := False;
+         when Kind_Float =>
+            Float_Value    : Float        := 0.0;
+         when Kind_Integer =>
+            Integer_Value  : Long_Integer := 0;
+         when Kind_String =>
+            String_Start   : Integer      := 0;
+            String_End     : Integer      := 0;
+      end case;
    end record;
 
    type Context_Type is array (Index_Type) of Context_Element_Type;
@@ -43,14 +52,9 @@ is
 
    Invalid_Element : constant Context_Element_Type :=
    -- Construct invalid element
-      (Kind           => Kind_Invalid,
-       Boolean_Value  => False,
-       Float_Value    => 0.0,
-       Integer_Value  => 0,
-       String_Start   => 0,
-       String_End     => 0,
-       Next_Value     => End_Index,
-       Next_Member    => End_Index);
+      (Kind        => Kind_Invalid,
+       Next_Member => Null_Index,
+       Next_Value  => Null_Index);
 
    Context : Context_Type := (others => Invalid_Element);
 
@@ -60,14 +64,9 @@ is
 
    Null_Element : constant Context_Element_Type :=
    -- Construct null element
-      (Kind           => Kind_Null,
-       Boolean_Value  => False,
-       Float_Value    => 0.0,
-       Integer_Value  => 0,
-       String_Start   => 0,
-       String_End     => 0,
-       Next_Value     => End_Index,
-       Next_Member    => End_Index);
+      (Kind        => Kind_Null,
+       Next_Member => Null_Index,
+       Next_Value  => Null_Index);
 
    ---------------------
    -- Boolean_Element --
@@ -75,14 +74,10 @@ is
 
    function Boolean_Element (Value : Boolean) return Context_Element_Type is
    -- Construct boolean element
-      (Kind           => Kind_Boolean,
-       Boolean_Value  => Value,
-       Float_Value    => 0.0,
-       Integer_Value  => 0,
-       String_Start   => 0,
-       String_End     => 0,
-       Next_Value     => End_Index,
-       Next_Member    => End_Index);
+      (Kind          => Kind_Boolean,
+       Boolean_Value => Value,
+       Next_Member   => Null_Index,
+       Next_Value    => Null_Index);
 
    -------------------
    -- Float_Element --
@@ -90,14 +85,10 @@ is
 
    function Float_Element (Value : Float) return Context_Element_Type is
    -- Construct float element
-      (Kind           => Kind_Float,
-       Boolean_Value  => False,
-       Float_Value    => Value,
-       Integer_Value  => 0,
-       String_Start   => 0,
-       String_End     => 0,
-       Next_Value     => End_Index,
-       Next_Member    => End_Index);
+      (Kind        => Kind_Float,
+       Float_Value => Value,
+       Next_Member => Null_Index,
+       Next_Value  => Null_Index);
 
    ---------------------
    -- Integer_Element --
@@ -105,14 +96,10 @@ is
 
    function Integer_Element (Value : Long_Integer) return Context_Element_Type is
    -- Construct integer element
-      (Kind           => Kind_Integer,
-       Boolean_Value  => False,
-       Float_Value    => 0.0,
-       Integer_Value  => Value,
-       String_Start   => 0,
-       String_End     => 0,
-       Next_Value     => End_Index,
-       Next_Member    => End_Index);
+      (Kind          => Kind_Integer,
+       Integer_Value => Value,
+       Next_Member   => Null_Index,
+       Next_Value    => Null_Index);
 
    --------------------
    -- String_Element --
@@ -120,14 +107,11 @@ is
 
    function String_Element (String_Start, String_End : Integer) return Context_Element_Type is
    -- Construct string element
-      (Kind           => Kind_String,
-       Boolean_Value  => False,
-       Float_Value    => 0.0,
-       Integer_Value  => 0,
-       String_Start   => String_Start,
-       String_End     => String_End,
-       Next_Value     => End_Index,
-       Next_Member    => End_Index);
+      (Kind         => Kind_String,
+       String_Start => String_Start,
+       String_End   => String_End,
+       Next_Member  => Null_Index,
+       Next_Value   => Null_Index);
 
    --------------------
    -- Object_Element --
@@ -135,14 +119,9 @@ is
 
    Object_Element : constant Context_Element_Type :=
    -- Construct object element
-      (Kind           => Kind_Object,
-       Boolean_Value  => False,
-       Float_Value    => 0.0,
-       Integer_Value  => 0,
-       String_Start   => 0,
-       String_End     => 0,
-       Next_Value     => End_Index,
-       Next_Member    => End_Index);
+      (Kind        => Kind_Object,
+       Next_Member => End_Index,
+       Next_Value  => Null_Index);
 
    -------------------
    -- Array_Element --
@@ -150,14 +129,9 @@ is
 
    Array_Element : constant Context_Element_Type :=
    -- Construct array element
-      (Kind           => Kind_Array,
-       Boolean_Value  => False,
-       Float_Value    => 0.0,
-       Integer_Value  => 0,
-       String_Start   => 0,
-       String_End     => 0,
-       Next_Value     => End_Index,
-       Next_Member    => End_Index);
+      (Kind        => Kind_Array,
+       Next_Member => Null_Index,
+       Next_Value  => End_Index);
 
    ---------
    -- Get --
