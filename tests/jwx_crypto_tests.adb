@@ -120,7 +120,7 @@ is
       use JWX.Util;
       use JWX.LSC;
       use SC.Types;
-      use type Interfaces.Unsigned_64;
+      use type SC.SHA256.Message_Index;
 
       Key_Input : String := Read_File ("tests/data/hmac_sha256-key-1.dat");
       Key_BA    : JWX.Byte_Array (1 .. Key_Input'Length);
