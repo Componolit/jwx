@@ -15,6 +15,8 @@ package Proof_JSON
 is
    package P is new JWX.JSON (100);
    procedure Do_Parse (Data  : String;
-                       Match : out P.Match_Type);
+                       Match : out P.Match_Type)
+   with
+      Pre => Data'First <= Data'Last;
 
 end Proof_JSON;

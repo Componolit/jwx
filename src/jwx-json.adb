@@ -120,7 +120,7 @@ is
    Object_Element : constant Context_Element_Type :=
    -- Construct object element
       (Kind        => Kind_Object,
-       Next_Member => End_Index,
+       Next_Member => Null_Index,
        Next_Value  => Null_Index);
 
    -------------------
@@ -131,7 +131,7 @@ is
    -- Construct array element
       (Kind        => Kind_Array,
        Next_Member => Null_Index,
-       Next_Value  => End_Index);
+       Next_Value  => Null_Index);
 
    ---------
    -- Get --
@@ -151,6 +151,15 @@ is
          return Context (Index);
       end if;
    end Get;
+
+   --------------
+   -- Has_Kind --
+   --------------
+
+   function Has_Kind (Index : Index_Type;
+                      Kind  : Kind_Type) return Boolean
+   is
+        (Get (Index).Kind = Kind);
 
    ---------
    -- Set --
@@ -410,8 +419,13 @@ is
          return;
       end if;
 
-      Offset := Offset + 1;
       Match  := Match_Invalid;
+      if Offset >= Natural'Last
+      then
+         return;
+      end if;
+
+      Offset := Offset + 1;
 
       loop
 
@@ -440,6 +454,7 @@ is
             return;
          end if;
 
+         pragma Assert (Divisor > 0);
          Result := Result +
             Float (To_Number (Data (Data'First + Offset))) / Float (Divisor);
          Divisor := Divisor * 10;
@@ -500,7 +515,9 @@ is
          exit when
             not Match_Set ("0123456789") or
             Data'First >= Integer'Last - Offset or
-            Offset > Input_Length - 1;
+            Data'First > Data'Last - Offset or
+            Offset > Input_Length - 1 or
+            Num_Matches >= Natural'Last;
 
          -- Check for leading '0'
          if Num_Matches = 0 and
@@ -510,9 +527,11 @@ is
          end if;
 
          pragma Loop_Invariant (Result >= 0);
+         pragma Loop_Invariant (Data'First + Offset in Data'Range);
 
          -- Check for overflow
-         if Result >= Long_Integer'Last/10
+         if Num_Matches >= Natural'Last or
+            Result >= Long_Integer'Last/10
          then
             Match := Match_Invalid;
             Offset := Old_Offset;
@@ -574,10 +593,17 @@ is
       then
          return;
       end if;
-      Offset := Offset + 1;
-      Match  := Match_Invalid;
 
-      if not (Data'First + Offset in Data'Range)
+      Match  := Match_Invalid;
+      if Offset >= Natural'Last
+      then
+         return;
+      end if;
+
+      Offset := Offset + 1;
+
+      if Offset > Data'Length or else
+         Data'First > Data'Last - Offset
       then
          Match := Match_None;
          Offset := Old_Offset;
@@ -603,6 +629,12 @@ is
       Result := 1;
       for I in 1 .. Scale
       loop
+         if Result > Long_Integer'Last / 10
+         then
+            Offset := Old_Offset;
+            return;
+         end if;
+         pragma Loop_Invariant (Result > 0);
          Result := Result * 10;
       end loop;
 
@@ -658,20 +690,23 @@ is
          return;
       end if;
 
+      pragma Assert (Scale > 0);
+
       --  Convert to float if either we have fractional part or dividing by the
       --  scale would yield a non-integer number.
       if Match_Frac = Match_OK or
          (Match_Exponent = Match_OK and then
           (Scale_Negative and Integer_Component mod Scale > 0))
       then
-         pragma Assert (Fractional_Component >= 0.0);
-         pragma Assert (Fractional_Component <  1.0);
          if Float (Integer_Component) >= Float'Last
          then
             Match := Match_Invalid;
             return;
          end if;
 
+         pragma Assert (Float (Integer_Component) < Float'Last);
+         pragma Assert (Fractional_Component >= 0.0);
+         pragma Assert (Fractional_Component <  1.0);
          declare
             Tmp : Float := Float (Integer_Component) + Fractional_Component;
          begin
@@ -735,8 +770,13 @@ is
          return;
       end if;
 
-      Offset := Offset + 1;
+      Match := Match_Invalid;
+      if Offset >= Natural'Last
+      then
+         return;
+      end if;
 
+      Offset := Offset + 1;
       String_Start := Data'First + Offset;
 
       loop
@@ -814,14 +854,20 @@ is
       Context_Index := Context_Index + 1;
       Previous_Member := Object_Index;
 
+      Match := Match_Invalid;
+      if Offset >= Natural'Last
+      then
+         return;
+      end if;
+
       Offset := Offset + 1;
 
       loop
-         if Data'First > Integer'Last - Offset or
+         if Offset >= Natural'Last or
+            Data'First > Integer'Last - Offset or
             Offset > Input_Length - 1
          then
             Offset := Old_Offset;
-            Match := Match_Invalid;
             return;
          end if;
 
@@ -840,17 +886,18 @@ is
          -- Parse member name
          Skip_Whitespace;
          Parse_String (Result);
-         if Result /= Match_OK then
+         if Result /= Match_OK
+         then
             Offset := Old_Offset;
-            Match := Match_Invalid;
             return;
          end if;
 
          -- Check for name separator (:)
          Skip_Whitespace;
-         if not Match_Set (":") then
+         if Offset >= Natural'Last or
+            not Match_Set (":")
+         then
             Offset := Old_Offset;
-            Match := Match_Invalid;
             return;
          end if;
          Offset := Offset + 1;
@@ -859,11 +906,16 @@ is
          Parse_Internal (Match_Member);
          if Match_Member /= Match_OK then
             Offset := Old_Offset;
-            Match := Match_Invalid;
             return;
          end if;
 
          Skip_Whitespace;
+
+         if Offset >= Natural'Last
+         then
+            Offset := Old_Offset;
+            return;
+         end if;
 
          -- Check for value separator ','
          if Match_Set (",") then
@@ -906,14 +958,20 @@ is
       Context_Index := Context_Index + 1;
       Previous_Element := Array_Index;
 
+      Match := Match_Invalid;
+      if Offset >= Natural'Last
+      then
+         return;
+      end if;
+
       Offset := Offset + 1;
 
       loop
-         if Data'First >= Integer'Last - Offset or
+         if Offset >= Natural'Last or
+            Data'First >= Integer'Last - Offset or
             Offset > Input_Length - 1
          then
             Offset := Old_Offset;
-            Match := Match_Invalid;
             return;
          end if;
 
@@ -933,11 +991,16 @@ is
          Parse_Internal (Match_Element);
          if Match_Element /= Match_OK then
             Offset := Old_Offset;
-            Match := Match_Invalid;
             return;
          end if;
 
          Skip_Whitespace;
+
+         if Offset >= Natural'Last
+         then
+            Offset := Old_Offset;
+            return;
+         end if;
 
          -- Check for value separator ','
          if Match_Set (",") then

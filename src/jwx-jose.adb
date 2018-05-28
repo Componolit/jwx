@@ -4,16 +4,15 @@ with JWX.Util;
 
 package body JWX.JOSE
 is
-   Jose_Data   : JWX.Byte_Array (1 .. Data'Length/4*3);
-   Jose_Text   : String (1 .. Jose_Data'Length);
-   Jose_Valid  : Boolean := False;
+   JOSE_Data   : JWX.Byte_Array (1 .. Data'Length/4*3);
+   JOSE_Valid  : Boolean := False;
    Alg         : JWX.Alg_Type := JWX.Alg_Invalid;
 
    -----------
    -- Valid --
    -----------
 
-   function Valid return Boolean is (Jose_Valid);
+   function Valid return Boolean is (JOSE_Valid);
 
    ------------
    -- Decode --
@@ -21,13 +20,14 @@ is
 
    procedure Decode
    is
-      package J is new JWX.JSON (Jose_Data'Length);
+      package J is new JWX.JSON (JOSE_Data'Length);
       use JWX.Base64;
       use type J.Match_Type;
       use type J.Index_Type;
       JOSE_Length : Natural;
       JOSE_Alg    : J.Index_Type;
       Match_JOSE  : J.Match_Type;
+      JOSE_Text   : String (1 .. JOSE_Data'Length);
    begin
       -- Decode JOSE header
       Decode_Url (Encoded => Data,
@@ -54,7 +54,7 @@ is
       end if;
 
       Alg := Algorithm (J.Get_String (JOSE_Alg));
-      Jose_Valid := True;
+      JOSE_Valid := True;
 
    end Decode;
 

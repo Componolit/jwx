@@ -132,6 +132,7 @@ is
       Last_Block               : Byte_Array_Block;
    begin
       Length := 0;
+      Result := (others => 0);
 
       -- Loop over all but the last block
       for I in Integer range 0 .. Last_Input_Block_Offset - 1
@@ -157,10 +158,14 @@ is
          return;
       end if;
 
+      pragma Assert (Num_Last_Block_Bytes < 5);
+
       B0_Pos := Encoded'Last - Num_Last_Block_Bytes + 1;
       B1_Pos := Encoded'Last - Num_Last_Block_Bytes + 2;
       B2_Pos := Encoded'Last - Num_Last_Block_Bytes + 3;
       B3_Pos := Encoded'Last - Num_Last_Block_Bytes + 4;
+
+      pragma Assert (B1_Pos in Encoded'Range);
 
       if not Is_Valid (Encoded (B0_Pos)) or
          not Is_Valid (Encoded (B1_Pos))
@@ -197,8 +202,6 @@ is
             return;
          end if;
       end if;
-
-      pragma Assert (Result'Length >= 3);
 
       Last_Block := UInt6_To_Bytes ((B0, B1, B2, B3));
 

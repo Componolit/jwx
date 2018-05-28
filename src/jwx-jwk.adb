@@ -65,6 +65,11 @@ is
 
       Valid := False;
 
+      if Get_Kind /= Kind_Object
+      then
+         return;
+      end if;
+
       --  Retrieve curve type 'crv'
       Crv := Query_Object ("crv", Key_Index);
       if Get_String (Crv) = "P-256"

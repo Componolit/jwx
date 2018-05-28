@@ -40,10 +40,20 @@ is
 
    -- Parse a JSON file
    procedure Parse (Input : String;
-                    Match : out Match_Type);
+                    Match : out Match_Type)
+   with
+      Pre => Input'First <= Input'Last;
+
+   -- Assert that a @Index@ has a certain kind
+   function Has_Kind (Index : Index_Type;
+                      Kind  : Kind_Type) return Boolean
+   with
+      Ghost;
 
    -- Return kind of current element of a context
-   function Get_Kind (Index : Index_Type := Null_Index) return Kind_Type;
+   function Get_Kind (Index : Index_Type := Null_Index) return Kind_Type
+   with
+      Post => Has_Kind (Index, Get_Kind'Result);
 
    -- Return value of a boolean context element
    function Get_Boolean (Index : Index_Type := Null_Index) return Boolean

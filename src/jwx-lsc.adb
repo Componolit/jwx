@@ -51,7 +51,6 @@ is
       Output := (others => (others => 0));
       for O in Output'First .. Output'Last
       loop
-         pragma Assert (O <= Output'Last);
          pragma Assert (Input'First < Integer'Last -
                                       64 * Integer (Output'Last - Output'First) -
                                       4 * Output'Length);

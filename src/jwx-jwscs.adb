@@ -21,6 +21,7 @@ is
 
    procedure Get_Separators
    is
+      Found : Boolean := False;
    begin
       Token_Valid := False;
       First := 0;
@@ -36,12 +37,14 @@ is
          end if;
       end loop;
 
-      if First = 0
+      if not Found or
+         First > Data'Last - 1
       then
          return;
       end if;
 
       --  Find second
+      Found := False;
       for I in First + 1 .. Data'Last
       loop
          if Data (I) = '.'
@@ -51,7 +54,8 @@ is
          end if;
       end loop;
 
-      if Second = 0
+      if not Found or
+         Second > Data'Last - 1
       then
          return;
       end if;
