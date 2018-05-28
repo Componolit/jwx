@@ -70,8 +70,7 @@ is
       --  Decode authenticator
       Base64.Decode_Url (Encoded => Auth,
                          Length  => Auth_Length,
-                         Result  => Auth_Raw,
-                         Padding => Base64.Padding_Implicit);
+                         Result  => Auth_Raw);
       if Auth_Length /= 32
       then
          return False;

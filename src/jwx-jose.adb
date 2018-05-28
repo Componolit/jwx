@@ -32,8 +32,7 @@ is
       -- Decode JOSE header
       Decode_Url (Encoded => Data,
                   Length  => JOSE_Length,
-                  Result  => JOSE_Data,
-                  Padding => Padding_Implicit);
+                  Result  => JOSE_Data);
       if JOSE_Length = 0
       then
          return;

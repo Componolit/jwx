@@ -15,20 +15,16 @@ package JWX.Base64
     with SPARK_Mode
 is
 
-   type Padding_Kind is (Padding_Implicit, Padding_Explicit);
-
    procedure Decode
        (Encoded :        String;
         Length  :    out Natural;
-        Result  :    out JWX.Byte_Array;
-        Padding :        Padding_Kind := Padding_Explicit);
+        Result  :    out JWX.Byte_Array);
    -- Decode Base64 encoded string into byte array
 
    procedure Decode_Url
        (Encoded :        String;
         Length  :    out Natural;
-        Result  :    out JWX.Byte_Array;
-        Padding :        Padding_Kind := Padding_Explicit);
+        Result  :    out JWX.Byte_Array);
    -- Decode Base64URL encoded string into byte array
 
 end JWX.Base64;

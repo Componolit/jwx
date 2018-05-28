@@ -106,7 +106,7 @@ package body JWX_BASE64_Tests is
       R : Result_Type;
       S : String_Type;
    begin
-      Decode (Encoded => Input, Length => L, Result => R, Padding => Padding_Implicit);
+      Decode (Encoded => Input, Length => L, Result => R);
       Util.To_String (R, S);
       Assert (L > 0, "Too short: " & L'Img);
       Assert (S(1..L) = Output, "Invalid result: " & S(1..L));

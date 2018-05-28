@@ -240,8 +240,7 @@ is
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_X),
                          Length  => Length,
-                         Result  => Value,
-                         Padding => Base64.Padding_Implicit);
+                         Result  => Value);
    end X;
 
    -------
@@ -256,8 +255,7 @@ is
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_Y),
                          Length  => Length,
-                         Result  => Value,
-                         Padding => Base64.Padding_Implicit);
+                         Result  => Value);
    end Y;
 
    -------
@@ -272,8 +270,7 @@ is
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_N),
                          Length  => Length,
-                         Result  => Value,
-                         Padding => Base64.Padding_Implicit);
+                         Result  => Value);
    end N;
 
    -------
@@ -288,8 +285,7 @@ is
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_E),
                          Length  => Length,
-                         Result  => Value,
-                         Padding => Base64.Padding_Implicit);
+                         Result  => Value);
    end E;
 
    -------
@@ -304,8 +300,7 @@ is
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_D),
                          Length  => Length,
-                         Result  => Value,
-                         Padding => Base64.Padding_Implicit);
+                         Result  => Value);
    end D;
 
    -------
@@ -320,8 +315,7 @@ is
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_K),
                          Length  => Length,
-                         Result  => Value,
-                         Padding => Base64.Padding_Implicit);
+                         Result  => Value);
    end K;
 
    -----------------
