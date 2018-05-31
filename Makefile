@@ -1,4 +1,4 @@
-GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j0 --codepeer=on --output-header
+GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j0 --codepeer=off --output-header --no-inlining --proof=progressive
 COMMON_OPTS = -Xlibtype=dynamic
 
 all:
