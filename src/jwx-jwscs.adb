@@ -33,6 +33,7 @@ is
          if Data (I) = '.'
          then
             First := I;
+            Found := True;
             exit;
          end if;
       end loop;
@@ -50,6 +51,7 @@ is
          if Data (I) = '.'
          then
             Second := I;
+            Found := True;
             exit;
          end if;
       end loop;

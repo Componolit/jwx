@@ -16,14 +16,13 @@ use JWX;
 
 package body JWX_JSON_Tests is
 
-   package J is new JWX.JSON (400000);
-
    procedure Test_Parse_True (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("true");
       use J;
       Match : Match_Type;
    begin
-      Parse ("true", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Boolean, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Boolean = true, "Invalid value");
@@ -33,10 +32,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_False (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("false");
       use J;
       Match : Match_Type;
    begin
-      Parse ("false", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Boolean, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Boolean = false, "Invalid value");
@@ -46,10 +46,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Null (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("null");
       use J;
       Match : Match_Type;
    begin
-      Parse ("null", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Null, "Invalid kind: " & Get_Kind'Img);
 	end Test_Parse_Null;
@@ -58,10 +59,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_True_Wrong_Case (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("True");
       use J;
       Match : Match_Type;
    begin
-      Parse ("True", Match);
+      Parse (Match);
 		Assert (Match /= Match_OK, "Must fail: " & Match'Img);
 	end Test_Parse_True_Wrong_Case;
 
@@ -69,10 +71,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_False_Wrong_Case (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("FALSE");
       use J;
       Match : Match_Type;
    begin
-      Parse ("FALSE", Match);
+      Parse (Match);
 		Assert (Match /= Match_OK, "Must fail: " & Match'Img);
 	end Test_Parse_False_Wrong_Case;
 
@@ -80,10 +83,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Null_Wrong_Case (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("nulL");
       use J;
       Match : Match_Type;
    begin
-      Parse ("nulL", Match);
+      Parse (Match);
 		Assert (Match /= Match_OK, "Must fail: " & Match'Img);
 	end Test_Parse_Null_Wrong_Case;
 
@@ -91,10 +95,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Null_With_Space (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("    null");
       use J;
       Match : Match_Type;
    begin
-      Parse ("    null", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Null, "Invalid kind: " & Get_Kind'Img);
 	end Test_Parse_Null_With_Space;
@@ -103,10 +108,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_True_With_Newline (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("  " & ASCII.CR & ASCII.LF & "true");
       use J;
       Match : Match_Type;
    begin
-      Parse ("  " & ASCII.CR & ASCII.LF & "true", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Boolean, "Invalid kind: " & Get_Kind'Img);
 	end Test_Parse_True_With_Newline;
@@ -115,10 +121,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_False_With_Tab (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON (ASCII.HT & "false");
       use J;
       Match : Match_Type;
    begin
-      Parse (ASCII.HT & "false", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Boolean, "Invalid kind: " & Get_Kind'Img);
 	end Test_Parse_False_With_Tab;
@@ -127,10 +134,12 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Small_Positive_Integer (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("42");
+      use J;
       use J;
       Match : Match_Type;
    begin
-      Parse ("42", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 42, "Invalid value: " & Get_Integer'Img);
@@ -140,10 +149,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Positive_Integer (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("40000");
       use J;
       Match : Match_Type;
    begin
-      Parse ("40000", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 40000, "Invalid value: " & Get_Integer'Img);
@@ -153,10 +163,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Small_Negative_Integer (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("-42");
       use J;
       Match : Match_Type;
    begin
-      Parse ("-42", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = -42, "Invalid value: " & Get_Integer'Img);
@@ -166,10 +177,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Big_Positive_Integer (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("2147483647");
       use J;
       Match : Match_Type;
    begin
-      Parse ("2147483647", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 2147483647, "Invalid value: " & Get_Integer'Img);
@@ -179,10 +191,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Integer_With_Positive_Exponent (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("1234e2");
       use J;
       Match : Match_Type;
    begin
-      Parse ("1234e2", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 123400, "Invalid value: " & Get_Integer'Img);
@@ -192,10 +205,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Integer_With_Positive_Exponent_2 (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("1234E+2");
       use J;
       Match : Match_Type;
    begin
-      Parse ("1234E+2", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 123400, "Invalid value: " & Get_Integer'Img);
@@ -205,10 +219,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Integer_With_Positive_Exponent_3 (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("1234E+02");
       use J;
       Match : Match_Type;
    begin
-      Parse ("1234E+02", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 123400, "Invalid value: " & Get_Integer'Img);
@@ -218,10 +233,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Num_With_Neg_Exp_Frac (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("12345e-2");
       use J;
       Match : Match_Type;
    begin
-      Parse ("12345e-2", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = 123.45, "Invalid value: " & Get_Float'Img);
@@ -231,10 +247,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Num_With_Neg_Exp_Int (T : in out Test_Cases.Test_Case'Class)
    is
+      package J is new JWX.JSON ("12300e-2");
       use J;
       Match : Match_Type;
    begin
-      Parse ("12300e-2", Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 123, "Invalid value: " & Get_Integer'Img);
@@ -244,11 +261,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Zero_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "   0 ";
+      package J is new JWX.JSON ("   0 ");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 0, "Invalid value: " & Get_Integer'Img);
@@ -258,11 +275,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Big_Negative_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "-2147483647";
+      package J is new JWX.JSON ("-2147483647");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = -2147483647, "Invalid value: " & Get_Integer'Img);
@@ -272,11 +289,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Too_Big_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "92233720368547758080";
+      package J is new JWX.JSON ("92233720368547758080");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_Invalid, "Must fail: " & Match'Img);
 	end Test_Parse_Too_Big_Integer;
 
@@ -284,11 +301,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Too_Small_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "-92233720368547758080";
+      package J is new JWX.JSON ("-92233720368547758080");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_Invalid, "Must fail: " & Match'Img);
 	end Test_Parse_Too_Small_Integer;
 
@@ -296,11 +313,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Small_Positive_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "3.14";
+      package J is new JWX.JSON ("3.14");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = 3.14, "Invalid value: " & Get_Float'Img);
@@ -310,11 +327,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Small_Negative_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "-3.14";
+      package J is new JWX.JSON ("-3.14");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = -3.14, "Invalid value: " & Get_Float'Img);
@@ -324,11 +341,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Very_Small_Positive_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "0.00000000001";
+      package J is new JWX.JSON ("0.00000000001");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = 0.00000000001, "Invalid value: " & Get_Float'Img);
@@ -338,11 +355,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Too_Small_Positive_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "0.0000000000000000000000000000000001";
+      package J is new JWX.JSON ("0.0000000000000000000000000000000001");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_Invalid, "Must fail: " & Match'Img);
 	end Test_Parse_Too_Small_Positive_Float;
 
@@ -350,11 +367,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Very_Small_Negative_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "-0.00000000001";
+      package J is new JWX.JSON ("-0.00000000001");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = -0.00000000001, "Invalid value: " & Get_Float'Img);
@@ -364,11 +381,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Too_Small_Negative_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "-0.0000000000000000000000000000000001";
+      package J is new JWX.JSON ("-0.0000000000000000000000000000000001");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_Invalid, "Must fail: " & Match'Img);
 	end Test_Parse_Too_Small_Negative_Float;
 
@@ -376,11 +393,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Zero_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := " 0.0 ";
+      package J is new JWX.JSON (" 0.0 ");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = 0.0, "Invalid value: " & Get_Float'Img);
@@ -390,11 +407,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Float_With_Exp_With_Leading_Zero (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "123.5e+02";
+      package J is new JWX.JSON ("123.5e+02");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = 12350.0, "Invalid value: " & Get_Float'Img);
@@ -404,11 +421,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Leading_Zero_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "000068547758080";
+      package J is new JWX.JSON ("000068547758080");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_Invalid, "Must fail: " & Match'Img);
 	end Test_Leading_Zero_Integer;
 
@@ -416,11 +433,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Leading_Zero_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "000.06854";
+      package J is new JWX.JSON ("000.06854");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_Invalid, "Must fail: " & Match'Img);
 	end Test_Leading_Zero_Float;
 
@@ -428,11 +445,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Missing_Fractional_Part (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "54775. ";
+      package J is new JWX.JSON ("54775. ");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_Invalid, "Must fail: " & Match'Img);
 	end Test_Missing_Fractional_Part;
 
@@ -440,11 +457,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Simple_String (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := """Hello world!""";
+      package J is new JWX.JSON ("""Hello world!""");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_String, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_String = "Hello world!", "Invalid value: " & Get_String);
@@ -454,11 +471,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Unclosed_String (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := """Invalid String";
+      package J is new JWX.JSON ("""Invalid String");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_Invalid, "Must fail: " & Match'Img);
 	end Test_Unclosed_String;
 
@@ -466,11 +483,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Escaped_String (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := """Say \""Hello World\""!""";
+      package J is new JWX.JSON ("""Say \""Hello World\""!""");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_String, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_String = "Say \""Hello World\""!", "Invalid value: " & Get_String);
@@ -480,11 +497,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Escaped_Backslash (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := """Escaped backslash\\""";
+      package J is new JWX.JSON ("""Escaped backslash\\""");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_String, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_String = "Escaped backslash\\", "Invalid value: " & Get_String);
@@ -494,11 +511,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Escaped_Regular_Character (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := """Escaped \character""";
+      package J is new JWX.JSON ("""Escaped \character""");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_String, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_String = "Escaped \character", "Invalid value: " & Get_String);
@@ -508,12 +525,12 @@ package body JWX_JSON_Tests is
 
    procedure Test_Simple_Object (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := " { ""precision"": ""zip"", ""Latitude"":  37.7668, ""Longitude"": -122.3959, ""Address"":   """", ""City"":      ""SAN FRANCISCO"", ""State"":     ""CA"", ""Zip"":       ""94107"", ""Country"":   ""US"" }";
+      package J is new JWX.JSON (" { ""precision"": ""zip"", ""Latitude"":  37.7668, ""Longitude"": -122.3959, ""Address"":   """", ""City"":      ""SAN FRANCISCO"", ""State"":     ""CA"", ""Zip"":       ""94107"", ""Country"":   ""US"" }");
       use J;
       Result : Index_Type;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Object, "Invalid kind: " & Get_Kind'Img);
 
@@ -560,11 +577,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Empty_Object (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "  {}  ";
+      package J is new JWX.JSON ("  {}  ");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Object, "Invalid kind: " & Get_Kind'Img);
 		Assert (Elements = 0, "Invalid number of elements: " & Elements'Img);
@@ -574,12 +591,12 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Simple_Array (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "  [116, 943, 234, 38793] ";
+      package J is new JWX.JSON ("  [116, 943, 234, 38793] ");
       use J;
       Result : Index_Type;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 
@@ -610,11 +627,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Unclosed_Array (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := " [""foo"", ""bar"" ";
+      package J is new JWX.JSON (" [""foo"", ""bar"" ");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_Invalid, "Unclosed array not detected");
    end Test_Unclosed_Array;
 
@@ -622,12 +639,12 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Mixed_Array (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "  [116, -4.5, ""baz"", true] ";
+      package J is new JWX.JSON ("  [116, -4.5, ""baz"", true] ");
       use J;
       Result : Index_Type;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 
@@ -655,11 +672,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Empty_Array (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "   [] ";
+      package J is new JWX.JSON ("   [] ");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 
@@ -670,11 +687,11 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Array_Of_Objects (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "[{""A"": 42}, {""B"": {""D"": 234}}, {""C"": 9}]";
+      package J is new JWX.JSON ("[{""A"": 42}, {""B"": {""D"": 234}}, {""C"": 9}]");
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 
@@ -686,10 +703,11 @@ package body JWX_JSON_Tests is
    procedure Test_RFC7159_Example_1 (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := Read_File ("tests/data/RFC7159_example1.json");
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Object, "Invalid kind: " & Get_Kind'Img);
 	end Test_RFC7159_Example_1;
@@ -699,10 +717,11 @@ package body JWX_JSON_Tests is
    procedure Test_RFC7159_Example_2 (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := Read_File ("tests/data/RFC7159_example2.json");
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 	end Test_RFC7159_Example_2;
@@ -712,11 +731,12 @@ package body JWX_JSON_Tests is
    procedure Test_Complex_Country (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := Read_File ("tests/data/country.json");
+      package J is new JWX.JSON (Data);
       use J;
       Result : Index_Type;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Object, "Invalid kind: " & Get_Kind'Img);
 		Assert (Elements = 20, "Invalid number of elements: " & Elements'Img);
@@ -730,12 +750,12 @@ package body JWX_JSON_Tests is
 
    procedure Test_Mixed_Objects (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : String := "[{""area"": 123.0}, {""area"": 200.5}]";
+      package J is new JWX.JSON ("[{""area"": 123.0}, {""area"": 200.5}]");
       use J;
       Result : Index_Type;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 
@@ -753,11 +773,12 @@ package body JWX_JSON_Tests is
    procedure Test_Complex_Two_Countries (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := Read_File ("tests/data/two_countries.json");
+      package J is new JWX.JSON (Data);
       use J;
       Result : Index_Type;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 
@@ -777,11 +798,12 @@ package body JWX_JSON_Tests is
    procedure Test_Complex_Countries (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := Read_File ("tests/data/countries.json");
+      package J is new JWX.JSON (Data);
       use J;
       Result : Index_Type;
       Match : Match_Type;
    begin
-      Parse (Data, Match);
+      Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 

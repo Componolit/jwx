@@ -12,9 +12,13 @@
 package body Proof_JSON
 is
    procedure Do_Parse (Data  : String;
-                       Match : out P.Match_Type)
+                       Match : out Boolean)
    is
+      package P is new JWX.JSON (Data);
+      M : P.Match_Type;
+      use type P.Match_Type;
    begin
-      P.Parse (Data, Match);
+      P.Parse (M);
+      Match := M = P.Match_OK;
    end Do_Parse;
 end Proof_JSON;

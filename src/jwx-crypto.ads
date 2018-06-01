@@ -6,6 +6,7 @@ package JWX.Crypto
 is
 
    --  Validate authenticator using algorithm @Alg@
-   function Valid (Alg : Alg_Type) return Boolean;
+   procedure Valid (Alg   : Alg_Type;
+                    Valid : out Boolean);
 
 end JWX.Crypto;

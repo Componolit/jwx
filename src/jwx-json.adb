@@ -11,7 +11,7 @@
 
 package body JWX.JSON
    with
-      Refined_State => (State => (Context, Context_Index, Offset, Data, Input_Length))
+      Refined_State => (State => (Context, Context_Index, Offset))
 is
    type Context_Element_Type (Kind : Kind_Type := Kind_Invalid) is
    record
@@ -38,11 +38,6 @@ is
 
    Context_Index : Index_Type;
    Offset        : Natural;
-
-   Data : String (1 .. Data_Length);
-
-   subtype Input_Length_Type is Natural range 1 .. Data_Length;
-   Input_Length : Input_Length_Type := 1;
 
    procedure Parse_Internal (Match : out Match_Type);
 
@@ -258,7 +253,7 @@ is
    is
    begin
       loop
-         if Offset >= Input_Length
+         if Offset >= Data'Length
          then
             return;
          end if;
@@ -292,7 +287,7 @@ is
          return;
       end if;
 
-      if Offset > Input_Length - 4
+      if Offset > Data'Length - 4
       then
          Match := Match_None;
          return;
@@ -325,7 +320,7 @@ is
          return;
       end if;
 
-      if Offset > Input_Length - 4
+      if Offset > Data'Length - 4
       then
          Match := Match_None;
          return;
@@ -341,7 +336,7 @@ is
          return;
       end if;
 
-      if Offset > Input_Length - 5
+      if Offset > Data'Length - 5
       then
          Match := Match_None;
          return;
@@ -370,7 +365,7 @@ is
    begin
       for Value of Set
       loop
-         if Offset < Input_Length and then
+         if Offset < Data'Length and then
             Data (Data'First + Offset) = Value
          then
             return True;
@@ -399,7 +394,7 @@ is
       Result  : out Float)
    with
       Pre => Data'First < Integer'Last - Offset and
-             Offset < Input_Length,
+             Offset < Data'Length,
       Post =>
          (if Match /= Match_OK then Offset = Offset'Old) and
          Result >= 0.0 and
@@ -430,14 +425,14 @@ is
       loop
 
          if Data'First > Integer'Last - Offset or
-            Offset > Input_Length - 1
+            Offset > Data'Length - 1
          then
             if Match /= Match_OK then
                Offset := Old_Offset;
             end if;
             return;
          end if;
-         
+
          if Divisor <= 0 or
             Divisor >= Long_Integer'Last/10
          then
@@ -490,7 +485,7 @@ is
       Negative := False;
       Result   := 0;
 
-      if Offset > Input_Length - 1
+      if Offset > Data'Length - 1
       then
          Match := Match_Invalid;
          return;
@@ -516,7 +511,7 @@ is
             not Match_Set ("0123456789") or
             Data'First >= Integer'Last - Offset or
             Data'First > Data'Last - Offset or
-            Offset > Input_Length - 1 or
+            Offset > Data'Length - 1 or
             Num_Matches >= Natural'Last;
 
          -- Check for leading '0'
@@ -666,7 +661,7 @@ is
       end if;
 
       if Data'First < Integer'Last - Offset and
-         Offset < Input_Length
+         Offset < Data'Length
       then
          Parse_Fractional_Part (Match_Frac, Fractional_Component);
       end if;
@@ -690,7 +685,7 @@ is
          return;
       end if;
 
-      pragma Assert (Scale > 0);
+      pragma Assert ((if Match_Exponent = Match_OK then Scale > 0));
 
       --  Convert to float if either we have fractional part or dividing by the
       --  scale would yield a non-integer number.
@@ -754,8 +749,7 @@ is
       Global => (In_Out => (Context,
                             Context_Index,
                             Offset),
-                 Input =>  (Data,
-                            Input_Length));
+                 Input =>  (Data));
 
    procedure Parse_String (Match : out Match_Type)
    is
@@ -781,7 +775,7 @@ is
 
       loop
          if Data'First > Integer'Last - Offset or
-            Offset > Input_Length - 1
+            Offset > Data'Length - 1
          then
             Offset := Old_Offset;
             Match  := Match_Invalid;
@@ -794,7 +788,7 @@ is
       end loop;
 
       if Data'First > Integer'Last - Offset or
-         Offset > Input_Length - 1
+         Offset > Data'Length - 1
       then
          Offset := Old_Offset;
          Match  := Match_Invalid;
@@ -865,7 +859,7 @@ is
       loop
          if Offset >= Natural'Last or
             Data'First > Integer'Last - Offset or
-            Offset > Input_Length - 1
+            Offset > Data'Length - 1
          then
             Offset := Old_Offset;
             return;
@@ -969,7 +963,7 @@ is
       loop
          if Offset >= Natural'Last or
             Data'First >= Integer'Last - Offset or
-            Offset > Input_Length - 1
+            Offset > Data'Length - 1
          then
             Offset := Old_Offset;
             return;
@@ -1050,21 +1044,9 @@ is
    -- Parse --
    -----------
 
-   procedure Parse (Input : String;
-                    Match : out Match_Type)
+   procedure Parse (Match : out Match_Type)
    is
    begin
-      if Data'Length < Input'Length
-      then
-         Match := Match_Out_Of_Memory;
-         return;
-      end if;
-
-      Data (Data'First .. Data'First + Input'Length - 1) := Input;
-      Data (Data'First + Input'Length .. Data'Last) := (others => ' ');
-      Input_Length := Input'Length;
-      Offset := 0;
-
       Parse_Internal (Match);
       if Context_Index > Context'First
       then
@@ -1167,5 +1149,4 @@ is
 
 begin
    Reset;
-   Data := (others => ' ');
 end JWX.JSON;

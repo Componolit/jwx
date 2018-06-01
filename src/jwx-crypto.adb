@@ -1,4 +1,3 @@
-with Ada.Text_IO; use Ada.Text_IO;
 with JWX.JWK;
 with JWX.Base64;
 with JWX.LSC;
@@ -13,13 +12,13 @@ use type LSC.SHA256.Message_Index;
 
 package body JWX.Crypto
 is
-   package K is new JWX.JWK;
+   package K is new JWX.JWK (Key);
 
    -----------------------
    -- Valid_HMAC_SHA256 --
    -----------------------
 
-   function Valid_HMAC_SHA256 return Boolean
+   procedure Valid_HMAC_SHA256 (Valid : out Boolean)
    is
       Payload_Raw : JWX.Byte_Array (1 .. Payload'Length);
       Key_Raw     : JWX.Byte_Array (1 .. (Key'Length/4 + 1) * 3);
@@ -37,21 +36,25 @@ is
       use SC.Types;
       use Interfaces;
    begin
-      if not K.Valid
+      Valid := False;
+      K.Select_Key;
+
+      if not K.Loaded or else
+         not K.Valid
       then
-         return False;
+         return;
       end if;
    
       if K.Algorithm /= Alg_Invalid and then
          K.Algorithm /= Alg_HS256
       then
-         return False;
+         return;
       end if;
 
       K.K (Key_Raw, Key_Length);
       if Key_Length = 0
       then
-         return False;
+         return;
       end if;
 
       --  Convert key into LSC compatible format
@@ -73,7 +76,7 @@ is
                          Result  => Auth_Raw);
       if Auth_Length /= 32
       then
-         return False;
+         return;
       end if;
 
       --  Convert authenticator LSC compatible format
@@ -87,28 +90,27 @@ is
           Length  => SC.SHA256.Message_Index (Payload'Length) * 8);
 
       --  Validate
-      if Auth_Input = Auth_Calc
+      if Auth_Input /= Auth_Calc
       then
-         return True;
+         return;
       end if;
 
-      return False;
+      Valid := True;
    end Valid_HMAC_SHA256;
 
    -----------
    -- Valid --
    -----------
 
-   function Valid (Alg : Alg_Type) return Boolean
+   procedure Valid (Alg   : Alg_Type;
+                    Valid : out Boolean)
    is
    begin
+      Valid := False;
       case Alg is
-         when Alg_HS256 => return Valid_HMAC_SHA256;
-         when others => return False;
+         when Alg_HS256 => Valid_HMAC_SHA256 (Valid);
+         when others    => null;
       end case;
    end Valid;
 
-begin
-   K.Load_Keys (Key);
-   K.Select_Key;
 end JWX.Crypto;

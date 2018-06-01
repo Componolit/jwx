@@ -16,8 +16,6 @@ use JWX;
 
 package body JWX_JWK_Tests is
 
-   package Key is new JWK;
-
    procedure Test_EC
       (Input_File : String;
        Key_ID     : String;
@@ -25,20 +23,22 @@ package body JWX_JWK_Tests is
        Y_Ref      : Byte_Array;
        D_Ref      : Byte_Array;
        Priv       : Boolean;
-       Usg        : Key.Use_Type;
+       Usg        : String;
        Alg        : Alg_Type;
-       Crv        : Key.EC_Curve_Type)
+       Crv        : String)
    is
-      use Key;
       Data : String := Read_File (Input_File);
+      package Key is new JWK (Data);
+      use Key;
       X_Val : Byte_Array (1 .. X_Ref'Length);
       X_Length : Natural;
       Y_Val : Byte_Array (1 .. Y_Ref'Length);
       Y_Length : Natural;
       D_Val : Byte_Array (1 .. D_Ref'Length);
       D_Length : Natural;
+      K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
+      K_Crv : Key.EC_Curve_Type := Key.EC_Curve_Type'Value (Crv);
    begin
-      Load_Keys (Data);
       Select_Key;
       Assert (Valid, "Key invalid");
       Assert (Kind = Kind_EC, "Invalid kind: " & Kind'Img);
@@ -61,9 +61,9 @@ package body JWX_JWK_Tests is
          Assert (D_Val (1 .. D_Length) = D_Ref, "Invalid D");
       end if;
 
-      Assert (Usage = Usg, "Wrong usage type: " & Usage'Img);
+      Assert (Usage = K_Usg, "Wrong usage type: " & Usage'Img);
       Assert (Algorithm = Alg, "Wrong algorithm: " & Algorithm'Img);
-      Assert (Curve = Crv, "Wrong curve: " & Curve'Img);
+      Assert (Curve = K_Crv, "Wrong curve: " & Curve'Img);
    end Test_EC;
 
    --------------------------------------------------------------------------------------------------------------------
@@ -72,22 +72,23 @@ package body JWX_JWK_Tests is
       (Input_File : String;
        Key_ID     : String;
        Priv       : Boolean;
-       Usg        : Key.Use_Type;
+       Usg        : String;
        Alg        : Alg_Type;
        N_Ref      : Byte_Array;
        E_Ref      : Byte_Array;
        D_Ref      : Byte_Array)
    is
-      use Key;
       Data : String := Read_File (Input_File);
+      package Key is new JWX.JWK (Data);
+      use Key;
       N_Val : Byte_Array (1 .. N_Ref'Length);
       N_Length : Natural;
       E_Val : Byte_Array (1 .. E_Ref'Length);
       E_Length : Natural;
       D_Val : Byte_Array (1 .. D_Ref'Length);
       D_Length : Natural;
+      K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
    begin
-      Load_Keys (Data);
       Assert (Loaded, "Invalid key file");
 
       Select_Key;
@@ -112,7 +113,7 @@ package body JWX_JWK_Tests is
          Assert (D_Val (1 .. D_Length) = D_Ref, "Invalid D");
       end if;
 
-      Assert (Usage = Usg, "Wrong usage type: " & Usage'Img);
+      Assert (Usage = K_Usg, "Wrong usage type: " & Usage'Img);
       Assert (Algorithm = Alg, "Wrong algorithm: " & Algorithm'Img);
    end Test_RSA;
 
@@ -121,16 +122,17 @@ package body JWX_JWK_Tests is
    procedure Test_Oct
       (Input_File : String;
        Key_ID     : String;
-       Usg        : Key.Use_Type;
+       Usg        : String;
        Alg        : Alg_Type;
        K_Ref      : Byte_Array)
    is
-      use Key;
       Data : String := Read_File (Input_File);
+      package Key is new JWX.JWK (Data);
+      use Key;
       K_Val : Byte_Array (1 .. K_Ref'Length);
       K_Length : Natural;
+      K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
    begin
-      Load_Keys (Data);
       Assert (Loaded, "Invalid key file");
 
       Select_Key;
@@ -144,7 +146,7 @@ package body JWX_JWK_Tests is
       Assert (K_Length = K_Ref'Length, "Wrong K size: " & K_Length'Img);
       Assert (K_Val (1 .. K_Length) = K_Ref, "Invalid K");
 
-      Assert (Usage = Usg, "Wrong usage type: " & Usage'Img);
+      Assert (Usage = K_Usg, "Wrong usage type: " & Usage'Img);
       Assert (Algorithm = Alg, "Wrong algorithm: " & Algorithm'Img);
    end Test_Oct;
 
@@ -152,7 +154,6 @@ package body JWX_JWK_Tests is
 
    procedure Test_Parse_RFC7517_Vector_1 (T : in out Test_Cases.Test_Case'Class)
    is
-      use Key;
    begin
       Test_EC (Input_File => "tests/data/RFC7517_example_1.json",
                Key_ID     => "Public key used in JWS spec Appendix A.3 example",
@@ -162,9 +163,9 @@ package body JWX_JWK_Tests is
                               179, 105, 093, 110, 169, 011, 036, 173, 138, 070, 035, 040, 133, 136, 229, 173),
                D_Ref      => (0, 0),
                Priv       => False,
-               Usg        => Use_Unknown,
+               Usg        => "Use_Unknown",
                Alg        => Alg_Invalid,
-               Crv        => Curve_P256);
+               Crv        => "Curve_P256");
 
    end Test_Parse_RFC7517_Vector_1;
 
@@ -172,7 +173,6 @@ package body JWX_JWK_Tests is
 
    procedure Test_Parse_Testkey013_Pubkey (T : in out Test_Cases.Test_Case'Class)
    is
-      use Key;
    begin
       Test_EC (Input_File => "tests/data/JWK_EC_P256_Signing_ES256_Testkey013_pubkey.json",
                Key_ID     => "Testkey013",
@@ -182,9 +182,9 @@ package body JWX_JWK_Tests is
                               225, 208, 150, 068, 135, 184, 202, 182, 098, 137, 208, 082, 109, 168, 110, 130),
                D_Ref      => (0, 0),
                Priv       => False,
-               Usg        => Use_Sign,
+               Usg        => "Use_Sign",
                Alg        => Alg_ES256,
-               Crv        => Curve_P256);
+               Crv        => "Curve_P256");
 
    end Test_Parse_Testkey013_Pubkey;
 
@@ -192,7 +192,6 @@ package body JWX_JWK_Tests is
 
    procedure Test_Parse_Testkey013_Keypair (T : in out Test_Cases.Test_Case'Class)
    is
-      use Key;
    begin
       Test_EC (Input_File => "tests/data/JWK_EC_P256_Signing_ES256_Testkey013_keypair.json",
                Key_ID     => "Testkey013",
@@ -203,9 +202,9 @@ package body JWX_JWK_Tests is
                D_Ref      => (141, 152, 000, 137, 177, 073, 191, 054, 208, 199, 187, 085, 102, 213, 159, 047,
                               179, 012, 196, 192, 194, 133, 124, 223, 076, 037, 213, 115, 028, 201, 231, 221),
                Priv       => True,
-               Usg        => Use_Sign,
+               Usg        => "Use_Sign",
                Alg        => Alg_ES256,
-               Crv        => Curve_P256);
+               Crv        => "Curve_P256");
 
    end Test_Parse_Testkey013_Keypair;
 
@@ -213,7 +212,6 @@ package body JWX_JWK_Tests is
 
    procedure Test_Parse_Testkey004_Keypair (T : in out Test_Cases.Test_Case'Class)
    is
-      use Key;
    begin
       Test_RSA (Input_File => "tests/data/JWK_RSA_2048_Encryption_RS256_Testkey004_keypair.json",
                 Key_ID     => "Testkey004",
@@ -251,7 +249,7 @@ package body JWX_JWK_Tests is
                                167, 063, 120, 074, 126, 219, 040, 153, 188, 249, 008, 025, 171, 156, 090, 103,
                                003, 095, 024, 150, 007, 231, 068, 217, 075, 158, 059, 159, 019, 233, 176, 001),
                 E_Ref      => (001, 000, 001),
-                Usg        => Use_Encrypt,
+                Usg        => "Use_Encrypt",
                 Alg        => Alg_RS256);
 
    end Test_Parse_Testkey004_Keypair;
@@ -260,12 +258,11 @@ package body JWX_JWK_Tests is
 
    procedure Test_Parse_Testkey033_Keyset (T : in out Test_Cases.Test_Case'Class)
    is
-      use Key;
    begin
       Test_Oct (Input_File => "tests/data/JWK_OCT_128_Signing_HS512_Testkey033_keyset.json",
                 Key_ID     => "Testkey033",
                 K_Ref      => (062, 028, 173, 034, 215, 007, 204, 249, 087, 122, 135, 146, 147, 118, 003, 047),
-                Usg        => Use_Sign,
+                Usg        => "Use_Sign",
                 Alg        => Alg_HS512);
 
    end Test_Parse_Testkey033_Keyset;

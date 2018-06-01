@@ -16,7 +16,6 @@ with JWX.JWK;
 with JWX.Crypto;
 with JWX.JWSCS;
 with JWX.JOSE;
-with Ada.Text_IO; use Ada.Text_IO;
 
 with LSC.HMAC_SHA256;
 
@@ -46,6 +45,7 @@ is
       end if;
 
       declare
+         Valid           : Boolean;
          Jose_Data       : constant String := Token.Jose_Data;
          Signature_Input : constant String := Token.Signature_Input;
          Signature       : constant String := Token.Signature;
@@ -60,8 +60,8 @@ is
             return;
          end if;
 
-         if L.Valid (J.Algorithm)
-         then
+         L.Valid (J.Algorithm, Valid);
+         if Valid then
             Result := Result_OK;
             return;
          end if;

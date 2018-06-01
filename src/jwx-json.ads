@@ -11,8 +11,8 @@
 
 generic
 
-   Data_Length  : Natural;
-   Context_Size : Natural := Data_Length/3 + 2;
+   Data         : String;
+   Context_Size : Natural := Data'Length/3 + 2;
 
 package JWX.JSON
    with
@@ -39,10 +39,9 @@ is
    End_Index  : constant Index_Type;
 
    -- Parse a JSON file
-   procedure Parse (Input : String;
-                    Match : out Match_Type)
+   procedure Parse (Match : out Match_Type)
    with
-      Pre => Input'First <= Input'Last;
+      Pre => Data'First <= Data'Last;
 
    -- Assert that a @Index@ has a certain kind
    function Has_Kind (Index : Index_Type;

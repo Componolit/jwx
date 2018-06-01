@@ -10,6 +10,7 @@
 --
 
 generic
+   Data : String;
 package JWX.JWK
    with
       Abstract_State => State,
@@ -31,11 +32,6 @@ is
 
    --  Key object loaded
    function Loaded return Boolean;
-
-   --  Load a JSON object containing a JWK or JWK set
-   procedure Load_Keys (Input : String)
-   with
-      Post => Loaded;
    
    --  Valid key
    function Valid return Boolean;

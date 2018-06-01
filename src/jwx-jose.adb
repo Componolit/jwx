@@ -20,13 +20,8 @@ is
 
    procedure Decode
    is
-      package J is new JWX.JSON (JOSE_Data'Length);
       use JWX.Base64;
-      use type J.Match_Type;
-      use type J.Index_Type;
       JOSE_Length : Natural;
-      JOSE_Alg    : J.Index_Type;
-      Match_JOSE  : J.Match_Type;
       JOSE_Text   : String (1 .. JOSE_Data'Length);
    begin
       -- Decode JOSE header
@@ -41,20 +36,29 @@ is
       -- Parse JOSE header
       Util.To_String (Data   => JOSE_Data (JOSE_Data'First .. JOSE_Data'First + JOSE_Length - 1),
                       Result => JOSE_Text);
-      J.Parse (JOSE_Text, Match_JOSE);
-      if Match_JOSE /= J.Match_OK
-      then
-         return;
-      end if;
 
-      JOSE_Alg := J.Query_Object ("alg");
-      if JOSE_Alg = J.End_Index
-      then
-         return;
-      end if;
+      declare
+         package J is new JWX.JSON (JOSE_Text);
+         Match_JOSE : J.Match_Type;
+         JOSE_Alg   : J.Index_Type;
+         use type J.Match_Type;
+         use type J.Index_Type;
+      begin
+         J.Parse (Match_JOSE);
+         if Match_JOSE /= J.Match_OK
+         then
+            return;
+         end if;
 
-      Alg := Algorithm (J.Get_String (JOSE_Alg));
-      JOSE_Valid := True;
+         JOSE_Alg := J.Query_Object ("alg");
+         if JOSE_Alg = J.End_Index
+         then
+            return;
+         end if;
+
+         Alg := Algorithm (J.Get_String (JOSE_Alg));
+         JOSE_Valid := True;
+      end;
 
    end Decode;
 

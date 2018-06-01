@@ -32,9 +32,9 @@ package body JWX.JWK
                                   Key_Alg))
 is
 
-   package Key_Data is new JSON (4096);
+   package Key_Data is new JSON (Data);
    Key_Valid  : Boolean := False;
-   Key_Loaded : Boolean := False;
+   Key_Loaded : Boolean;
    Key_Kind   : Kind_Type := Kind_Invalid;
    Key_Curve  : EC_Curve_Type := Curve_Invalid;
    Key_Index  : Key_Data.Index_Type := Key_Data.End_Index;
@@ -180,29 +180,6 @@ is
 
       Valid := True;
    end Valid_Oct;
-
-   ---------------
-   -- Load_Keys --
-   ---------------
-
-   procedure Load_Keys (Input : String)
-   is
-      use Key_Data;
-      Match : Match_Type;
-   begin
-      Key_Valid := False;
-      Key_Array := End_Index;
-      Key_Index := End_Index;
-
-      Parse (Input, Match);
-      if Match /= Match_OK
-      then
-         Key_Loaded := False;
-         return;
-      end if;
-      Key_Loaded := True;
-
-   end Load_Keys;
 
    -----------
    -- Valid --
@@ -503,4 +480,12 @@ is
 
    end Select_Key;
 
+begin
+   declare
+      Match : Key_Data.Match_Type;
+      use Key_Data;
+   begin
+      Key_Data.Parse (Match);
+      Key_Loaded := Match = Key_Data.Match_OK;
+   end;
 end JWX.JWK;
