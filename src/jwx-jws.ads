@@ -21,6 +21,8 @@ is
 
    procedure Validate_Compact (Data     :        String;
                                Key_Data : in out String;
-                               Result   :    out Result_Type);
+                               Result   :    out Result_Type)
+   with
+      Pre => Key_Data'First <= Key_Data'Last;
 
 end JWX.JWS;

@@ -33,16 +33,17 @@ is
 
       Auth_Length    : Natural;
       Key_Length     : Natural;
+      Key_Valid      : Boolean;
 
       use JWX.LSC;
       use SC.Types;
       use Interfaces;
    begin
       Valid := False;
-      K.Select_Key;
+      K.Select_Key (Key_Valid);
 
       if not K.Loaded or else
-         not K.Valid
+         not Key_Valid
       then
          return;
       end if;

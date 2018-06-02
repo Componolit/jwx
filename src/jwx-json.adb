@@ -11,7 +11,9 @@
 
 package body JWX.JSON
    with
-      Refined_State => (State => (Context, Context_Index, Offset))
+      Refined_State => (State => (Context,
+                                  Context_Index,
+                                  Offset))
 is
    type Context_Element_Type (Kind : Kind_Type := Kind_Invalid) is
    record

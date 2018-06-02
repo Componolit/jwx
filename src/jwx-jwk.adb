@@ -15,8 +15,8 @@ with JWX.Base64;
 package body JWX.JWK
    with
       Refined_State => (State => (Key_Data.State,
+                                  Key_Is_Valid,
                                   Key_Loaded,
-                                  Key_Valid,
                                   Key_Index,
                                   Key_Array,
                                   Key_Kind,
@@ -33,21 +33,23 @@ package body JWX.JWK
 is
 
    package Key_Data is new JSON (Data);
-   Key_Valid  : Boolean := False;
-   Key_Loaded : Boolean;
-   Key_Kind   : Kind_Type := Kind_Invalid;
-   Key_Curve  : EC_Curve_Type := Curve_Invalid;
-   Key_Index  : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_Array  : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_ID     : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_X      : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_Y      : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_D      : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_N      : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_E      : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_K      : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_Use    : Key_Data.Index_Type := Key_Data.End_Index;
-   Key_Alg    : Key_Data.Index_Type := Key_Data.End_Index;
+   use Key_Data;
+
+   Key_Loaded   : Boolean;
+   Key_Is_Valid : Boolean := False;
+   Key_Kind     : Kind_Type := Kind_Invalid;
+   Key_Curve    : EC_Curve_Type := Curve_Invalid;
+   Key_Index    : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Array    : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_ID       : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_X        : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Y        : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_D        : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_N        : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_E        : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_K        : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Use      : Key_Data.Index_Type := Key_Data.End_Index;
+   Key_Alg      : Key_Data.Index_Type := Key_Data.End_Index;
 
    -----------------
    -- Validate_EC --
@@ -55,23 +57,30 @@ is
 
    procedure Valid_EC (Valid : out Boolean)
    with
-      Pre => Key_Kind = Kind_EC;
+      Pre  => Key_Kind = Kind_EC,
+      Post => Get_Kind (Key_X) = Kind_String and
+              Get_Kind (Key_Y) = Kind_String;
 
    procedure Valid_EC (Valid : out Boolean)
    is
-      use Key_Data;
       Crv : Index_Type;
    begin
 
       Valid := False;
 
-      if Get_Kind /= Kind_Object
+      --  Retrieve curve type 'crv'
+      if Get_Kind (Key_Index) /= Kind_Object
       then
          return;
       end if;
 
-      --  Retrieve curve type 'crv'
       Crv := Query_Object ("crv", Key_Index);
+
+      if Get_Kind (Crv) /= Kind_String
+      then
+         return;
+      end if;
+
       if Get_String (Crv) = "P-256"
       then
          Key_Curve := Curve_P256;
@@ -87,13 +96,17 @@ is
 
       --  Check for 'x'
       Key_X := Query_Object ("x", Key_Index);
-      if Key_X = End_Index then
+      if Key_X = End_Index or else
+         Get_Kind (Key_X) /= Kind_String
+      then
          return;
       end if;
 
       --  Check for 'y'
       Key_Y := Query_Object ("y", Key_Index);
-      if Key_Y = End_Index then
+      if Key_Y = End_Index or else
+         Get_Kind (Key_Y) /= Kind_String
+      then
          return;
       end if;
 
@@ -132,13 +145,19 @@ is
 
    procedure Valid_RSA (Valid : out Boolean)
    with
-      Pre => Key_Kind = Kind_RSA;
+      Pre  => Key_Kind = Kind_RSA,
+      Post => Get_Kind (Key_N) = Kind_String and
+              Get_Kind (Key_E) = Kind_String;
 
    procedure Valid_RSA (Valid : out Boolean)
    is
-      use Key_Data;
    begin
       Valid := False;
+
+      if Get_Kind (Key_Index) /= Kind_Object
+      then
+         return;
+      end if;
 
       --  Check for 'n'
       Key_N := Query_Object ("n", Key_Index);
@@ -164,15 +183,20 @@ is
 
    procedure Valid_Oct (Valid : out Boolean)
    with
-      Pre => Key_Kind = Kind_OCT;
+      Pre => Key_Kind = Kind_OCT and
+             Get_Kind (Key_K) = Kind_String;
 
    procedure Valid_Oct (Valid : out Boolean)
    is
-      use Key_Data;
    begin
       Valid := False;
 
-      --  Check for 'k'
+      if Get_Kind (Key_Index) /= Kind_Object
+      then
+         return;
+      end if;
+
+     --  Check for 'k'
       Key_K := Query_Object ("k", Key_Index);
       if Key_K = End_Index then
          return;
@@ -181,11 +205,16 @@ is
       Valid := True;
    end Valid_Oct;
 
-   -----------
-   -- Valid --
-   -----------
+   ---------------
+   -- Key_Valid --
+   ---------------
 
-   function Valid return Boolean is (Key_Valid);
+   function Key_Valid return Boolean is
+      (case Key_Kind is
+          when Kind_EC      => Get_Kind (Key_X) = Kind_String and Get_Kind (Key_Y) = Kind_String,
+          when Kind_RSA     => Get_Kind (Key_N) = Kind_String and Get_Kind (Key_E) = Kind_String,
+          when Kind_Oct     => Get_Kind (Key_K) = Kind_String,
+          when Kind_Invalid => False);
 
    ------------
    -- Loaded --
@@ -205,7 +234,6 @@ is
 
    function ID return String
    is
-      use Key_Data;
    begin
       return Get_String (Key_ID);
    end ID;
@@ -218,7 +246,6 @@ is
                 Length : out Natural)
    is
       use JWX;
-      use Key_Data;
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_X),
                          Length  => Length,
@@ -233,7 +260,6 @@ is
                 Length : out Natural)
    is
       use JWX;
-      use Key_Data;
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_Y),
                          Length  => Length,
@@ -248,7 +274,6 @@ is
                 Length : out Natural)
    is
       use JWX;
-      use Key_Data;
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_N),
                          Length  => Length,
@@ -263,7 +288,6 @@ is
                 Length : out Natural)
    is
       use JWX;
-      use Key_Data;
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_E),
                          Length  => Length,
@@ -278,7 +302,6 @@ is
                 Length : out Natural)
    is
       use JWX;
-      use Key_Data;
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_D),
                          Length  => Length,
@@ -293,7 +316,6 @@ is
                 Length : out Natural)
    is
       use JWX;
-      use Key_Data;
    begin
       Base64.Decode_Url (Encoded => Get_String (Key_K),
                          Length  => Length,
@@ -306,7 +328,6 @@ is
 
    function Private_Key return Boolean
    is
-      use Key_Data;
    begin
       case Key_Kind is
          when Kind_EC | Kind_RSA => return Key_D /= Key_Data.End_Index;
@@ -321,9 +342,9 @@ is
 
    function Usage return Use_Type
    is
-      use Key_Data;
    begin
-      if Key_Use = End_Index
+      if Key_Use = End_Index or
+         Get_Kind (Key_Use) /= Kind_String
       then
          return Use_Unknown;
       end if;
@@ -345,9 +366,9 @@ is
 
    function Algorithm return Alg_Type
    is
-      use Key_Data;
    begin
-      if Key_Alg = End_Index
+      if Key_Alg = End_Index or
+         Get_Kind (Key_Alg) /= Kind_String
       then
          return Alg_Invalid;
       end if;
@@ -371,7 +392,6 @@ is
 
    function Keyset return Boolean
    is
-      use Key_Data;
    begin
       return Key_Index /= Null_Index;
    end Keyset;
@@ -382,7 +402,6 @@ is
 
    function Num_Keys return Natural
    is
-      use Key_Data;
    begin
       if Key_Index = Null_Index
       then
@@ -396,13 +415,12 @@ is
    -- Select_Key --
    ----------------
 
-   procedure Select_Key (Index : Positive := 1)
+   procedure Select_Key (Valid : out Boolean;
+                         Index :     Positive := 1)
    is
-      use Key_Data;
       Kty   : Index_Type;
-      Valid : Boolean := False;
    begin
-      Key_Valid := False;
+      Valid := False;
 
       --  Key must be an object
       if Get_Kind /= Kind_Object
@@ -429,11 +447,21 @@ is
          end if;
       end if;
 
+      if Get_Kind (Key_Index) /= Kind_Object
+      then
+         return;
+      end if;
+
       --  Retrieve key id 'kid'
       Key_ID := Query_Object ("kid", Key_Index);
 
       --  Retrieve key type 'kty'
       Kty := Query_Object ("kty", Key_Index);
+      if Get_Kind (Kty) /= Kind_String
+      then
+         return;
+      end if;
+
       if Get_String (Kty) = "EC"
       then
          Key_Kind := Kind_EC;
@@ -457,33 +485,19 @@ is
       case Key_Kind is
          when Kind_EC =>
             Valid_EC (Valid);
-            if not Valid
-            then
-               return;
-            end if;
          when Kind_RSA =>
             Valid_RSA (Valid);
-            if not Valid
-            then
-               return;
-            end if;
          when Kind_OCT =>
             Valid_Oct (Valid);
-            if not Valid
-            then
-               return;
-            end if;
          when Kind_Invalid =>
             return;
       end case;
-      Key_Valid := True;
 
    end Select_Key;
 
 begin
    declare
       Match : Key_Data.Match_Type;
-      use Key_Data;
    begin
       Key_Data.Parse (Match);
       Key_Loaded := Match = Key_Data.Match_OK;
