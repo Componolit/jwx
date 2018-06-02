@@ -749,7 +749,8 @@ is
       Global => (In_Out => (Context,
                             Context_Index,
                             Offset),
-                 Input =>  (Data));
+                 Input =>  (Data,
+                            Context_Size));
 
    procedure Parse_String (Match : out Match_Type)
    is

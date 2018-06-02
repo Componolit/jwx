@@ -13,8 +13,8 @@ with JWX.JSON;
 
 package Proof_JSON
 is
-   procedure Do_Parse (Data  : String;
-                       Match : out Boolean)
+   procedure Do_Parse (Data  : in out String;
+                       Match :    out Boolean)
    with
       Pre => Data'First <= Data'Last;
 

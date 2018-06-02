@@ -11,6 +11,8 @@ with Interfaces;
 use type LSC.SHA256.Message_Index;
 
 package body JWX.Crypto
+   with
+      Refined_State => (State => (K.State))
 is
    package K is new JWX.JWK (Key);
 

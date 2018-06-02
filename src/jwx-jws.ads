@@ -10,8 +10,8 @@
 --
 
 package JWX.JWS
-   with
-      SPARK_Mode
+with
+   SPARK_Mode
 is
 
    type Result_Type is (Result_Invalid,
@@ -19,8 +19,8 @@ is
                         Result_OK,
                         Result_Fail);
 
-   procedure Validate_Compact (Data     :     String;
-                               Key_Data :     String;
-                               Result   : out Result_Type);
+   procedure Validate_Compact (Data     :        String;
+                               Key_Data : in out String;
+                               Result   :    out Result_Type);
 
 end JWX.JWS;

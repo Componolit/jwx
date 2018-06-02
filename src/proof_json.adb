@@ -11,8 +11,8 @@
 
 package body Proof_JSON
 is
-   procedure Do_Parse (Data  : String;
-                       Match : out Boolean)
+   procedure Do_Parse (Data  : in out String;
+                       Match :    out Boolean)
    is
       package P is new JWX.JSON (Data);
       M : P.Match_Type;

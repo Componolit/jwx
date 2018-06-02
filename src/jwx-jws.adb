@@ -10,10 +10,10 @@
 --
 
 with JWX.Base64;
-with JWX.JSON;
 with JWX.Util;
 with JWX.JWK;
 with JWX.Crypto;
+with JWX.JSON;
 with JWX.JWSCS;
 with JWX.JOSE;
 
@@ -22,16 +22,16 @@ with LSC.HMAC_SHA256;
 use JWX;
 
 package body JWX.JWS
-   with
-      SPARK_Mode
+with
+   SPARK_Mode
 is
    ----------------------
    -- Validate_Compact --
    ----------------------
 
-   procedure Validate_Compact (Data     :     String;
-                               Key_Data :     String;
-                               Result   : out Result_Type)
+   procedure Validate_Compact (Data     :        String;
+                               Key_Data : in out String;
+                               Result   :    out Result_Type)
    is
       use JWX.Base64;
 

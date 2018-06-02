@@ -11,8 +11,8 @@
 
 generic
 
-   Data         : String;
-   Context_Size : Natural := Data'Length/3 + 2;
+   Data         : in out String;
+   Context_Size :        Natural := Data'Length/3 + 2;
 
 package JWX.JSON
    with
@@ -52,7 +52,8 @@ is
    -- Return kind of current element of a context
    function Get_Kind (Index : Index_Type := Null_Index) return Kind_Type
    with
-      Post => Has_Kind (Index, Get_Kind'Result);
+      Global => (Input => State),
+      Post   => Has_Kind (Index, Get_Kind'Result);
 
    -- Return value of a boolean context element
    function Get_Boolean (Index : Index_Type := Null_Index) return Boolean

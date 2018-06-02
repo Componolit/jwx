@@ -1,8 +1,11 @@
 generic
    Payload : String;
    Auth    : String;
-   Key     : String;
+   Key     : in out String;
 package JWX.Crypto
+with
+   Abstract_State => State,
+   Initializes    => State
 is
 
    --  Validate authenticator using algorithm @Alg@

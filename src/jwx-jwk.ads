@@ -10,7 +10,7 @@
 --
 
 generic
-   Data : String;
+   Data : in out String;
 package JWX.JWK
    with
       Abstract_State => State,
