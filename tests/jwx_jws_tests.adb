@@ -20,9 +20,11 @@ package body JWX_JWS_Tests is
    is
       use JWS;
       Result : Result_Type;
+      Data : String := Read_File ("tests/data/JWS_RFC7515_example_1.dat");
+      Key  : String := Read_File ("tests/data/JWS_RFC7515_example_1_key.json");
    begin
-      Validate_Compact (Data     => Read_File ("tests/data/JWS_RFC7515_example_1.dat"),
-                        Key_Data => Read_File ("tests/data/JWS_RFC7515_example_1_key.json"),
+      Validate_Compact (Data     => Data,
+                        Key_Data => Key,
                         Result   => Result);
 
       Assert (Result = Result_OK, "Validation failed: " & Result'Img);
@@ -34,9 +36,11 @@ package body JWX_JWS_Tests is
    is
       use JWS;
       Result : Result_Type;
+      Data : String := Read_File ("tests/data/JWS_RFC7515_example_2.dat");
+      Key  : String := Read_File ("tests/data/JWS_RFC7515_example_1_key.json");
    begin
-      Validate_Compact (Data     => Read_File ("tests/data/JWS_RFC7515_example_2.dat"),
-                        Key_Data => Read_File ("tests/data/JWS_RFC7515_example_1_key.json"),
+      Validate_Compact (Data     => Data,
+                        Key_Data => Key,
                         Result   => Result);
 
       Assert (Result /= Result_OK, "Validation must fail");

@@ -18,7 +18,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_True (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("true");
+      Data : String := "true";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -32,7 +33,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_False (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("false");
+      Data : String := "false";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -46,7 +48,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Null (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("null");
+      Data : String := "null";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -59,7 +62,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_True_Wrong_Case (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("True");
+      Data : String := "True";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -71,7 +75,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_False_Wrong_Case (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("FALSE");
+      Data : String := "FALSE";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -83,7 +88,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Null_Wrong_Case (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("nulL");
+      Data : String := "nulL";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -95,7 +101,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Null_With_Space (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("    null");
+      Data : String := "    null";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -108,7 +115,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_True_With_Newline (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("  " & ASCII.CR & ASCII.LF & "true");
+      Data : String := "  " & ASCII.CR & ASCII.LF & "true";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -121,7 +129,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_False_With_Tab (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON (ASCII.HT & "false");
+      Data : String := ASCII.HT & "false";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -134,7 +143,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Small_Positive_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("42");
+      Data : String := "42";
+      package J is new JWX.JSON (Data);
       use J;
       use J;
       Match : Match_Type;
@@ -149,7 +159,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Positive_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("40000");
+      Data : String := "40000";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -163,7 +174,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Small_Negative_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("-42");
+      Data : String := "-42";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -177,7 +189,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Big_Positive_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("2147483647");
+      Data : String := "2147483647";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -191,7 +204,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Integer_With_Positive_Exponent (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("1234e2");
+      Data : String := "1234e2";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -205,7 +219,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Integer_With_Positive_Exponent_2 (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("1234E+2");
+      Data : String := "1234E+2";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -219,7 +234,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Integer_With_Positive_Exponent_3 (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("1234E+02");
+      Data : String := "1234E+02";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -233,7 +249,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Num_With_Neg_Exp_Frac (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("12345e-2");
+      Data : String := "12345e-2";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -247,7 +264,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Num_With_Neg_Exp_Int (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("12300e-2");
+      Data : String := "12300e-2";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -261,7 +279,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Zero_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("   0 ");
+      Data : String := "   0 ";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -275,7 +294,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Big_Negative_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("-2147483647");
+      Data : String := "-2147483647";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -289,7 +309,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Too_Big_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("92233720368547758080");
+      Data : String := "92233720368547758080";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -301,7 +322,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Too_Small_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("-92233720368547758080");
+      Data : String := "-92233720368547758080";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -313,7 +335,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Small_Positive_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("3.14");
+      Data : String := "3.14";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -327,7 +350,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Small_Negative_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("-3.14");
+      Data : String := "-3.14";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -341,7 +365,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Very_Small_Positive_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("0.00000000001");
+      Data : String := "0.00000000001";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -355,7 +380,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Too_Small_Positive_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("0.0000000000000000000000000000000001");
+      Data : String := "0.0000000000000000000000000000000001";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -367,7 +393,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Very_Small_Negative_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("-0.00000000001");
+      Data : String := "-0.00000000001";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -381,7 +408,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Too_Small_Negative_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("-0.0000000000000000000000000000000001");
+      Data : String := "-0.0000000000000000000000000000000001";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -393,7 +421,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Zero_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON (" 0.0 ");
+      Data : String := " 0.0 ";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -407,7 +436,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Float_With_Exp_With_Leading_Zero (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("123.5e+02");
+      Data : String := "123.5e+02";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -421,7 +451,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Leading_Zero_Integer (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("000068547758080");
+      Data : String := "000068547758080";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -433,7 +464,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Leading_Zero_Float (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("000.06854");
+      Data : String := "000.06854";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -445,7 +477,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Missing_Fractional_Part (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("54775. ");
+      Data : String := "54775. ";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -457,7 +490,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Simple_String (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("""Hello world!""");
+      Data : String := """Hello world!""";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -471,7 +505,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Unclosed_String (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("""Invalid String");
+      Data : String := """Invalid String";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -483,7 +518,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Escaped_String (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("""Say \""Hello World\""!""");
+      Data : String := """Say \""Hello World\""!""";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -497,7 +533,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Escaped_Backslash (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("""Escaped backslash\\""");
+      Data : String := """Escaped backslash\\""";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -511,7 +548,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Escaped_Regular_Character (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("""Escaped \character""");
+      Data : String := """Escaped \character""";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -525,7 +563,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Simple_Object (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON (" { ""precision"": ""zip"", ""Latitude"":  37.7668, ""Longitude"": -122.3959, ""Address"":   """", ""City"":      ""SAN FRANCISCO"", ""State"":     ""CA"", ""Zip"":       ""94107"", ""Country"":   ""US"" }");
+      Data : String := " { ""precision"": ""zip"", ""Latitude"":  37.7668, ""Longitude"": -122.3959, ""Address"":   """", ""City"":      ""SAN FRANCISCO"", ""State"":     ""CA"", ""Zip"":       ""94107"", ""Country"":   ""US"" }";
+      package J is new JWX.JSON (Data);
       use J;
       Result : Index_Type;
       Match : Match_Type;
@@ -577,7 +616,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Empty_Object (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("  {}  ");
+      Data : String := "  {}  ";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -591,7 +631,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Simple_Array (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("  [116, 943, 234, 38793] ");
+      Data : String := "  [116, 943, 234, 38793] ";
+      package J is new JWX.JSON (Data);
       use J;
       Result : Index_Type;
       Match : Match_Type;
@@ -627,7 +668,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Unclosed_Array (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON (" [""foo"", ""bar"" ");
+      Data : String := " [""foo"", ""bar"" ";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -639,7 +681,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Mixed_Array (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("  [116, -4.5, ""baz"", true] ");
+      Data : String := "  [116, -4.5, ""baz"", true] ";
+      package J is new JWX.JSON (Data);
       use J;
       Result : Index_Type;
       Match : Match_Type;
@@ -672,7 +715,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Empty_Array (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("   [] ");
+      Data : String := "   [] ";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -687,7 +731,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Parse_Array_Of_Objects (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("[{""A"": 42}, {""B"": {""D"": 234}}, {""C"": 9}]");
+      Data : String := "[{""A"": 42}, {""B"": {""D"": 234}}, {""C"": 9}]";
+      package J is new JWX.JSON (Data);
       use J;
       Match : Match_Type;
    begin
@@ -750,7 +795,8 @@ package body JWX_JSON_Tests is
 
    procedure Test_Mixed_Objects (T : in out Test_Cases.Test_Case'Class)
    is
-      package J is new JWX.JSON ("[{""area"": 123.0}, {""area"": 200.5}]");
+      Data : String := "[{""area"": 123.0}, {""area"": 200.5}]";
+      package J is new JWX.JSON (Data);
       use J;
       Result : Index_Type;
       Match : Match_Type;

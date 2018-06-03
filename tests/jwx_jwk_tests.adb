@@ -38,8 +38,9 @@ package body JWX_JWK_Tests is
       D_Length : Natural;
       K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
       K_Crv : Key.EC_Curve_Type := Key.EC_Curve_Type'Value (Crv);
+      Valid : Boolean;
    begin
-      Select_Key;
+      Select_Key (Valid);
       Assert (Valid, "Key invalid");
       Assert (Kind = Kind_EC, "Invalid kind: " & Kind'Img);
       Assert (ID = Key_ID, "Invalid key ID: " & ID);
@@ -88,10 +89,11 @@ package body JWX_JWK_Tests is
       D_Val : Byte_Array (1 .. D_Ref'Length);
       D_Length : Natural;
       K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
+      Valid : Boolean;
    begin
       Assert (Loaded, "Invalid key file");
 
-      Select_Key;
+      Select_Key (Valid);
       Assert (Valid, "Key invalid");
       Assert (Kind = Kind_RSA, "Invalid kind: " & Kind'Img);
       Assert (ID = Key_ID, "Invalid key ID: " & ID);
@@ -132,10 +134,11 @@ package body JWX_JWK_Tests is
       K_Val : Byte_Array (1 .. K_Ref'Length);
       K_Length : Natural;
       K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
+      Valid : Boolean;
    begin
       Assert (Loaded, "Invalid key file");
 
-      Select_Key;
+      Select_Key (Valid);
       Assert (Valid, "Key invalid");
       Assert (Kind = Kind_Oct, "Invalid kind: " & Kind'Img);
       Assert (ID = Key_ID, "Invalid key ID: " & ID);
