@@ -183,8 +183,8 @@ is
 
    procedure Valid_Oct (Valid : out Boolean)
    with
-      Pre => Key_Kind = Kind_OCT and
-             Get_Kind (Key_K) = Kind_String;
+      Pre  => Key_Kind = Kind_OCT,
+      Post => Get_Kind (Key_K) = Kind_String;
 
    procedure Valid_Oct (Valid : out Boolean)
    is
