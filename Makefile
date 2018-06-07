@@ -20,4 +20,7 @@ example:
 	@gnatprove $(COMMON_OPTS) -P doc/example.gpr $(GNATPROVE_OPTS)
 	@obj/example
 
+authproxy:
+	@gprbuild $(COMMON_OPTS) -P doc/authproxy.gpr
+
 .PHONY: test
