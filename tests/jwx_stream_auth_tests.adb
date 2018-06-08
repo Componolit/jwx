@@ -175,6 +175,39 @@ package body JWX_Stream_Auth_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Valid_Multipart_Request (T : in out Test_Cases.Test_Case'Class)
+   is
+      Request       : String := Read_File ("tests/data/HTTP_valid_auth.dat");
+      Key_Data      : String := Read_File ("tests/data/HTTP_auth_key.json");
+      Error_Message : String := "Error Message";
+
+      procedure Check_OK (Data : String)
+      is
+         Data_Does_Not_Match : exception;
+      begin
+         if Data /= Request
+         then
+            raise Data_Does_Not_Match;
+         end if;
+         raise Test_OK;
+      end Check_OK;
+
+      package HA is new JWX.Stream_Auth (Error_Response  => Error_Message,
+                                      Key_Data        => Key_Data,
+                                      Upstream_Send   => Check_OK,
+                                      Downstream_Send => Raise_Logic_Error);
+   begin
+      -- Make sure we "cut through" the token
+      HA.Downstream_Receive (Request (Request'First .. Request'First + 700));
+      HA.Downstream_Receive (Request (Request'First + 701 .. Request'Last));
+      HA.Downstream_Close;
+      Assert (False, "Valid multipart request not detected");
+   exception
+      when Test_OK => null;
+   end Test_Valid_Multipart_Request;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -183,6 +216,7 @@ package body JWX_Stream_Auth_Tests is
       Register_Routine (T, Test_Valid_Authenticated_Request'Access, "Valid authenticated HTTP Request");
       Register_Routine (T, Test_Garbage_Token'Access, "Garbage token");
       Register_Routine (T, Test_Invalid_Key'Access, "Invalid key");
+      Register_Routine (T, Test_Valid_Multipart_Request'Access, "Authenticated Request in multiple messages");
    end Register_Tests;
 
    function Name (T : Test_Case) return Test_String is
