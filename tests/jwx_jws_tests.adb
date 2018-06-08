@@ -18,17 +18,19 @@ package body JWX_JWS_Tests is
 
    procedure Test_Parse_RFC7515_Vector_1 (T : in out Test_Cases.Test_Case'Class)
    is
-      use JWS;
-      Result : Result_Type;
-      Data : String := Read_File ("tests/data/JWS_RFC7515_example_1.dat");
+      Tmp  : String := Read_File ("tests/data/JWS_RFC7515_example_1.dat");
       Key  : String := Read_File ("tests/data/JWS_RFC7515_example_1_key.json");
-   begin
+
       -- Do not pass in last character in Data as this is a new line which
       -- is not expected (JWX.JWSCS expects the token to end at the last
       -- character)
-      Validate_Compact (Data     => Data (Data'First .. Data'Last - 1),
-                        Key_Data => Key,
-                        Result   => Result);
+      Data : String := Tmp (Tmp'First .. Tmp'Last - 1);
+
+      package J is new JWX.JWS (Data, Key);
+      use J;
+      Result : Result_Type;
+   begin
+      Validate_Compact (Result => Result);
 
       Assert (Result = Result_OK, "Validation failed: " & Result'Img);
    end Test_Parse_RFC7515_Vector_1;
@@ -37,15 +39,13 @@ package body JWX_JWS_Tests is
 
    procedure Test_Parse_RFC7515_Vector_1_Invalid (T : in out Test_Cases.Test_Case'Class)
    is
-      use JWS;
-      Result : Result_Type;
       Data : String := Read_File ("tests/data/JWS_RFC7515_example_2.dat");
       Key  : String := Read_File ("tests/data/JWS_RFC7515_example_1_key.json");
+      package J is new JWX.JWS (Data, Key);
+      use J;
+      Result : Result_Type;
    begin
-      Validate_Compact (Data     => Data,
-                        Key_Data => Key,
-                        Result   => Result);
-
+      Validate_Compact (Result => Result);
       Assert (Result /= Result_OK, "Validation must fail");
    end Test_Parse_RFC7515_Vector_1_Invalid;
 

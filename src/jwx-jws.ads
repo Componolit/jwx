@@ -9,9 +9,10 @@
 -- GNU Affero General Public License version 3.
 --
 
+generic
+   Data     : String;
+   Key_Data : in out String;
 package JWX.JWS
-with
-   SPARK_Mode
 is
 
    type Result_Type is (Result_Invalid,
@@ -19,10 +20,11 @@ is
                         Result_OK,
                         Result_Fail);
 
-   procedure Validate_Compact (Data     :        String;
-                               Key_Data : in out String;
-                               Result   :    out Result_Type)
+   procedure Validate_Compact (Result : out Result_Type)
    with
       Pre => Key_Data'First <= Key_Data'Last;
+
+   -- Return payload
+   function Payload return String;
 
 end JWX.JWS;

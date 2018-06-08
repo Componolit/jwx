@@ -22,20 +22,17 @@ with LSC.HMAC_SHA256;
 use JWX;
 
 package body JWX.JWS
-with
-   SPARK_Mode
 is
+
+   package Token is new JWX.JWSCS (Data);
+
    ----------------------
    -- Validate_Compact --
    ----------------------
 
-   procedure Validate_Compact (Data     :        String;
-                               Key_Data : in out String;
-                               Result   :    out Result_Type)
+   procedure Validate_Compact (Result : out Result_Type)
    is
       use JWX.Base64;
-
-      package Token is new JWX.JWSCS (Data);
    begin
       Result := Result_Invalid;
 
@@ -70,5 +67,15 @@ is
       Result := Result_Fail;
 
    end Validate_Compact;
+
+   -------------
+   -- Payload --
+   -------------
+
+   function Payload return String
+   is
+   begin
+      return Token.Payload;
+   end Payload;
 
 end JWX.JWS;

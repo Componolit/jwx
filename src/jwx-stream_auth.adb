@@ -28,10 +28,8 @@ is
 
    procedure Check_Authentication
    is
-      use JWX;
       First : Natural := Buf'Last;
       Last  : Natural := Buf'First;
-      Auth_Result : JWS.Result_Type;
    begin
       Authenticated := Auth_Noent;
 
@@ -65,18 +63,23 @@ is
          return;
       end if;
 
-      JWS.Validate_Compact
-         (Data     => Buf (First .. Last),
-          Key_Data => Key_Data,
-          Result   => Auth_Result);
+      declare
+         B : constant String := Buf (First .. Last);
+         package P is new JWX.JWS (Data     => B,
+                                   Key_Data => Key_Data);
+         use P;
+         Auth_Result : Result_Type;
+      begin
+         Validate_Compact (Result => Auth_Result);
 
-      case Auth_Result
-      is
-         when JWS.Result_Invalid
-            | JWS.Result_Invalid_Key => Authenticated := Auth_Invalid;
-         when JWS.Result_Fail        => Authenticated := Auth_Fail;
-         when JWS.Result_OK          => Authenticated := Auth_OK;
-      end case;
+         case Auth_Result
+         is
+            when Result_Invalid
+               | Result_Invalid_Key => Authenticated := Auth_Invalid;
+            when Result_Fail        => Authenticated := Auth_Fail;
+            when Result_OK          => Authenticated := Auth_OK;
+         end case;
+      end;
 
    end Check_Authentication;
 
