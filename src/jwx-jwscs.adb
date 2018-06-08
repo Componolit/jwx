@@ -108,7 +108,7 @@ is
    -- Signature --
    ---------------
 
-   function Signature return String is (Data (Second + 1.. Data'Last - 1));
+   function Signature return String is (Data (Second + 1 .. Data'Last));
 
 begin
    Get_Separators;

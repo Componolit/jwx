@@ -23,7 +23,10 @@ package body JWX_JWS_Tests is
       Data : String := Read_File ("tests/data/JWS_RFC7515_example_1.dat");
       Key  : String := Read_File ("tests/data/JWS_RFC7515_example_1_key.json");
    begin
-      Validate_Compact (Data     => Data,
+      -- Do not pass in last character in Data as this is a new line which
+      -- is not expected (JWX.JWSCS expects the token to end at the last
+      -- character)
+      Validate_Compact (Data     => Data (Data'First .. Data'Last - 1),
                         Key_Data => Key,
                         Result   => Result);
 

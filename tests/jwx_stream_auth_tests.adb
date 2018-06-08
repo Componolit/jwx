@@ -1,5 +1,5 @@
 --
--- \brief  Tests for JWX.HTTPAuth
+-- \brief  Tests for JWX.Stream_Auth
 -- \author Alexander Senier
 -- \date   2018-06-06
 --
@@ -11,7 +11,7 @@
 with AUnit.Assertions; use AUnit.Assertions;
 with JWX_Test_Utils; use JWX_Test_Utils;
 
-package body JWX_HTTPAuth_Tests is
+package body JWX_Stream_Auth_Tests is
 
    Logic_Error : exception;
    Test_OK     : exception;
@@ -37,12 +37,15 @@ package body JWX_HTTPAuth_Tests is
          raise Test_OK;
       end Check_Failed;
 
-      package HA is new JWX.HTTPAuth (Error_Response  => Error_Message,
-                                      Key_Data        => Read_File ("tests/data/HTTP_auth_key.json"),
+      Key_Data : String := Read_File ("tests/data/HTTP_auth_key.json");
+
+      package HA is new JWX.Stream_Auth (Error_Response  => Error_Message,
+                                      Key_Data        => Key_Data,
                                       Upstream_Send   => Raise_Logic_Error,
                                       Downstream_Send => Check_Failed);
    begin
       HA.Downstream_Receive ("INVAILD REQUEST");
+      HA.Downstream_Close;
       Assert (False, "Invalid request not detected");
    exception
       when Test_OK => null;
@@ -63,12 +66,15 @@ package body JWX_HTTPAuth_Tests is
          raise Test_OK;
       end Check_Failed;
 
-      package HA is new JWX.HTTPAuth (Error_Response  => Error_Message,
-                                      Key_Data        => Read_File ("tests/data/HTTP_auth_key.json"),
+      Key_Data : String := Read_File ("tests/data/HTTP_auth_key.json");
+
+      package HA is new JWX.Stream_Auth (Error_Response  => Error_Message,
+                                      Key_Data        => Key_Data,
                                       Upstream_Send   => Raise_Logic_Error,
                                       Downstream_Send => Check_Failed);
    begin
       HA.Downstream_Receive (Read_File ("tests/data/HTTP_valid_unauth.dat"));
+      HA.Downstream_Close;
       Assert (False, "Valid unauthenticated request not detected");
    exception
       when Test_OK => null;
@@ -78,25 +84,28 @@ package body JWX_HTTPAuth_Tests is
 
    procedure Test_Valid_Authenticated_Request (T : in out Test_Cases.Test_Case'Class)
    is
-      Request : String := Read_File ("tests/data/HTTP_valid_auth.dat");
+      Request       : String := Read_File ("tests/data/HTTP_valid_auth.dat");
+      Key_Data      : String := Read_File ("tests/data/HTTP_auth_key.json");
       Error_Message : String := "Error Message";
 
       procedure Check_OK (Data : String)
       is
+         Data_Does_Not_Match : exception;
       begin
          if Data /= Request
          then
-            raise Logic_Error;
+            raise Data_Does_Not_Match;
          end if;
          raise Test_OK;
       end Check_OK;
 
-      package HA is new JWX.HTTPAuth (Error_Response  => Error_Message,
-                                      Key_Data        => Read_File ("tests/data/HTTP_auth_key.json"),
-                                      Upstream_Send   => Raise_Logic_Error,
-                                      Downstream_Send => Check_OK);
+      package HA is new JWX.Stream_Auth (Error_Response  => Error_Message,
+                                      Key_Data        => Key_Data,
+                                      Upstream_Send   => Check_OK,
+                                      Downstream_Send => Raise_Logic_Error);
    begin
       HA.Downstream_Receive (Request);
+      HA.Downstream_Close;
       Assert (False, "Valid authenticated request not detected");
    exception
       when Test_OK => null;
@@ -111,20 +120,24 @@ package body JWX_HTTPAuth_Tests is
 
       procedure Check_OK (Data : String)
       is
+         Error_Not_Set_Downstream : exception;
       begin
          if Data /= Error_Message 
          then
-            raise Logic_Error;
+            raise Error_Not_Set_Downstream;
          end if;
          raise Test_OK;
       end Check_OK;
 
-      package HA is new JWX.HTTPAuth (Error_Response  => Error_Message,
-                                      Key_Data        => Read_File ("tests/data/HTTP_auth_key.json"),
+      Key_Data : String := Read_File ("tests/data/HTTP_auth_key.json");
+
+      package HA is new JWX.Stream_Auth (Error_Response  => Error_Message,
+                                      Key_Data        => Key_Data,
                                       Upstream_Send   => Raise_Logic_Error,
                                       Downstream_Send => Check_OK);
    begin
       HA.Downstream_Receive (Request);
+      HA.Downstream_Close;
       Assert (False, "Garbage token not detected");
    exception
       when Test_OK => null;
@@ -140,20 +153,22 @@ package body JWX_HTTPAuth_Tests is
       procedure Check_OK (Data : String)
       is
       begin
-         if Data /= Request
+         if Data /= Error_Message
          then
             raise Logic_Error;
          end if;
          raise Test_OK;
       end Check_OK;
 
-      package HA is new JWX.HTTPAuth (Error_Response  => Error_Message,
-                                      Key_Data        => Read_File ("tests/data/JWS_RFC7515_example_1_key.json"),
+      Key_Data : String := Read_File ("tests/data/JWS_RFC7515_example_1_key.json");
+
+      package HA is new JWX.Stream_Auth (Error_Response  => Error_Message,
+                                      Key_Data        => Key_Data,
                                       Upstream_Send   => Raise_Logic_Error,
                                       Downstream_Send => Check_OK);
    begin
       HA.Downstream_Receive (Request);
-      Assert (False, "Invalid key not detected");
+      HA.Downstream_Close;
    exception
       when Test_OK => null;
    end Test_Invalid_Key;
@@ -172,7 +187,7 @@ package body JWX_HTTPAuth_Tests is
 
    function Name (T : Test_Case) return Test_String is
    begin
-      return Format ("HTTPAuth Tests");
+      return Format ("Stream_Auth Tests");
    end Name;
 
-end JWX_HTTPAuth_Tests;
+end JWX_Stream_Auth_Tests;
