@@ -16,6 +16,7 @@ with JWX_JWK_Tests;
 with JWX_JWS_Tests;
 with JWX_Crypto_Tests;
 with JWX_Stream_Auth_Tests;
+with JWX_JWT_Tests;
 
 package body JWX_Suite is
 
@@ -31,6 +32,7 @@ package body JWX_Suite is
    JWS_Test         : aliased JWX_JWS_Tests.Test_Case;
    Crypto_Test      : aliased JWX_Crypto_Tests.Test_Case;
    Stream_Auth_Test : aliased JWX_Stream_Auth_Tests.Test_Case;
+   JWT_Test         : aliased JWX_JWT_Tests.Test_Case;
 
    function Suite return Access_Test_Suite is
    begin
@@ -40,6 +42,7 @@ package body JWX_Suite is
       Add_Test (Result'Access, JWS_Test'Access);
       Add_Test (Result'Access, Crypto_Test'Access);
       Add_Test (Result'Access, Stream_Auth_Test'Access);
+      Add_Test (Result'Access, JWT_Test'Access);
       return Result'Access;
    end Suite;
 

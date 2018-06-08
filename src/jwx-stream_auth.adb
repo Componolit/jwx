@@ -9,7 +9,7 @@
 -- GNU Affero General Public License version 3.
 --
 
-with JWX.JWS;
+with JWX.JWT;
 
 package body JWX.Stream_Auth
    with
@@ -65,8 +65,11 @@ is
 
       declare
          B : constant String := Buf (First .. Last);
-         package P is new JWX.JWS (Data     => B,
-                                   Key_Data => Key_Data);
+         package P is new JWX.JWT (Data     => B,
+                                   Key_Data => Key_Data,
+                                   Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
+                                   Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
+                                   Now      => 1528404620);
          use P;
          Auth_Result : Result_Type;
       begin
@@ -74,10 +77,9 @@ is
 
          case Auth_Result
          is
-            when Result_Invalid
-               | Result_Invalid_Key => Authenticated := Auth_Invalid;
             when Result_Fail        => Authenticated := Auth_Fail;
             when Result_OK          => Authenticated := Auth_OK;
+            when others             => Authenticated := Auth_Invalid;
          end case;
       end;
 
