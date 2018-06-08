@@ -1,5 +1,5 @@
 --
--- \brief  Helper package for proving generic JWX.HTTPAUTH
+-- \brief  Helper package for proving generic JWX.Stream_Auth
 -- \author Alexander Senier
 -- \date   2018-06-07
 --
@@ -9,7 +9,7 @@
 -- GNU Affero General Public License version 3.
 --
 
-package body Proof_HTTPAuth
+package body Proof_Stream_Auth
 with
    SPARK_Mode
 is
@@ -23,7 +23,7 @@ is
 
       Invalid_Key : String := "Invalid key";
 
-      package HA is new JWX.HTTPAuth
+      package HA is new JWX.Stream_Auth
                            (Error_Response  => "Error",
                             Key_Data        => Invalid_Key,
                             Upstream_Send   => Dump,
@@ -33,5 +33,4 @@ is
       HA.Upstream_Receive ("Message");
    end Test;
 
-end Proof_HTTPAuth;
-
+end Proof_Stream_Auth;

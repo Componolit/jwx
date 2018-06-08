@@ -112,7 +112,6 @@ is
 
    procedure Downstream_Receive (Data : String)
    is
-      Result : Auth_Result_Type;
    begin
       -- Reset state if we receive data and are already Authenticated
       if Authenticated = Auth_OK
