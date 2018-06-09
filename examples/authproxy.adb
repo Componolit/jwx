@@ -1,3 +1,15 @@
+--
+-- \brief  WIP: Filter for transparently checking authentication token in TCP
+--         connections. THIS IS UNFINISHED AND DOES NOT WORK, YET.
+-- \author Alexander Senier
+-- \date   2018-06-09
+--
+-- Copyright (C) 2018 Componolit GmbH
+--
+-- This file is part of JWX, which is distributed under the terms of the
+-- GNU Affero General Public License version 3.
+--
+
 with Ada.Text_IO;
 with Ada.IO_Exceptions;
 with GNAT.Sockets;
