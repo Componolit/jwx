@@ -15,10 +15,10 @@ test:
 	@gprbuild $(COMMON_OPTS) -P tests/test.gpr -gnata -p
 	@obj/test
 
-example:
-	@gprbuild $(COMMON_OPTS) -P doc/example.gpr
-	@gnatprove $(COMMON_OPTS) -P doc/example.gpr $(GNATPROVE_OPTS)
-	@obj/example
+examples::
+	@gprbuild $(COMMON_OPTS) -P examples/examples.gpr
+	@gnatprove $(COMMON_OPTS) -P examples/examples.gpr $(GNATPROVE_OPTS)
+	@obj/b64
 
 authproxy:
 	@gprbuild $(COMMON_OPTS) -P doc/authproxy.gpr

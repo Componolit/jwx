@@ -1,13 +1,13 @@
-with Examples;
+with Areas;
 with Ada.Text_IO; use Ada.Text_IO;
 with JWX_Test_Utils; use JWX_Test_Utils;
 
-procedure Example
-is
+procedure Area is
    Area  : Float;
    Valid : Boolean;
+   Data  : String := Read_File ("tests/data/countries.json");
 begin   
-   Examples.Areas (Read_File ("tests/data/countries.json"), Valid, Area);
+   Areas.Areas (Data, Valid, Area);
    if Valid
    then
       Put_Line ("Area of all countries: " & Area'Img);
@@ -15,4 +15,4 @@ begin
       Put_Line ("Error");
    end if;
    
-end Example;
+end Area;

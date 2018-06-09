@@ -3,15 +3,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 pragma Elaborate_All (JWX.JSON);
 
-package body Examples
-   with SPARK_Mode
-is
-   package C is new JWX.JSON (400000);
-
-   procedure Areas (Data   : String;
+package body Areas is
+   procedure Areas (Data   : in out String;
                     Valid  : out Boolean;
                     Result : out Float)
    is
+      package C is new JWX.JSON (Data);
       use C;
 
       Match   : Match_Type;
@@ -21,7 +18,7 @@ is
       Result := 0.0;
       Valid := False;
 
-      Parse (Data, Match);
+      Parse (Match);
       if Match /= Match_OK or else
          Get_Kind /= Kind_Array
       then
@@ -38,4 +35,4 @@ is
       Valid := True;
    end Areas;
 
-end Examples;
+end Areas;
