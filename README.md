@@ -93,6 +93,7 @@ The following known limitations exist in JWX:
 * The code is valid SPARK, but absence of runtime errors is still to be proven
 * Generation of Base64, JSON, JWS, JWT etc. is not supported (only validation)
 * JWS and JWT only support HMAC-SHA256 (no other HMAC modes, RSA or ECDSA)
+* JWS JSON serialization is not supported (only JWS compact serialization)
 * Only the registered claims `iss`, `exp` and `aud` are supported
 * No scopes or custom claims are supported
 * No proper API documentation exists
