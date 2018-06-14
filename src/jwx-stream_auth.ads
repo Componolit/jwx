@@ -18,6 +18,6 @@ is
    type Auth_Result_Type is (Auth_OK, Auth_Noent, Auth_Fail, Auth_Invalid);
 
    function Authenticated (Buf : String;
-                           Now : Natural) return Auth_Result_Type;
+                           Now : Long_Integer) return Auth_Result_Type;
 
 end JWX.Stream_Auth;

@@ -19,7 +19,7 @@ is
    -------------------
 
    function Authenticated (Buf : String;
-                           Now : Natural) return Auth_Result_Type
+                           Now : Long_Integer) return Auth_Result_Type
    is
       First : Natural := Buf'Last;
       Last  : Natural := Buf'First;

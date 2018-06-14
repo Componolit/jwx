@@ -25,6 +25,11 @@ is
    Error_HTML : constant String :=
       "<HTML><BODY><H1>Unauthorized request. Please login.</H1></BODY></HTML>";
 
+   --  FIXME: Warning: This is dangerous
+   type Time_t is new Long_Integer;
+   procedure Time (Time : in out Time_t);
+   pragma import (C, Time);
+
    function Error_Message (Input : String) return String
    is
    begin
@@ -91,6 +96,7 @@ is
       use HA;
 
       Auth : Auth_Result_Type := Auth_Invalid;
+      Now : Time_t;
    begin
 
       accept Setup (Server : GNAT.Sockets.Socket_Type)
@@ -117,8 +123,8 @@ is
 
             if State.Done
             then
-               -- FIXME: Current time!
-               Auth := Authenticated (Buf (Buf'First .. Off), 10000000);
+               Time (Now);
+               Auth := Authenticated (Buf (Buf'First .. Off), Long_Integer (Now));
                if Auth /= Auth_OK
                then
                   -- Send error message
