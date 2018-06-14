@@ -14,7 +14,7 @@ generic
    Key_Data : in out String;
    Audience : String;
    Issuer   : String;
-   Now      : Natural;
+   Now      : Long_Integer;
 package JWX.JWT
 is
    type Result_Type is (Result_Invalid,
