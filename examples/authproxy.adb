@@ -1,6 +1,6 @@
 --
--- \brief  WIP: Filter for transparently checking authentication token in TCP
---         connections. THIS IS UNFINISHED AND DOES NOT WORK, YET.
+-- \brief  Proof-of-concept gilter for transparently checking
+--         JWT authentication token in HTTP connections
 -- \author Alexander Senier
 -- \date   2018-06-09
 --
@@ -15,111 +15,153 @@ with Ada.IO_Exceptions;
 with GNAT.Sockets;
 with JWX.Stream_Auth;
 with JWX_Test_Utils; use JWX_Test_Utils;
+with Authproxy_State;
 
 procedure Authproxy
 is
-   Server     : GNAT.Sockets.Socket_Type;
-   Upstream   : GNAT.Sockets.Socket_Type;
-   Downstream : GNAT.Sockets.Socket_Type;
-   Address    : GNAT.Sockets.Sock_Addr_Type;
+   Server  : GNAT.Sockets.Socket_Type;
+   Address : GNAT.Sockets.Sock_Addr_Type;
 
-   Error_Message : String := "HTTP/1.1 401 Unauthorized" & ASCII.CR & ASCII.LF;
+   Error_HTML : constant String :=
+      "<HTML><BODY><H1>Unauthorized request. Please login.</H1></BODY></HTML>";
+
+   function Error_Message (Input : String) return String
+   is
+   begin
+      return
+         "HTTP/1.1 401 Unauthorized"          & ASCII.CR & ASCII.LF &
+         "Content-Length:" & Input'Length'Img & ASCII.CR & ASCII.LF &
+         ASCII.CR & ASCII.LF &
+         Input;
+   end Error_Message;
+
    Key_Data      : String := Read_File ("tests/data/HTTP_auth_key.json");
 
-   procedure Send_Upstream (Data : String)
-   is
-   begin
-      Put_Line ("Send_Upstream");
-      String'Write (GNAT.Sockets.Stream (Upstream), Data);
-   end Send_Upstream;
-
-   procedure Send_Downstream (Data : String)
-   is
-   begin
-      Put_Line ("Send_Downstream");
-      String'Write (GNAT.Sockets.Stream (Downstream), Data);
-   end Send_Downstream;
-
-   package HA is new JWX.Stream_Auth (Error_Response  => Error_Message,
-                                      Key_Data        => Key_Data,
-                                      Upstream_Send   => Send_Upstream,
-                                      Downstream_Send => Send_Downstream);
-
-   task type Copy_Up is
-      entry Run;
-   end Copy_Up;
-
-   task body Copy_Up
-   is
-      C : Character;
-   begin
-      loop
-         accept Run;
-         begin
-            loop
-               C := Character'Input (GNAT.Sockets.Stream (Downstream));
-               Put_Line ("Copy_Up1: " & C);
-               HA.Downstream_Receive ("" & C);
-               -- FIXME: We need to detect when request is finished to
-               -- signal that upstream got closed.
-            end loop;
-         exception
-            when Ada.IO_Exceptions.End_Error =>
-               Put_Line ("Copy_Up Done");
-               GNAT.Sockets.Close_Socket (Downstream);
-         end;
-      end loop;
-   end Copy_Up;
-
    task type Copy_Down is
-      entry Run;
+      entry Setup (H : GNAT.Sockets.Socket_Type;
+                   L : GNAT.Sockets.Socket_Type);
    end Copy_Down;
 
    task body Copy_Down
    is
+      C     : Character;
+      High  : GNAT.Sockets.Socket_Type;
+      Low   : GNAT.Sockets.Socket_Type;
    begin
+      accept Setup (H : GNAT.Sockets.Socket_Type;
+                    L : GNAT.Sockets.Socket_Type)
+      do
+         High := H;
+         Low  := L;
+      end;
+
       loop
-         accept Run;
          begin
-            loop
-               Put_Line ("Copy_Down1");
-               HA.Upstream_Receive ("" & Character'Input (GNAT.Sockets.Stream (Upstream)));
-               Put_Line ("Copy_Down2");
-            end loop;
+            Character'Read (GNAT.Sockets.Stream (High), C);
+            Character'Write (GNAT.Sockets.Stream (Low), C);
          exception
             when Ada.IO_Exceptions.End_Error =>
-               GNAT.Sockets.Close_Socket (Upstream);
+               exit;
          end;
       end loop;
+
+      GNAT.Sockets.Close_Socket (High);
    end Copy_Down;
 
-   Up   : Copy_Up;
-   Down : Copy_Down;
+   task type Copy_Up is
+      entry Setup (Server : GNAT.Sockets.Socket_Type);
+   end Copy_Up;
+
+   task body Copy_Up
+   is
+      C    : Character;
+      Low  : GNAT.Sockets.Socket_Type;
+      High : GNAT.Sockets.Socket_Type;
+      Down : Copy_Down;
+
+      Buf  : String (1..1000);
+      Off  : Natural := Buf'First;
+
+      use Authproxy_State;
+      State : ES_Type;
+
+      package HA is new JWX.Stream_Auth (Key_Data => Key_Data,
+                                         Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
+                                         Issuer   => "https://cmpnlt-demo.eu.auth0.com/");
+      use HA;
+
+      Auth : Auth_Result_Type := Auth_Invalid;
+   begin
+
+      accept Setup (Server : GNAT.Sockets.Socket_Type)
+      do
+         GNAT.Sockets.Accept_Socket
+            (Server  => Server,
+             Socket  => Low,
+             Address => Address);
+         Ada.Text_IO.Put_Line ("Connection from " & GNAT.Sockets.Image (Address));
+      end;
+
+      loop
+         begin
+            Character'Read (GNAT.Sockets.Stream (Low), C);
+         exception
+            when Ada.IO_Exceptions.End_Error =>
+               exit;
+         end;
+
+         Buf (Off) := C;
+         if Auth /= Auth_OK
+         then
+            State.Next (C);
+
+            if State.Done
+            then
+               -- FIXME: Current time!
+               Auth := Authenticated (Buf (Buf'First .. Off), 10000000);
+               if Auth /= Auth_OK
+               then
+                  -- Send error message
+                  String'Write (GNAT.Sockets.Stream (Low), Error_Message (Error_HTML));
+                  GNAT.Sockets.Close_Socket (Low);
+                  exit;
+               else
+                  GNAT.Sockets.Create_Socket (Socket => High);
+                  GNAT.Sockets.Connect_Socket (Socket => High,
+                                               Server => (Family => GNAT.Sockets.Family_Inet,
+                                                          Addr   => GNAT.Sockets.Inet_Addr ("127.0.0.1"),
+                                                          Port   => 5000));
+                  Down.Setup (High, Low);
+                  String'Write (GNAT.Sockets.Stream (High), Buf (1 .. Off));
+                  Off := Buf'First;
+               end if;
+            end if;
+         else
+            String'Write (GNAT.Sockets.Stream (High), Buf (1 .. Off));
+         end if;
+         Off := Off + 1;
+
+      end loop;
+   end Copy_Up;
 
 begin
    GNAT.Sockets.Initialize;
-   GNAT.Sockets.Create_Socket (Socket => Upstream);
-   GNAT.Sockets.Connect_Socket (Socket => Upstream,
-                                Server => (Family => GNAT.Sockets.Family_Inet,
-                                           Addr   => GNAT.Sockets.Inet_Addr ("127.0.0.1"),
-                                           Port   => 5000));
    GNAT.Sockets.Create_Socket (Socket => Server);
    GNAT.Sockets.Set_Socket_Option
       (Socket => Server,
        Option => (Name => GNAT.Sockets.Reuse_Address, Enabled => True));
-
    GNAT.Sockets.Bind_Socket
       (Socket  => Server,
        Address => (Family => GNAT.Sockets.Family_Inet,
                    Addr   => GNAT.Sockets.Inet_Addr ("127.0.0.1"),
                    Port   => 5001));
    GNAT.Sockets.Listen_Socket (Socket => Server);
-   GNAT.Sockets.Accept_Socket
-      (Server  => Server,
-       Socket  => Downstream,
-       Address => Address);
-   Ada.Text_IO.Put_Line ("Connection from " & GNAT.Sockets.Image (Address));
 
-   Down.Run;
-   Up.Run;
+   loop
+      declare
+         Up : Copy_Up;
+      begin
+         Up.Setup (Server);
+      end;
+   end loop;
 end Authproxy;

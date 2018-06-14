@@ -10,31 +10,14 @@
 --
 
 generic
-   Buffer_Length  : Natural := 4096;
-   Error_Response : String;
    Key_Data       : in out String;
-   with procedure Upstream_Send (Data : String);
-   with procedure Downstream_Send (Data : String);
+   Audience       : String;
+   Issuer         : String;
 package JWX.Stream_Auth
-   with
-      Abstract_State => (State, Auth),
-      Initializes    => (State, Auth)
 is
-   -- Receive data from upstream
-   procedure Upstream_Receive (Data : String)
-   with
-      Global => (Input => Auth);
+   type Auth_Result_Type is (Auth_OK, Auth_Noent, Auth_Fail, Auth_Invalid);
 
-   -- Receive data from downstream
-   procedure Downstream_Receive (Data : String)
-   with
-      Global => (In_Out => State,
-                 Output => Auth);
-
-   -- Signal that downstream got closed
-   procedure Downstream_Close
-   with
-      Global => (In_Out => State,
-                 Output => Auth);
+   function Authenticated (Buf : String;
+                           Now : Natural) return Auth_Result_Type;
 
 end JWX.Stream_Auth;

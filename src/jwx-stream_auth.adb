@@ -10,37 +10,29 @@
 --
 
 with JWX.JWT;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body JWX.Stream_Auth
-   with
-      Refined_State => (State => (Buf, Off),
-                        Auth => (Authenticated))
 is
-   type Auth_Result_Type is (Auth_OK, Auth_Noent, Auth_Fail, Auth_Invalid);
+   -------------------
+   -- Authenticated --
+   -------------------
 
-   Authenticated : Auth_Result_Type := Auth_Invalid;
-   Buf           : String (1 .. Buffer_Length) := (others => ' ');
-   Off           : Natural := 0;
-
-   -------------------------
-   -- Check_Authentication --
-   -------------------------
-
-   procedure Check_Authentication
+   function Authenticated (Buf : String;
+                           Now : Natural) return Auth_Result_Type
    is
       First : Natural := Buf'Last;
       Last  : Natural := Buf'First;
+      Auth  : Auth_Result_Type := Auth_Noent;
    begin
-      Authenticated := Auth_Noent;
-
       -- At least space for 'id_token=' must be available
-      if Off < 10
+      if Buf'Length < 10
       then
-         return;
+         return Auth_Noent;
       end if;
 
       -- Search ID token
-      for I in Buf'First .. Buf'First + Off
+      for I in Buf'First .. Buf'Last - 8
       loop
          if Buf (I .. I + 8) = "id_token="
          then
@@ -53,23 +45,23 @@ is
       loop
          if Buf (I) = '&'
          then
-            Last          := I - 1;
-            Authenticated := Auth_Fail;
+            Last := I - 1;
+            Auth := Auth_Fail;
          end if;
       end loop;
 
-      if Authenticated = Auth_Noent
+      if Auth = Auth_Noent
       then
-         return;
+         return Auth_Noent;
       end if;
 
       declare
          B : constant String := Buf (First .. Last);
          package P is new JWX.JWT (Data     => B,
                                    Key_Data => Key_Data,
-                                   Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
-                                   Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
-                                   Now      => 1528404620);
+                                   Audience => Audience,
+                                   Issuer   => Issuer,
+                                   Now      => Now);
          use P;
          Auth_Result : Result_Type;
       begin
@@ -77,91 +69,12 @@ is
 
          case Auth_Result
          is
-            when Result_Fail        => Authenticated := Auth_Fail;
-            when Result_OK          => Authenticated := Auth_OK;
-            when others             => Authenticated := Auth_Invalid;
+            when Result_Fail        => return Auth_Fail;
+            when Result_OK          => return Auth_OK;
+            when others             => return Auth_Invalid;
          end case;
       end;
 
-   end Check_Authentication;
-
-   ----------------------
-   -- Upstream_Receive --
-   ----------------------
-
-   procedure Upstream_Receive (Data : String)
-   is
-   begin
-      if Authenticated /= Auth_OK
-      then
-         return;
-      end if;
-
-      Downstream_Send (Data);
-   end Upstream_Receive;
-
-   -----------
-   -- Reset --
-   -----------
-
-   procedure Reset
-   is
-   begin
-      Buf := (others => ' ');
-      Off := 0;
-   end Reset;
-
-   ------------------------
-   -- Downstream_Receive --
-   ------------------------
-
-   procedure Downstream_Receive (Data : String)
-   is
-   begin
-      -- Reset state if we receive data and are already Authenticated
-      if Authenticated = Auth_OK
-      then
-         Authenticated := Auth_Invalid;
-         Reset;
-      end if;
-
-      if Buf'First > Buf'Last - Off - Data'Length
-      then
-         return;
-      end if;
-
-      Buf (Buf'First + Off .. Buf'First + Off + Data'Length - 1) := Data;
-      Off := Off + Data'Length;
-
-      Check_Authentication;
-      case Authenticated
-      is
-         when Auth_OK =>
-            Upstream_Send (Buf (Buf'First .. Buf'First + Off - 1));
-            Reset;
-         when Auth_Invalid
-            | Auth_Fail =>
-            Reset;
-            Downstream_Send (Error_Response);
-         when Auth_Noent =>
-            -- Wait for more data
-            null;
-      end case;
-   end Downstream_Receive;
-
-   ----------------------
-   -- Downstream_Close --
-   ----------------------
-
-   procedure Downstream_Close
-   is
-   begin
-      if Authenticated = Auth_Noent
-      then
-         Downstream_Send (Error_Response);
-      end if;
-      Reset;
-      Authenticated := Auth_Invalid;
-   end Downstream_Close;
+   end Authenticated;
 
 end JWX.Stream_Auth;
