@@ -10,7 +10,6 @@
 --
 
 with JWX.JWT;
-with Ada.Text_IO; use Ada.Text_IO;
 
 package body JWX.Stream_Auth
 is
