@@ -13,8 +13,6 @@ package body JWX.Base64
     with SPARK_Mode
 is
 
-   type Symbol_Type is array (UInt6) of Character;
-
    function Alpha_To_Value_Default (Alpha : Character) return Natural is
       (case Alpha is
          when 'A' =>  0, when 'B' =>  1, when 'C' =>  2, when 'D' =>  3,
@@ -127,7 +125,7 @@ is
 
       Last_Input_Block_Offset  : constant Integer := (Encoded'Length + 3)/4-1;
       Last_Output_Block_Start  : constant Integer := Result'First + (3 * Last_Input_Block_Offset);
-      Num_Last_Block_Bytes     : Integer := (Encoded'Length - 1) mod 4 + 1;
+      Num_Last_Block_Bytes     : constant Integer := (Encoded'Length - 1) mod 4 + 1;
       Num_Last_Block_Out_Bytes : Integer := Encoded'Length mod 4;
       Last_Block               : Byte_Array_Block;
    begin

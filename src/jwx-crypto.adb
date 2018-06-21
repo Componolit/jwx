@@ -18,7 +18,6 @@ with LSC.Types;
 with LSC.SHA256;
 with LSC.HMAC_SHA256;
 
-with Interfaces;
 use type LSC.SHA256.Message_Index;
 
 package body JWX.Crypto
@@ -48,7 +47,6 @@ is
 
       use JWX.LSC;
       use SC.Types;
-      use Interfaces;
    begin
       Valid := False;
       K.Select_Key (Key_Valid);

@@ -236,7 +236,7 @@ is
 
    function Get_String (Index : Index_Type := Null_Index) return String
    is
-      Element : Context_Element_Type := Get (Index);
+      Element : constant Context_Element_Type := Get (Index);
    begin
       if Element.String_Start in Data'Range and
          Element.String_End in Data'Range

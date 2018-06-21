@@ -15,7 +15,6 @@ with JWX.Base64;
 package body JWX.JWK
    with
       Refined_State => (State => (Key_Data.State,
-                                  Key_Is_Valid,
                                   Key_Loaded,
                                   Key_Index,
                                   Key_Array,
@@ -36,7 +35,6 @@ is
    use Key_Data;
 
    Key_Loaded   : Boolean;
-   Key_Is_Valid : Boolean := False;
    Key_Kind     : Kind_Type := Kind_Invalid;
    Key_Curve    : EC_Curve_Type := Curve_Invalid;
    Key_Index    : Key_Data.Index_Type := Key_Data.End_Index;

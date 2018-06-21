@@ -14,9 +14,6 @@ with JWX.JSON;
 with JWX.Base64;
 with JWX.Util;
 
-with Ada.Text_IO;
-use Ada.Text_IO;
-
 package body JWX.JWT
 is
    procedure Validate_Compact (Result : out Result_Type)
@@ -41,7 +38,7 @@ is
       end if;
 
       declare
-         Data : String := J.Payload;
+         Data : constant String := J.Payload;
          use Base64;
          Len   : Natural;
          Decoded    : Byte_Array (1 .. Data'Length);

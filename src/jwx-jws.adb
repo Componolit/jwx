@@ -9,15 +9,9 @@
 -- GNU Affero General Public License version 3.
 --
 
-with JWX.Base64;
-with JWX.Util;
-with JWX.JWK;
 with JWX.Crypto;
-with JWX.JSON;
 with JWX.JWSCS;
 with JWX.JOSE;
-
-with LSC.HMAC_SHA256;
 
 use JWX;
 
@@ -32,7 +26,6 @@ is
 
    procedure Validate_Compact (Result : out Result_Type)
    is
-      use JWX.Base64;
    begin
       Result := Result_Invalid;
 
