@@ -19,8 +19,16 @@ with Authproxy_State;
 
 procedure Authproxy
 is
-   Server  : GNAT.Sockets.Socket_Type;
-   Address : GNAT.Sockets.Sock_Addr_Type;
+   Server    : GNAT.Sockets.Socket_Type;
+   Client    : GNAT.Sockets.Sock_Addr_Type;
+   Listen    : GNAT.Sockets.Sock_Addr_Type;
+   Webserver : GNAT.Sockets.Sock_Addr_Type :=
+      (Family => GNAT.Sockets.Family_Inet,
+       Addr   => GNAT.Sockets.Inet_Addr ("127.0.0.1"),
+       Port   => 80);
+
+   Listen_Address : String := "127.0.3.1";
+   Listen_Port    : constant := 5001;
 
    Error_HTML : constant String :=
       "<HTML><BODY><H1>Unauthorized request. Please login.</H1></BODY></HTML>";
@@ -34,10 +42,14 @@ is
    is
    begin
       return
-         "HTTP/1.1 401 Unauthorized"          & ASCII.CR & ASCII.LF &
-         "Content-Length:" & Input'Length'Img & ASCII.CR & ASCII.LF &
-         ASCII.CR & ASCII.LF &
-         Input;
+         "HTTP/1.1 401 Unauthorized"
+         & ASCII.CR & ASCII.LF &
+         "Connection: Keep-Alive"
+         & ASCII.CR & ASCII.LF &
+         "Content-Length:" & Input'Length'Img
+         & ASCII.CR & ASCII.LF
+         & ASCII.CR & ASCII.LF
+         & Input;
    end Error_Message;
 
    Key_Data      : String := Read_File ("tests/data/HTTP_auth_key.json");
@@ -84,7 +96,7 @@ is
       High : GNAT.Sockets.Socket_Type;
       Down : Copy_Down;
 
-      Buf  : String (1..1000);
+      Buf  : String (1 .. 4096);
       Off  : Natural := Buf'First;
 
       use Authproxy_State;
@@ -104,8 +116,8 @@ is
          GNAT.Sockets.Accept_Socket
             (Server  => Server,
              Socket  => Low,
-             Address => Address);
-         Ada.Text_IO.Put_Line ("Connection from " & GNAT.Sockets.Image (Address));
+             Address => Client);
+         Put_Line ("Connection from " & GNAT.Sockets.Image (Client));
       end;
 
       loop
@@ -127,16 +139,17 @@ is
                Auth := Authenticated (Buf (Buf'First .. Off), Long_Integer (Now));
                if Auth /= Auth_OK
                then
+                  Put_Line ("Not authenticated, sending error message");
                   -- Send error message
                   String'Write (GNAT.Sockets.Stream (Low), Error_Message (Error_HTML));
-                  GNAT.Sockets.Close_Socket (Low);
+                  -- GNAT.Sockets.Close_Socket (Low);
                   exit;
                else
+                  Put_Line ("Authenticated, forwarding");
                   GNAT.Sockets.Create_Socket (Socket => High);
                   GNAT.Sockets.Connect_Socket (Socket => High,
-                                               Server => (Family => GNAT.Sockets.Family_Inet,
-                                                          Addr   => GNAT.Sockets.Inet_Addr ("127.0.0.1"),
-                                                          Port   => 5000));
+                                               Server => Webserver);
+                  Put_Line ("Connected to " & GNAT.Sockets.Image (Webserver));
                   Down.Setup (High, Low);
                   String'Write (GNAT.Sockets.Stream (High), Buf (1 .. Off));
                   Off := Buf'First;
@@ -156,12 +169,14 @@ begin
    GNAT.Sockets.Set_Socket_Option
       (Socket => Server,
        Option => (Name => GNAT.Sockets.Reuse_Address, Enabled => True));
+   Listen := (Family => GNAT.Sockets.Family_Inet,
+              Addr   => GNAT.Sockets.Inet_Addr (Listen_Address),
+              Port   => Listen_Port);
    GNAT.Sockets.Bind_Socket
       (Socket  => Server,
-       Address => (Family => GNAT.Sockets.Family_Inet,
-                   Addr   => GNAT.Sockets.Inet_Addr ("127.0.0.1"),
-                   Port   => 5001));
+       Address => Listen);
    GNAT.Sockets.Listen_Socket (Socket => Server);
+   Put_Line ("Validator listening on " & GNAT.Sockets.Image (Listen));
 
    loop
       declare
