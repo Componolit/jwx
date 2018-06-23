@@ -96,7 +96,7 @@ is
       use HA;
 
       Auth : Auth_Result_Type := Auth_Invalid;
-      Now : Time_t;
+      Now : Time_t := 0;
    begin
 
       accept Setup (Server : GNAT.Sockets.Socket_Type)
