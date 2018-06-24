@@ -42,10 +42,12 @@ is
       -- Search end of ID token (next ampersand)
       for I in First .. Buf'Last
       loop
-         if Buf (I) = '&'
+         if Buf (I) = '&' or
+            Buf (I) = ' '
          then
             Last := I - 1;
             Auth := Auth_Fail;
+            exit;
          end if;
       end loop;
 
