@@ -1,5 +1,5 @@
 --
--- \brief  Simple TCP forwarder
+-- \brief  JWT authentication proxy demo
 -- \author Alexander Senier
 -- \date   2018-06-24
 --
@@ -123,7 +123,7 @@ is
                      Buffer : String (1 .. Request.Size);
                   begin
                      String'Read (Stream (Server_Socket), Buffer);
-                     if not Passthrough
+                     if Auth /= Auth_OK and not Passthrough
                      then
                         Time (Now);
                         Auth := Authenticated (Buffer, Long_Integer (Now));
