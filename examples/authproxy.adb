@@ -1,8 +1,7 @@
 --
--- \brief  Proof-of-concept gilter for transparently checking
---         JWT authentication token in HTTP connections
+-- \brief  Simple TCP forwarder
 -- \author Alexander Senier
--- \date   2018-06-09
+-- \date   2018-06-24
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
@@ -10,33 +9,50 @@
 -- GNU Affero General Public License version 3.
 --
 
+with GNAT.Sockets; use GNAT.Sockets;
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.IO_Exceptions;
-with GNAT.Sockets;
+
 with JWX.Stream_Auth;
 with JWX_Test_Utils; use JWX_Test_Utils;
-with Authproxy_State;
 
 procedure Authproxy
 is
-   Server    : GNAT.Sockets.Socket_Type;
-   Client    : GNAT.Sockets.Sock_Addr_Type;
-   Listen    : GNAT.Sockets.Sock_Addr_Type;
-   Webserver : GNAT.Sockets.Sock_Addr_Type :=
-      (Family => GNAT.Sockets.Family_Inet,
-       Addr   => GNAT.Sockets.Inet_Addr ("127.0.0.1"),
-       Port   => 80);
+   Server_Socket  : Socket_Type;
 
-   Listen_Address : String := "127.0.3.1";
-   Listen_Port    : constant := 5001;
+   Client_Socket  : Socket_Type;
+   Client_Address : Sock_Addr_Type;
+
+   Audience : constant String := "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM";
+   Issuer   : constant String := "https://cmpnlt-demo.eu.auth0.com/";
+   Key_Data : String := Read_File ("tests/data/HTTP_auth_key.json");
+
+   Server_IP   : String   := "127.0.3.1";
+   Server_Port : constant := 8080;
+
+   Server_Address : constant Sock_Addr_Type :=
+      (Family => Family_Inet,
+       Addr   => Inet_Addr (Server_IP),
+       Port   => Server_Port);
+
+   Upstream_IP   : String   := "127.0.0.1";
+   Upstream_Port : constant := 80;
+
+   Upstream_Address : constant Sock_Addr_Type :=
+      (Family => Family_Inet,
+       Addr   => Inet_Addr (Upstream_IP),
+       Port   => Upstream_Port);
 
    Error_HTML : constant String :=
       "<HTML><BODY><H1>Unauthorized request. Please login.</H1></BODY></HTML>";
 
-   --  FIXME: Warning: This is dangerous
+   --  FIXME: Warning: This is dangerous, use Ada function to retrieve time
    type Time_t is new Long_Integer;
    procedure Time (Time : in out Time_t);
    pragma import (C, Time);
+
+   -------------------
+   -- Error_Message --
+   -------------------
 
    function Error_Message (Input : String) return String
    is
@@ -52,137 +68,134 @@ is
          & Input;
    end Error_Message;
 
-   Key_Data      : String := Read_File ("tests/data/HTTP_auth_key.json");
+   -----------
+   -- Proxy --
+   -----------
 
-   task type Copy_Down is
-      entry Setup (H : GNAT.Sockets.Socket_Type;
-                   L : GNAT.Sockets.Socket_Type);
-   end Copy_Down;
-
-   task body Copy_Down
+   task type Proxy 
    is
-      C     : Character;
-      High  : GNAT.Sockets.Socket_Type;
-      Low   : GNAT.Sockets.Socket_Type;
-   begin
-      accept Setup (H : GNAT.Sockets.Socket_Type;
-                    L : GNAT.Sockets.Socket_Type)
-      do
-         High := H;
-         Low  := L;
-      end;
+      entry Setup (S : Socket_Type);
+   end Proxy;
 
-      loop
-         begin
-            Character'Read (GNAT.Sockets.Stream (High), C);
-            Character'Write (GNAT.Sockets.Stream (Low), C);
-         exception
-            when Ada.IO_Exceptions.End_Error =>
-               exit;
-         end;
-      end loop;
-
-      GNAT.Sockets.Close_Socket (High);
-   end Copy_Down;
-
-   task type Copy_Up is
-      entry Setup (Server : GNAT.Sockets.Socket_Type);
-   end Copy_Up;
-
-   task body Copy_Up
+   task body Proxy
    is
-      C    : Character;
-      Low  : GNAT.Sockets.Socket_Type;
-      High : GNAT.Sockets.Socket_Type;
-      Down : Copy_Down;
+      Server_Socket   : Socket_Type;
+      Upstream_Socket : Socket_Type;
 
-      Buf  : String (1 .. 4096);
-      Off  : Natural := Buf'First;
-
-      use Authproxy_State;
-      State : ES_Type;
+      C         : Character;
+      Read_Set  : Socket_Set_Type;
+      Write_Set : Socket_Set_Type;
+      Selector  : Selector_Type;
+      Status    : Selector_Status;
+      Request   : Request_Type (N_Bytes_To_Read);
 
       package HA is new JWX.Stream_Auth (Key_Data => Key_Data,
-                                         Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
-                                         Issuer   => "https://cmpnlt-demo.eu.auth0.com/");
+                                         Audience => Audience,
+                                         Issuer   => Issuer);
       use HA;
 
       Auth : Auth_Result_Type := Auth_Invalid;
       Now : Time_t := 0;
    begin
-
-      accept Setup (Server : GNAT.Sockets.Socket_Type)
+      accept Setup (S : Socket_Type)
       do
-         GNAT.Sockets.Accept_Socket
-            (Server  => Server,
-             Socket  => Low,
-             Address => Client);
-         Put_Line ("Connection from " & GNAT.Sockets.Image (Client));
+         Server_Socket := S;
       end;
+
+      Create_Socket (Socket => Upstream_Socket);
+      Connect_Socket (Socket => Upstream_Socket,
+                      Server => Upstream_Address);
+
+      -- Initialized socket set
+      Empty (Read_Set);
+      Empty (Write_Set);
+
+      Create_Selector (Selector);
 
       loop
-         begin
-            Character'Read (GNAT.Sockets.Stream (Low), C);
-         exception
-            when Ada.IO_Exceptions.End_Error =>
-               exit;
-         end;
+         Set (Read_Set, Server_Socket);
+         Set (Read_Set, Upstream_Socket);
+         Check_Selector (Selector, Read_Set, Write_Set, Status);
 
-         Buf (Off) := C;
-         if Auth /= Auth_OK
-         then
-            State.Next (C);
-
-            if State.Done
-            then
-               Time (Now);
-               Auth := Authenticated (Buf (Buf'First .. Off), Long_Integer (Now));
-               if Auth /= Auth_OK
+         case Status is
+            when Completed =>
+               if Is_Set (Read_Set, Server_Socket)
                then
-                  Put_Line ("Not authenticated, sending error message");
-                  -- Send error message
-                  String'Write (GNAT.Sockets.Stream (Low), Error_Message (Error_HTML));
-                  -- GNAT.Sockets.Close_Socket (Low);
-                  exit;
-               else
-                  Put_Line ("Authenticated, forwarding");
-                  GNAT.Sockets.Create_Socket (Socket => High);
-                  GNAT.Sockets.Connect_Socket (Socket => High,
-                                               Server => Webserver);
-                  Put_Line ("Connected to " & GNAT.Sockets.Image (Webserver));
-                  Down.Setup (High, Low);
-                  String'Write (GNAT.Sockets.Stream (High), Buf (1 .. Off));
-                  Off := Buf'First;
+                  Control_Socket (Server_Socket, Request);
+                  if Request.Size = 0
+                  then
+                     -- Server socket was closed, close upstream socket
+                     Close_Socket (Upstream_Socket);
+                     Close_Socket (Server_Socket);
+                     exit;
+                  end if;
+                  declare
+                     Buffer : String (1 .. Request.Size);
+                  begin
+                     String'Read (Stream (Server_Socket), Buffer);
+                     Time (Now);
+                     Auth := Authenticated (Buffer, Long_Integer (Now));
+                     if Auth /= Auth_OK
+                     then
+                        String'Write (Stream (Server_Socket), Error_Message (Error_HTML));
+                        Close_Socket (Upstream_Socket);
+                        Close_Socket (Server_Socket);
+                        exit;
+                     end if;
+                     String'Write (Stream (Upstream_Socket), Buffer);
+                  end;
+               elsif Is_Set (Read_Set, Upstream_Socket)
+               then
+                  Control_Socket (Upstream_Socket, Request);
+                  if Request.Size = 0
+                  then
+                     -- Upstream socket was closed, close server socket
+                     Close_Socket (Upstream_Socket);
+                     Close_Socket (Server_Socket);
+                     exit;
+                  end if;
+                  declare
+                     Buffer : String (1 .. Request.Size);
+                  begin
+                     String'Read (Stream (Upstream_Socket), Buffer);
+                     if Auth = Auth_OK
+                     then
+                        String'Write (Stream (Server_Socket), Buffer);
+                     end if;
+                  end;
                end if;
-            end if;
-         else
-            String'Write (GNAT.Sockets.Stream (High), Buf (1 .. Off));
-         end if;
-         Off := Off + 1;
 
+            when Expired => Put_Line ("Expired");
+            when Aborted => Put_Line ("Aborted");
+         end case;
       end loop;
-   end Copy_Up;
+
+      Close_Selector (Selector);
+      Put (ASCII.BS);
+
+   end Proxy;
+
+   P : access Proxy;
 
 begin
-   GNAT.Sockets.Initialize;
-   GNAT.Sockets.Create_Socket (Socket => Server);
-   GNAT.Sockets.Set_Socket_Option
-      (Socket => Server,
-       Option => (Name => GNAT.Sockets.Reuse_Address, Enabled => True));
-   Listen := (Family => GNAT.Sockets.Family_Inet,
-              Addr   => GNAT.Sockets.Inet_Addr (Listen_Address),
-              Port   => Listen_Port);
-   GNAT.Sockets.Bind_Socket
-      (Socket  => Server,
-       Address => Listen);
-   GNAT.Sockets.Listen_Socket (Socket => Server);
-   Put_Line ("Validator listening on " & GNAT.Sockets.Image (Listen));
+   Put_Line ("Forwarding " & Image (Server_Address) & " <=> " & Image (Upstream_Address));
+   Initialize;
+   Create_Socket (Socket => Server_Socket);
+   Set_Socket_Option
+      (Socket => Server_Socket,
+       Option => (Name => Reuse_Address, Enabled => True));
+   Bind_Socket
+      (Socket  => Server_Socket,
+       Address => Server_Address);
+   Listen_Socket (Socket => Server_Socket);
 
    loop
-      declare
-         Up : Copy_Up;
-      begin
-         Up.Setup (Server);
-      end;
+      Accept_Socket
+         (Server  => Server_Socket,
+          Socket  => Client_Socket,
+          Address => Client_Address);
+      Put (".");
+      P := new Proxy; 
+      P.Setup (Client_Socket);
    end loop;
 end Authproxy;
