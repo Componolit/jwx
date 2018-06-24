@@ -12,6 +12,9 @@
 with GNAT.Sockets; use GNAT.Sockets;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with JWX.Stream_Auth;
+with JWX_Test_Utils; use JWX_Test_Utils;
+
 procedure Proxy
 is
    Server_Socket  : Socket_Type;
@@ -19,8 +22,12 @@ is
    Client_Socket  : Socket_Type;
    Client_Address : Sock_Addr_Type;
 
-   Server_IP   : String   := "127.0.0.1";
-   Server_Port : constant := 5001;
+   Audience : constant String := "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM";
+   Issuer   : constant String := "https://cmpnlt-demo.eu.auth0.com/";
+   Key_Data : String := Read_File ("tests/data/HTTP_auth_key.json");
+
+   Server_IP   : String   := "127.0.3.1";
+   Server_Port : constant := 8080;
 
    Server_Address : constant Sock_Addr_Type :=
       (Family => Family_Inet,
@@ -34,6 +41,36 @@ is
       (Family => Family_Inet,
        Addr   => Inet_Addr (Upstream_IP),
        Port   => Upstream_Port);
+
+   Error_HTML : constant String :=
+      "<HTML><BODY><H1>Unauthorized request. Please login.</H1></BODY></HTML>";
+
+   --  FIXME: Warning: This is dangerous, use Ada function to retrieve time
+   type Time_t is new Long_Integer;
+   procedure Time (Time : in out Time_t);
+   pragma import (C, Time);
+
+   -------------------
+   -- Error_Message --
+   -------------------
+
+   function Error_Message (Input : String) return String
+   is
+   begin
+      return
+         "HTTP/1.1 401 Unauthorized"
+         & ASCII.CR & ASCII.LF &
+         "Connection: Keep-Alive"
+         & ASCII.CR & ASCII.LF &
+         "Content-Length:" & Input'Length'Img
+         & ASCII.CR & ASCII.LF
+         & ASCII.CR & ASCII.LF
+         & Input;
+   end Error_Message;
+
+   -----------
+   -- Proxy --
+   -----------
 
    task type Proxy 
    is
@@ -51,6 +88,14 @@ is
       Selector  : Selector_Type;
       Status    : Selector_Status;
       Request   : Request_Type (N_Bytes_To_Read);
+
+      package HA is new JWX.Stream_Auth (Key_Data => Key_Data,
+                                         Audience => Audience,
+                                         Issuer   => Issuer);
+      use HA;
+
+      Auth : Auth_Result_Type := Auth_Invalid;
+      Now : Time_t := 0;
    begin
       accept Setup (S : Socket_Type)
       do
@@ -88,6 +133,15 @@ is
                      Buffer : String (1 .. Request.Size);
                   begin
                      String'Read (Stream (Server_Socket), Buffer);
+                     Time (Now);
+                     Auth := Authenticated (Buffer, Long_Integer (Now));
+                     if Auth /= Auth_OK
+                     then
+                        String'Write (Stream (Server_Socket), Error_Message (Error_HTML));
+                        Close_Socket (Upstream_Socket);
+                        Close_Socket (Server_Socket);
+                        exit;
+                     end if;
                      String'Write (Stream (Upstream_Socket), Buffer);
                   end;
                elsif Is_Set (Read_Set, Upstream_Socket)
@@ -104,7 +158,10 @@ is
                      Buffer : String (1 .. Request.Size);
                   begin
                      String'Read (Stream (Upstream_Socket), Buffer);
-                     String'Write (Stream (Server_Socket), Buffer);
+                     if Auth = Auth_OK
+                     then
+                        String'Write (Stream (Server_Socket), Buffer);
+                     end if;
                   end;
                end if;
 
