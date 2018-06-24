@@ -84,8 +84,12 @@ is
                      Close_Socket (Server_Socket);
                      exit;
                   end if;
-                  Character'Read (Stream (Server_Socket), C);
-                  Character'Write (Stream (Upstream_Socket), C);
+                  declare
+                     Buffer : String (1 .. Request.Size);
+                  begin
+                     String'Read (Stream (Server_Socket), Buffer);
+                     String'Write (Stream (Upstream_Socket), Buffer);
+                  end;
                elsif Is_Set (Read_Set, Upstream_Socket)
                then
                   Control_Socket (Upstream_Socket, Request);
@@ -96,8 +100,12 @@ is
                      Close_Socket (Server_Socket);
                      exit;
                   end if;
-                  Character'Read (Stream (Upstream_Socket), C);
-                  Character'Write (Stream (Server_Socket), C);
+                  declare
+                     Buffer : String (1 .. Request.Size);
+                  begin
+                     String'Read (Stream (Upstream_Socket), Buffer);
+                     String'Write (Stream (Server_Socket), Buffer);
+                  end;
                end if;
 
             when Expired => Put_Line ("Expired");
