@@ -15,7 +15,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 procedure Proxy
 is
    Server_Socket  : Socket_Type;
-   Server_Address : Sock_Addr_Type;
 
    Client_Socket  : Socket_Type;
    Client_Address : Sock_Addr_Type;
@@ -23,8 +22,18 @@ is
    Server_IP   : String   := "127.0.0.1";
    Server_Port : constant := 5001;
 
+   Server_Address : constant Sock_Addr_Type :=
+      (Family => Family_Inet,
+       Addr   => Inet_Addr (Server_IP),
+       Port   => Server_Port);
+
    Upstream_IP   : String   := "127.0.0.1";
    Upstream_Port : constant := 80;
+
+   Upstream_Address : constant Sock_Addr_Type :=
+      (Family => Family_Inet,
+       Addr   => Inet_Addr (Upstream_IP),
+       Port   => Upstream_Port);
 
    task type Proxy 
    is
@@ -35,11 +44,6 @@ is
    is
       Server_Socket   : Socket_Type;
       Upstream_Socket : Socket_Type;
-
-      Upstream_Address : Sock_Addr_Type :=
-         (Family => Family_Inet,
-          Addr   => Inet_Addr (Upstream_IP),
-          Port   => Upstream_Port);
 
       C         : Character;
       Read_Set  : Socket_Set_Type;
@@ -109,18 +113,16 @@ is
    P : access Proxy;
 
 begin
+   Put_Line ("Forwarding " & Image (Server_Address) & " <=> " & Image (Upstream_Address));
    Initialize;
    Create_Socket (Socket => Server_Socket);
    Set_Socket_Option
       (Socket => Server_Socket,
        Option => (Name => Reuse_Address, Enabled => True));
-   Server_Address := (Family => Family_Inet,
-                      Addr   => Inet_Addr (Server_IP),
-                      Port   => Server_Port);
    Bind_Socket
       (Socket  => Server_Socket,
        Address => Server_Address);
-   Listen_Socket (Socket => Server_Socket, Length => 100);
+   Listen_Socket (Socket => Server_Socket);
 
    loop
       Accept_Socket
