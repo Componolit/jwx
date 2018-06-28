@@ -27,6 +27,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Boolean, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Boolean = true, "Invalid value");
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_True;
 
    ---------------------------------------------------------------------------
@@ -42,6 +43,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Boolean, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Boolean = false, "Invalid value");
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_False;
 
    ---------------------------------------------------------------------------
@@ -56,6 +58,7 @@ package body JWX_JSON_Tests is
       Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Null, "Invalid kind: " & Get_Kind'Img);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_Null;
 
    ---------------------------------------------------------------------------
@@ -109,6 +112,7 @@ package body JWX_JSON_Tests is
       Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Null, "Invalid kind: " & Get_Kind'Img);
+      Assert (Serialize = "null", "Serialization invalid: " & Serialize);
 	end Test_Parse_Null_With_Space;
 
    ---------------------------------------------------------------------------
@@ -123,6 +127,7 @@ package body JWX_JSON_Tests is
       Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Boolean, "Invalid kind: " & Get_Kind'Img);
+      Assert (Serialize = "true", "Serialization invalid: " & Serialize);
 	end Test_Parse_True_With_Newline;
 
    ---------------------------------------------------------------------------
@@ -137,6 +142,7 @@ package body JWX_JSON_Tests is
       Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Boolean, "Invalid kind: " & Get_Kind'Img);
+      Assert (Serialize = "false", "Serialization invalid: " & Serialize);
 	end Test_Parse_False_With_Tab;
 
    ---------------------------------------------------------------------------
@@ -153,6 +159,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 42, "Invalid value: " & Get_Integer'Img);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_Small_Positive_Integer;
 
    ---------------------------------------------------------------------------
@@ -168,6 +175,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 40000, "Invalid value: " & Get_Integer'Img);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_Positive_Integer;
 
    ---------------------------------------------------------------------------
@@ -183,6 +191,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = -42, "Invalid value: " & Get_Integer'Img);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_Small_Negative_Integer;
 
    ---------------------------------------------------------------------------
@@ -198,6 +207,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 2147483647, "Invalid value: " & Get_Integer'Img);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_Big_Positive_Integer;
 
    ---------------------------------------------------------------------------
@@ -213,6 +223,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 123400, "Invalid value: " & Get_Integer'Img);
+      Assert (Serialize = "123400", "Serialization invalid: " & Serialize);
 	end Test_Parse_Integer_With_Positive_Exponent;
 
    ---------------------------------------------------------------------------
@@ -228,6 +239,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 123400, "Invalid value: " & Get_Integer'Img);
+      Assert (Serialize = "123400", "Serialization invalid: " & Serialize);
 	end Test_Parse_Integer_With_Positive_Exponent_2;
 
    ---------------------------------------------------------------------------
@@ -243,6 +255,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 123400, "Invalid value: " & Get_Integer'Img);
+      Assert (Serialize = "123400", "Serialization invalid: " & Serialize);
 	end Test_Parse_Integer_With_Positive_Exponent_3;
 
    ---------------------------------------------------------------------------
@@ -258,6 +271,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = 123.45, "Invalid value: " & Get_Float'Img);
+      Assert (Serialize = "123.45", "Serialization invalid: " & Serialize);
 	end Test_Parse_Num_With_Neg_Exp_Frac;
 
    ---------------------------------------------------------------------------
@@ -273,6 +287,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 123, "Invalid value: " & Get_Integer'Img);
+      Assert (Serialize = "123", "Serialization invalid: " & Serialize);
 	end Test_Parse_Num_With_Neg_Exp_Int;
 
    ---------------------------------------------------------------------------
@@ -288,6 +303,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = 0, "Invalid value: " & Get_Integer'Img);
+      Assert (Serialize = "0", "Serialization invalid: " & Serialize);
 	end Test_Parse_Zero_Integer;
 
    ---------------------------------------------------------------------------
@@ -303,6 +319,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Integer, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Integer = -2147483647, "Invalid value: " & Get_Integer'Img);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_Big_Negative_Integer;
 
    ---------------------------------------------------------------------------
@@ -344,6 +361,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = 3.14, "Invalid value: " & Get_Float'Img);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_Small_Positive_Float;
 
    ---------------------------------------------------------------------------
@@ -359,6 +377,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = -3.14, "Invalid value: " & Get_Float'Img);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_Small_Negative_Float;
 
    ---------------------------------------------------------------------------
@@ -374,6 +393,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = 0.00000000001, "Invalid value: " & Get_Float'Img);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_Very_Small_Positive_Float;
 
    ---------------------------------------------------------------------------
@@ -402,6 +422,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = -0.00000000001, "Invalid value: " & Get_Float'Img);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Parse_Very_Small_Negative_Float;
 
    ---------------------------------------------------------------------------
@@ -430,6 +451,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = 0.0, "Invalid value: " & Get_Float'Img);
+      Assert (Serialize = "0.0", "Serialization invalid: " & Serialize);
 	end Test_Parse_Zero_Float;
 
    ---------------------------------------------------------------------------
@@ -445,6 +467,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float = 12350.0, "Invalid value: " & Get_Float'Img);
+      Assert (Serialize = "12350", "Serialization invalid: " & Serialize);
 	end Test_Parse_Float_With_Exp_With_Leading_Zero;
 
    ---------------------------------------------------------------------------
@@ -499,6 +522,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_String, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_String = "Hello world!", "Invalid value: " & Get_String);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Simple_String;
 
    ---------------------------------------------------------------------------
@@ -527,6 +551,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_String, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_String = "Say \""Hello World\""!", "Invalid value: " & Get_String);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Escaped_String;
 
    ---------------------------------------------------------------------------
@@ -542,6 +567,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_String, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_String = "Escaped backslash\\", "Invalid value: " & Get_String);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Escaped_Backslash;
 
    ---------------------------------------------------------------------------
@@ -557,6 +583,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_String, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_String = "Escaped \character", "Invalid value: " & Get_String);
+      Assert (Serialize = Data, "Serialization invalid: " & Serialize);
 	end Test_Escaped_Regular_Character;
 
    ---------------------------------------------------------------------------
@@ -610,6 +637,8 @@ package body JWX_JSON_Tests is
       Result := Query_Object ("Does-not-exist");
 		Assert (Result = End_Index, "Non-existent element found");
 
+      Assert (Serialize = "{""precision"": ""zip"", ""Latitude"": 37.7668, ""Longitude"": -122.3959, ""Address"": """", ""City"": ""SAN FRANCISCO"", ""State"": ""CA"", ""Zip"": ""94107"", ""Country"": ""US"" }", "Serialization invalid: " & Serialize);
+
 	end Test_Simple_Object;
 
    ---------------------------------------------------------------------------
@@ -625,6 +654,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Object, "Invalid kind: " & Get_Kind'Img);
 		Assert (Elements = 0, "Invalid number of elements: " & Elements'Img);
+      Assert (Serialize = "{}", "Serialization invalid: " & Serialize);
 	end Test_Parse_Empty_Object;
 
    ---------------------------------------------------------------------------
@@ -641,7 +671,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 
-      AUnit.Assertions.Assert (Length = 4, "Invalid array length: " & Length'Img);
+      Assert (Length = 4, "Invalid array length: " & Length'Img);
 
       Result := Pos (1);
       Assert (Get_Kind (Result) = Kind_Integer, "Invalid kind: " & Get_Kind (Result)'Img);
@@ -661,6 +691,8 @@ package body JWX_JSON_Tests is
 
       Result := Pos (7);
       Assert (Result = End_Index, "Out of bounds access not detected");
+
+      Assert (Serialize = "[116, 943, 234, 38793]", "Serialization invalid: " & Serialize);
 
 	end Test_Parse_Simple_Array;
 
@@ -691,7 +723,7 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 
-      AUnit.Assertions.Assert (Length = 4, "Invalid array length: " & Length'Img);
+      Assert (Length = 4, "Invalid array length: " & Length'Img);
 
       Result := Pos (1);
       Assert (Get_Kind (Result) = Kind_Integer, "Invalid kind: " & Get_Kind (Result)'Img);
@@ -709,6 +741,7 @@ package body JWX_JSON_Tests is
       Assert (Get_Kind (Result) = Kind_Boolean, "Invalid kind: " & Get_Kind (Result)'Img);
 		Assert (Get_Boolean (Result) = true, "Invalid value: " & Get_Boolean (Result)'Img);
 
+      Assert (Serialize = "[116, -4.5, ""baz"", true]", "Serialization invalid: " & Serialize);
 	end Test_Parse_Mixed_Array;
 
    ---------------------------------------------------------------------------
@@ -724,7 +757,8 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 
-      AUnit.Assertions.Assert (Length = 0, "Invalid array length: " & Length'Img);
+      Assert (Length = 0, "Invalid array length: " & Length'Img);
+      Assert (Serialize = "[]", "Serialization invalid: " & Serialize);
 	end Test_Parse_Empty_Array;
 
    ---------------------------------------------------------------------------
@@ -740,7 +774,8 @@ package body JWX_JSON_Tests is
 		Assert (Match = Match_OK, "No match: " & Match'Img);
 		Assert (Get_Kind = Kind_Array, "Invalid kind: " & Get_Kind'Img);
 
-      AUnit.Assertions.Assert (Length = 3, "Invalid array length: " & Length'Img);
+      Assert (Length = 3, "Invalid array length: " & Length'Img);
+      Assert (Serialize = "[{""A"": 42}, {""B"": {""D"": 234}}, {""C"": 9}]", "Serialization invalid: " & Serialize);
 	end Test_Parse_Array_Of_Objects;
 
    ---------------------------------------------------------------------------
@@ -812,6 +847,7 @@ package body JWX_JSON_Tests is
       Result := Query_Object ("area", Result);
 		Assert (Get_Kind (Result) = Kind_Float, "Invalid kind: " & Get_Kind'Img);
 		Assert (Get_Float (Result) = 123.0, "Invalid value: " & Get_Float (Result)'Img);
+      Assert (Serialize = "[{""area"": 123.0}, {""area"": 200.5}]", "Serialization invalid: " & Serialize);
 	end Test_Mixed_Objects;
 
    ---------------------------------------------------------------------------

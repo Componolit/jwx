@@ -43,6 +43,10 @@ is
    with
       Pre => Data'First <= Data'Last;
 
+   function Serialize return String
+   with
+      Global => (Input => State);
+
    -- Assert that a @Index@ has a certain kind
    function Has_Kind (Index : Index_Type;
                       Kind  : Kind_Type) return Boolean

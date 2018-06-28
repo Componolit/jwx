@@ -1062,6 +1062,16 @@ is
       end if;
    end Parse;
 
+   ---------------
+   -- Serialize --
+   ---------------
+
+   function Serialize return String
+   is
+   begin
+      return "Foobar";
+   end Serialize;
+
    ------------------
    -- Query_Object --
    ------------------
