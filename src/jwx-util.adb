@@ -45,5 +45,20 @@ is
       end loop;
    end To_String;
 
-end JWX.Util;
+   ----------
+   -- Size --
+   ----------
 
+   function Size (Value : Float) return Natural
+   is
+   begin
+      return 0;
+   end Size;
+
+   function Size (Value : Long_Integer) return Natural
+   is
+   begin
+      return 0;
+   end Size;
+
+end JWX.Util;

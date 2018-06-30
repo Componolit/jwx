@@ -17,9 +17,10 @@ with JWX_JWS_Tests;
 with JWX_Crypto_Tests;
 with JWX_Stream_Auth_Tests;
 with JWX_JWT_Tests;
+with JWX_Util_Tests;
 
-package body JWX_Suite is
-
+package body JWX_Suite
+is
    use AUnit.Test_Suites;
 
    -- Statically allocate test suite:
@@ -33,6 +34,7 @@ package body JWX_Suite is
    Crypto_Test      : aliased JWX_Crypto_Tests.Test_Case;
    Stream_Auth_Test : aliased JWX_Stream_Auth_Tests.Test_Case;
    JWT_Test         : aliased JWX_JWT_Tests.Test_Case;
+   Util             : aliased JWX_Util_Tests.Test_Case;
 
    function Suite return Access_Test_Suite is
    begin
@@ -43,6 +45,7 @@ package body JWX_Suite is
       Add_Test (Result'Access, Crypto_Test'Access);
       Add_Test (Result'Access, Stream_Auth_Test'Access);
       Add_Test (Result'Access, JWT_Test'Access);
+      Add_Test (Result'Access, Util'Access);
       return Result'Access;
    end Suite;
 

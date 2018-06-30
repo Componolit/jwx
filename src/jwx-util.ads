@@ -27,4 +27,10 @@ is
    with
       Pre => Result'Length >= Data'Length;
 
+   function Size (Value : Float) return Natural;
+   -- Return the size of the representation of a float
+
+   function Size (Value : Long_Integer) return Natural;
+   -- Return the size of the representation of a long integer
+
 end JWX.Util;
