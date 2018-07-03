@@ -43,7 +43,7 @@ is
    with
       Pre => Data'First <= Data'Last;
 
-   function Serialize return String
+   function Serialize (Index : Index_Type := Null_Index) return String
    with
       Global => (Input => State);
 

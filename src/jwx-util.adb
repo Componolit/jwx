@@ -57,8 +57,20 @@ is
 
    function Size (Value : Long_Integer) return Natural
    is
+      Tmp    : Long_Integer := Value;
+      Result : Natural      := 0;
    begin
-      return 0;
+      if Tmp <= 0
+      then
+         Result := 1;
+      end if;
+
+      while Tmp /= 0
+      loop
+         Tmp    := Tmp / 10;
+         Result := Result + 1;
+      end loop;
+      return Result;
    end Size;
 
 end JWX.Util;

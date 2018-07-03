@@ -9,6 +9,8 @@
 -- GNU Affero General Public License version 3.
 --
 
+with JWX.Util;
+
 package body JWX.JSON
    with
       Refined_State => (State => (Context,
@@ -1062,14 +1064,63 @@ is
       end if;
    end Parse;
 
+   -----------------
+   -- Size_Object --
+   -----------------
+
+   function Size_Object (Index : Index_Type) return Natural
+   is
+   begin
+      return 0;
+   end Size_Object;
+
+   -----------------
+   -- Size_Array --
+   -----------------
+
+   function Size_Array (Index : Index_Type) return Natural
+   is
+   begin
+      return 0;
+   end Size_Array;
+
+   ----------
+   -- Size --
+   ----------
+
+   function Size (Index : Index_Type := Null_Index) return Natural
+   is
+      use JWX.Util;
+   begin
+      case Get_Kind (Index) is
+         when Kind_Null    => return 4;
+         when Kind_Boolean => return (if Get_Boolean (Index) then 4 else 5);
+         when Kind_Float   => return Size (Get_Float (Index));
+         when Kind_Integer => return Size (Get_Integer (Index));
+         when Kind_String  => return Get_String (Index)'Length + 2;
+         when Kind_Object  => return Size_Object (Index);
+         when Kind_Array   => return Size_Array (Index);
+         when others       => return 0;
+      end case;
+   end Size;
+
    ---------------
    -- Serialize --
    ---------------
 
-   function Serialize return String
+   function Serialize (Index : Index_Type := Null_Index) return String
    is
    begin
-      return "Foobar";
+      return Result : String (1 .. Size (Index))
+      do
+         case Get_Kind (Index) is
+            when Kind_Boolean => Result := (if Get_Boolean (Index) then "true" else "false");
+            when Kind_String  => Result := """" & Get_String (Index) & """";
+            when Kind_Null    => Result := "null";
+            when others       => Result := "";
+         end case;
+      end return;
+
    end Serialize;
 
    ------------------
