@@ -15,22 +15,14 @@ with
 is
    procedure Test (OK : out Boolean)
    is
-      procedure Dump (Data : String)
-      is
-      begin
-         OK := (if Data = "foo" then True else False);
-      end Dump;
-
       Invalid_Key : String := "Invalid key";
-
       package HA is new JWX.Stream_Auth
-                           (Error_Response  => "Error",
-                            Key_Data        => Invalid_Key,
-                            Upstream_Send   => Dump,
-                            Downstream_Send => Dump);
+                           (Key_Data  => Invalid_Key,
+                            Audience  => "Invalid",
+                            Issuer    => "Invalid");
+      use HA;
    begin
-      OK := False;
-      HA.Upstream_Receive ("Message");
+      OK := Authenticated ("Message", 12345678) = Auth_OK;
    end Test;
 
 end Proof_Stream_Auth;
