@@ -1,8 +1,11 @@
-with "libsparkcrypto";
-
 project Proj is
 
-   for Source_Dirs use ("src");
+   for Source_Dirs use
+      (
+       "src",
+       "contrib/libsparkcrypto/src/ada/generic",
+       "contrib/libsparkcrypto/src/shared/generic"
+      );
 
    for Object_Dir use "obj";
    for Library_Name use "base64";

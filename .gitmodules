@@ -1,0 +1,3 @@
+[submodule "contrib/libsparkcrypto"]
+	path = contrib/libsparkcrypto
+	url = https://github.com/Componolit/libsparkcrypto.git
