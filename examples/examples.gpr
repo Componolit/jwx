@@ -1,4 +1,4 @@
-with "libsparkcrypto";
+with "../obj/lsc/libsparkcrypto";
 
 project Examples is
 
