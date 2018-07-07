@@ -113,7 +113,14 @@ is
    procedure Decode_Gen
      (Encoded :        String;
       Length  :    out Natural;
-      Result  :    out JWX.Byte_Array);
+      Result  :    out JWX.Byte_Array)
+     with
+       Pre =>
+         (Encoded'Length > 0 and
+          Encoded'Length < Integer'Last - 3 and
+          Result'Length >= 9 * Encoded'Length / 12 - 3 and
+          Encoded'Length < Natural'Last / 9) and then
+          Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3;
 
    procedure Decode_Gen
      (Encoded :        String;
@@ -126,7 +133,7 @@ is
       Last_Input_Block_Offset  : constant Integer := (Encoded'Length + 3)/4-1;
       Last_Output_Block_Start  : constant Integer := Result'First + (3 * Last_Input_Block_Offset);
       Num_Last_Block_Bytes     : constant Integer := (Encoded'Length - 1) mod 4 + 1;
-      Num_Last_Block_Out_Bytes : Integer := Encoded'Length mod 4;
+      Num_Last_Block_Out_Bytes : Integer;
       Last_Block               : Byte_Array_Block;
    begin
       Length := 0;

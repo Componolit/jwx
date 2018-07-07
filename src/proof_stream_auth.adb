@@ -15,9 +15,8 @@ with
 is
    procedure Test (OK : out Boolean)
    is
-      Invalid_Key : String := "Invalid key";
       package HA is new JWX.Stream_Auth
-                           (Key_Data  => Invalid_Key,
+                           (Key_Data  => "Invalid key",
                             Audience  => "Invalid",
                             Issuer    => "Invalid");
       use HA;

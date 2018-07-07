@@ -10,7 +10,7 @@
 --
 
 generic
-   Key_Data       : in out String;
+   Key_Data       : String;
    Audience       : String;
    Issuer         : String;
 package JWX.Stream_Auth

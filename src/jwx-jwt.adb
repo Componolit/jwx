@@ -54,12 +54,17 @@ is
          Util.To_String (Decoded, JSON_Input);
 
          declare
-            package Token is new JWX.JSON (JSON_Input);
+            Input : constant String := JSON_Input;
+            package Token is new JWX.JSON (Input);
             use Token;
             Match : Match_Type;
             Value : Index_Type;
          begin
             Parse (Match);
+            if Match /= Match_OK
+            then
+               return;
+            end if;
             if Get_Kind /= Kind_Object
             then
                Result := Result_Invalid_Object;

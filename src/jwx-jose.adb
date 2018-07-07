@@ -49,7 +49,8 @@ is
                       Result => JOSE_Text);
 
       declare
-         package J is new JWX.JSON (JOSE_Text);
+         JT : constant String := JOSE_Text;
+         package J is new JWX.JSON (JT);
          Match_JOSE : J.Match_Type;
          JOSE_Alg   : J.Index_Type;
          use type J.Match_Type;

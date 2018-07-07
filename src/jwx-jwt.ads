@@ -11,7 +11,7 @@
 
 generic
    Data     : String;
-   Key_Data : in out String;
+   Key_Data : String;
    Audience : String;
    Issuer   : String;
    Now      : Long_Integer;
