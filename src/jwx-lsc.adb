@@ -62,9 +62,6 @@ is
       Output := (others => (others => 0));
       for O in Output'First .. Output'Last
       loop
-         pragma Assert (Input'First < Integer'Last -
-                                      64 * Integer (Output'Last - Output'First) -
-                                      4 * Output'Length);
          JWX_Byte_Array_To_LSC_Word32_Array
             (Input  => Input,
              Output => Output (O),

@@ -12,7 +12,7 @@
 generic
    Payload : String;
    Auth    : String;
-   Key     : in out String;
+   Key     : String;
 package JWX.Crypto
 with
    Abstract_State => State,

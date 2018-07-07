@@ -11,9 +11,9 @@
 
 package body JWX.JWSCS
 is
-   Token_Valid : Boolean := False;
-   First       : Natural := 0;
-   Second      : Natural := 0;
+   Token_Valid : Boolean;
+   First       : Natural;
+   Second      : Natural;
 
    --------------------
    -- Get_Separators --

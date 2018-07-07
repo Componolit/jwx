@@ -11,7 +11,7 @@
 
 generic
    Data     : String;
-   Key_Data : in out String;
+   Key_Data : String;
 package JWX.JWS
 is
 

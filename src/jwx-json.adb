@@ -408,6 +408,7 @@ is
    is
       Divisor     : Long_Integer := 10;
       Old_Offset  : constant Natural := Offset;
+      Digts       : constant String := "0123456789";
    begin
       Result := 0.0;
       Match  := Match_None;
@@ -443,7 +444,8 @@ is
             return;
          end if;
 
-         if not Match_Set ("0123456789")
+         if Data (Data'First + Offset) < '0' or
+            Data (Data'First + Offset) > '9'
          then
             if Match /= Match_OK then
                Offset := Old_Offset;
@@ -452,6 +454,7 @@ is
          end if;
 
          pragma Assert (Divisor > 0);
+         pragma Assert (Float (Divisor) > 0.0);
          Result := Result +
             Float (To_Number (Data (Data'First + Offset))) / Float (Divisor);
          Divisor := Divisor * 10;
@@ -746,18 +749,13 @@ is
    -- Parse_String --
    ------------------
 
-   -- This is a workaround for a bug in GNAT prior to Community 2018, where a
-   -- generic formal parameter is not considered a legal component of refined
-   -- state.
-   Data_GNAT_Workaround : constant String := Data;
-
    procedure Parse_String (Match : out Match_Type)
    with
       Global => (In_Out => (Context,
                             Context_Index,
-                            Offset),
-                 Input =>  (Data_GNAT_Workaround,
-                            Context_Size));
+                            Offset));
+   --                 Input =>  (Data,
+   --                            Context_Size));
 
    procedure Parse_String (Match : out Match_Type)
    is
@@ -981,6 +979,7 @@ is
          Skip_Whitespace;
          if Match_Set ("]")
          then
+            pragma Assert (Offset < Natural'Last);
             Offset := Offset + 1;
             exit;
          end if;

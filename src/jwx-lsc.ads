@@ -36,6 +36,6 @@ is
       Pre => ((Input'Length > 0 and
               Output'Last > Output'First and
               Output'Length <= SC.SHA256.Message_Index (Integer'Last) / 64) and then
-              Input'First < Integer'Last - 64 * Integer (Output'Last - Output'First) - 4 * Output'Length);
+              Input'First < Integer'Last - 64 * Output'Length - 64);
 
 end JWX.LSC;

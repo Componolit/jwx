@@ -10,7 +10,7 @@
 --
 
 generic
-   Data : in out String;
+   Data : String;
 package JWX.JWK
    with
       Abstract_State => State,
@@ -126,7 +126,8 @@ is
    procedure Select_Key (Valid : out Boolean;
                          Index :     Positive := 1)
    with
-      Pre  => Loaded,
-      Post => (if Valid then Key_Valid);
+      Global => (Input => State),
+      Pre    => Loaded,
+      Post   => (if Valid then Key_Valid);
 
 end JWX.JWK;

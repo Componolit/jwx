@@ -11,14 +11,20 @@
 
 generic
 
-   Data         : in out String;
-   Context_Size :        Natural := Data'Length/3 + 2;
+   Input_Data   : String;
+   Context_Size : Natural := Input_Data'Length/3 + 2;
 
 package JWX.JSON
    with
       Abstract_State => State,
-      Initializes    => State
+      Initializes    => (State, Data)
 is
+
+
+   -- This is a workaround for a bug in GNAT prior to Community 2018, where a
+   -- generic formal parameter is not considered a legal component of refined
+   -- state.
+   Data : constant String := Input_Data;
 
    type Kind_Type is (Kind_Invalid,
                       Kind_Null,
@@ -35,13 +41,13 @@ is
                        Match_Out_Of_Memory);
 
    type Index_Type is new Natural range 1 .. Context_Size;
-   Null_Index : constant Index_Type;
-   End_Index  : constant Index_Type;
+   Null_Index : constant Index_Type := Index_Type'First;
+   End_Index  : constant Index_Type := Index_Type'Last;
 
    -- Parse a JSON file
    procedure Parse (Match : out Match_Type)
    with
-      Pre => Data'First <= Data'Last;
+       Pre     => Data'First <= Data'Last;
 
    -- Assert that a @Index@ has a certain kind
    function Has_Kind (Index : Index_Type;
@@ -97,10 +103,5 @@ is
                  Index    : Index_Type := Null_Index) return Index_Type
    with
       Pre => Get_Kind (Index) = Kind_Array;
-
-private
-
-   Null_Index : constant Index_Type := Index_Type'First;
-   End_Index  : constant Index_Type := Index_Type'Last;
 
 end JWX.JSON;
