@@ -27,7 +27,7 @@ is
          when Kind_Boolean =>
             Boolean_Value  : Boolean      := False;
          when Kind_Float =>
-            Float_Value    : Float        := 0.0;
+            Float_Value    : Long_Float   := 0.0;
          when Kind_Integer =>
             Integer_Value  : Long_Integer := 0;
          when Kind_String =>
@@ -80,7 +80,7 @@ is
    -- Float_Element --
    -------------------
 
-   function Float_Element (Value : Float) return Context_Element_Type is
+   function Float_Element (Value : Long_Float) return Context_Element_Type is
    -- Construct float element
       (Kind        => Kind_Float,
        Float_Value => Value,
@@ -210,12 +210,12 @@ is
    -- Get_Float --
    ---------------
 
-   function Get_Float (Index : Index_Type := Null_Index) return Float
+   function Get_Float (Index : Index_Type := Null_Index) return Long_Float
    is
    begin
       if Get_Kind (Index) = Kind_Integer
       then
-         return Float (Get (Index).Integer_Value);
+         return Long_Float (Get (Index).Integer_Value);
       end if;
       return Get (Index).Float_Value;
    end Get_Float;
@@ -393,7 +393,7 @@ is
 
    procedure Parse_Fractional_Part
      (Match   : out Match_Type;
-      Result  : out Float)
+      Result  : out Long_Float)
    with
       Pre => Data'First < Integer'Last - Offset and
              Offset < Data'Length,
@@ -404,7 +404,7 @@ is
 
    procedure Parse_Fractional_Part
      (Match   :    out Match_Type;
-      Result  :    out Float)
+      Result  :    out Long_Float)
    is
       Divisor     : Long_Integer := 10;
       Old_Offset  : constant Natural := Offset;
@@ -454,9 +454,9 @@ is
          end if;
 
          pragma Assert (Divisor > 0);
-         pragma Assert (Float (Divisor) > 0.0);
+         pragma Assert (Long_Float (Divisor) >= 1.0);
          Result := Result +
-            Float (To_Number (Data (Data'First + Offset))) / Float (Divisor);
+            Long_Float (To_Number (Data (Data'First + Offset))) / Long_Float (Divisor);
          Divisor := Divisor * 10;
          Offset  := Offset + 1;
          Match   := Match_OK;
@@ -648,7 +648,7 @@ is
 
    procedure Parse_Number (Match : out Match_Type)
    is
-      Fractional_Component : Float := 0.0;
+      Fractional_Component : Long_Float := 0.0;
       Integer_Component    : Long_Integer;
       Scale                : Long_Integer;
 
@@ -698,17 +698,17 @@ is
          (Match_Exponent = Match_OK and then
           (Scale_Negative and Integer_Component mod Scale > 0))
       then
-         if Float (Integer_Component) >= Float'Last
+         if Long_Float (Integer_Component) >= Long_Float'Last
          then
             Match := Match_Invalid;
             return;
          end if;
 
-         pragma Assert (Float (Integer_Component) < Float'Last);
+         pragma Assert (Long_Float (Integer_Component) < Long_Float'Last);
          pragma Assert (Fractional_Component >= 0.0);
          pragma Assert (Fractional_Component <  1.0);
          declare
-            Tmp : Float := Float (Integer_Component) + Fractional_Component;
+            Tmp : Long_Float := Long_Float (Integer_Component) + Fractional_Component;
          begin
             if Negative then
                Tmp := -Tmp;
@@ -717,9 +717,9 @@ is
             then
                if Scale_Negative
                then
-                  Tmp := Tmp / Float (Scale);
+                  Tmp := Tmp / Long_Float (Scale);
                else
-                  Tmp := Tmp * Float (Scale);
+                  Tmp := Tmp * Long_Float (Scale);
                end if;
             end if;
             Set (Float_Element (Tmp));
