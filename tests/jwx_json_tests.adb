@@ -788,7 +788,7 @@ package body JWX_JSON_Tests is
 
       Result := Query_Object ("area");
 		Assert (Get_Kind (Result) = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (Get_Float (Result) = 1246700.0, "Invalid value: " & Get_Float (Result)'Img);
+		Assert (abs (Get_Float (Result) - 1246700.0) < Float'Epsilon, "Invalid value: " & Get_Float (Result)'Img);
 	end Test_Complex_Country;
 
    ---------------------------------------------------------------------------
@@ -836,7 +836,7 @@ package body JWX_JSON_Tests is
       Result := Query_Object ("area", Result);
 		Assert (Result /= Null_Index, "Element not found");
 		Assert (Get_Kind (Result) = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (Get_Float (Result) = 1246700.0, "Invalid value: " & Get_Float (Result)'Img);
+		Assert (abs (Get_Float (Result) - 1246700.0) < Float'Epsilon, "Invalid value: " & Get_Float (Result)'Img);
 	end Test_Complex_Two_Countries;
 
    ---------------------------------------------------------------------------

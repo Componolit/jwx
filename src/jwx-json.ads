@@ -67,7 +67,7 @@ is
       Pre => Get_Kind (Index) = Kind_Boolean;
 
    -- Return value of float context element
-   function Get_Float (Index : Index_Type := Null_Index) return Float
+   function Get_Float (Index : Index_Type := Null_Index) return Long_Float
    with
       Pre => Get_Kind (Index) = Kind_Float or
              Get_Kind (Index) = Kind_Integer;
