@@ -395,12 +395,13 @@ is
      (Match   : out Match_Type;
       Result  : out Long_Float)
    with
-      Pre => Data'First < Integer'Last - Offset and
-             Offset < Data'Length,
-      Post =>
-         (if Match /= Match_OK then Offset = Offset'Old) and
-         Result >= 0.0 and
-         Result <  1.0;
+       Pre =>
+         Data'First < Integer'Last - Offset and
+         Offset < Data'Length,
+       Post =>
+         (case Match is
+            when Match_OK => Result >= 0.0 and Result < 1.0,
+            when others   => Offset =  Offset'Old);
 
    procedure Parse_Fractional_Part
      (Match   :    out Match_Type;
@@ -426,6 +427,7 @@ is
       Offset := Offset + 1;
 
       loop
+         pragma Loop_Invariant (Result >= 0.0 and Result < 1.0);
 
          if Data'First > Integer'Last - Offset or
             Offset > Data'Length - 1
@@ -454,7 +456,6 @@ is
          end if;
 
          pragma Assert (Divisor > 0);
-         pragma Assert (Long_Float (Divisor) >= 1.0);
          Result := Result +
             Long_Float (To_Number (Data (Data'First + Offset))) / Long_Float (Divisor);
          Divisor := Divisor * 10;
@@ -504,7 +505,9 @@ is
 
       loop
 
-         if Num_Matches >= Natural'Last
+         if Num_Matches >= Natural'Last or
+            (Offset > Data'Length or else
+             Data'First > Data'Last - Offset)
          then
             Match := Match_Invalid;
             Offset := Old_Offset;
@@ -513,7 +516,8 @@ is
 
          -- Valid digit?
          exit when
-            not Match_Set ("0123456789") or
+            Data (Data'First + Offset) < '0' or
+            Data (Data'First + Offset) > '9' or
             Data'First >= Integer'Last - Offset or
             Data'First > Data'Last - Offset or
             Offset > Data'Length - 1 or
@@ -528,6 +532,8 @@ is
 
          pragma Loop_Invariant (Result >= 0);
          pragma Loop_Invariant (Data'First + Offset in Data'Range);
+         pragma Loop_Invariant (Data (Data'First + Offset) >= '0');
+         pragma Loop_Invariant (Data (Data'First + Offset) <= '9');
 
          -- Check for overflow
          if Num_Matches >= Natural'Last or
@@ -634,7 +640,7 @@ is
             Offset := Old_Offset;
             return;
          end if;
-         pragma Loop_Invariant (Result > 0);
+         pragma Assert (Result <= Long_Integer'Last / 10);
          Result := Result * 10;
       end loop;
 

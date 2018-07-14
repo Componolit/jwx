@@ -117,10 +117,12 @@ is
      with
        Pre =>
          (Encoded'Length > 0 and
-          Encoded'Length < Integer'Last - 3 and
-          Result'Length >= 9 * Encoded'Length / 12 - 3 and
-          Encoded'Length < Natural'Last / 9) and then
-          Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3;
+            Encoded'Length < Natural'Last / 9 and
+              Encoded'Last > 7 and
+                Encoded'Last < Natural'Last - 4 and
+                  Result'Length >= 3 * ((Encoded'Length + 3) / 4) and
+            Result'Length >= 9 * Encoded'Length / 12 - 3) and then
+     Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3;
 
    procedure Decode_Gen
      (Encoded :        String;
@@ -155,7 +157,8 @@ is
          B2 := UInt6 (Alpha_To_Value (Encoded (Encoded'First + 4*I + 2)));
          B3 := UInt6 (Alpha_To_Value (Encoded (Encoded'First + 4*I + 3)));
 
-         Result (Result'First+3*I .. Result'First+3*I+2) := UInt6_To_Bytes ((B0, B1, B2, B3));
+         Result (Result'First + 3 * I .. Result'First + 3 * I + 2) :=
+           UInt6_To_Bytes ((B0, B1, B2, B3));
       end loop;
 
       if Num_Last_Block_Bytes < 2
@@ -164,6 +167,8 @@ is
       end if;
 
       pragma Assert (Num_Last_Block_Bytes < 5);
+      pragma Assert (Encoded'Last > 7);
+      pragma Assert (Encoded'Last < Natural'Last - 4);
 
       B0_Pos := Encoded'Last - Num_Last_Block_Bytes + 1;
       B1_Pos := Encoded'Last - Num_Last_Block_Bytes + 2;
@@ -232,9 +237,9 @@ is
    procedure Decode_Default_Inst is new Decode_Gen (Alpha_To_Value_Default, Is_Valid_Default);
 
    procedure Decode
-       (Encoded :        String;
-        Length  :    out Natural;
-        Result  :    out JWX.Byte_Array) renames Decode_Default_Inst;
+     (Encoded :        String;
+      Length  :    out Natural;
+      Result  :    out JWX.Byte_Array) renames Decode_Default_Inst;
 
    ----------------
    -- Decode_Url --
@@ -243,8 +248,8 @@ is
    procedure Decode_Url_Inst is new Decode_Gen (Alpha_To_Value_Url, Is_Valid_Url);
 
    procedure Decode_Url
-       (Encoded :        String;
-        Length  :    out Natural;
-        Result  :    out JWX.Byte_Array) renames Decode_Url_Inst;
+     (Encoded :        String;
+      Length  :    out Natural;
+      Result  :    out JWX.Byte_Array) renames Decode_Url_Inst;
 
 end JWX.Base64;
