@@ -9,10 +9,10 @@ project Proj is
    for Library_Dir use "adalib";
    for Library_Kind use "dynamic";
 
-    package Gnattest
-    is
-        for Tests_Dir use "../tests";
-    end Gnattest;
+   package Gnattest
+   is
+      for Tests_Dir use "../tests";
+   end Gnattest;
 
    package Builder is
       for Global_Configuration_Pragmas use "spark.adc";
