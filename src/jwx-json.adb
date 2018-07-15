@@ -505,9 +505,12 @@ is
 
       loop
 
-         if Num_Matches >= Natural'Last or
-            (Offset > Data'Length or else
-             Data'First > Data'Last - Offset)
+         if (Offset >= Data'Length)
+         then
+            exit;
+         end if;
+
+         if Num_Matches >= Natural'Last
          then
             Match := Match_Invalid;
             Offset := Old_Offset;
