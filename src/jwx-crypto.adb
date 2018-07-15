@@ -34,7 +34,7 @@ is
    is
       Payload_Raw : JWX.Byte_Array (1 .. Payload'Length);
       Key_Raw     : JWX.Byte_Array (1 .. (Key'Length/4 + 1) * 3);
-      Auth_Raw    : JWX.Byte_Array (1 .. 32);
+      Auth_Raw    : JWX.Byte_Array (1 .. 3 * ((Auth'Length + 3) / 4));
 
       Payload_LSC : Standard.LSC.SHA256.Message_Type (1 .. (Payload_Raw'Length - 1) / 64 + 1);
       Auth_Input  : Standard.LSC.SHA256.SHA256_Hash_Type;
