@@ -15,8 +15,8 @@ with JWX.Util;
 
 package body JWX.JOSE
 is
-   JOSE_Data   : JWX.Byte_Array (1 .. Data'Length/4*3);
-   JOSE_Valid  : Boolean := False;
+   JOSE_Data   : JWX.Byte_Array (1 .. 3 * ((Data'Length + 3) / 4));
+   JOSE_Valid  : Boolean      := False;
    Alg         : JWX.Alg_Type := JWX.Alg_Invalid;
 
    -----------

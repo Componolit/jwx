@@ -41,7 +41,7 @@ is
          Data : constant String := J.Payload;
          use Base64;
          Len   : Natural;
-         Decoded    : Byte_Array (1 .. Data'Length);
+         Decoded    : Byte_Array (1 .. 3 * ((Data'Length + 3) / 4));
          JSON_Input : String (1 .. Data'Length);
       begin
          Decode_Url (Data, Len, Decoded);

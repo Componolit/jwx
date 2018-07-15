@@ -30,11 +30,11 @@ package body JWX_JWK_Tests is
       Data : String := Read_File (Input_File);
       package Key is new JWK (Data);
       use Key;
-      X_Val : Byte_Array (1 .. X_Ref'Length);
+      X_Val : Byte_Array (1 .. X_Ref'Length + 4);
       X_Length : Natural;
-      Y_Val : Byte_Array (1 .. Y_Ref'Length);
+      Y_Val : Byte_Array (1 .. Y_Ref'Length + 4);
       Y_Length : Natural;
-      D_Val : Byte_Array (1 .. D_Ref'Length);
+      D_Val : Byte_Array (1 .. D_Ref'Length + 4);
       D_Length : Natural;
       K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
       K_Crv : Key.EC_Curve_Type := Key.EC_Curve_Type'Value (Crv);
@@ -82,11 +82,11 @@ package body JWX_JWK_Tests is
       Data : String := Read_File (Input_File);
       package Key is new JWX.JWK (Data);
       use Key;
-      N_Val : Byte_Array (1 .. N_Ref'Length);
+      N_Val : Byte_Array (1 .. N_Ref'Length + 4);
       N_Length : Natural;
-      E_Val : Byte_Array (1 .. E_Ref'Length);
+      E_Val : Byte_Array (1 .. E_Ref'Length + 4);
       E_Length : Natural;
-      D_Val : Byte_Array (1 .. D_Ref'Length);
+      D_Val : Byte_Array (1 .. D_Ref'Length + 4);
       D_Length : Natural;
       K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
       Valid : Boolean;
@@ -131,7 +131,7 @@ package body JWX_JWK_Tests is
       Data : String := Read_File (Input_File);
       package Key is new JWX.JWK (Data);
       use Key;
-      K_Val : Byte_Array (1 .. K_Ref'Length);
+      K_Val : Byte_Array (1 .. K_Ref'Length + 4);
       K_Length : Natural;
       K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
       Valid : Boolean;
@@ -286,7 +286,7 @@ package body JWX_JWK_Tests is
 
    function Name (T : Test_Case) return Test_String is
    begin
-      return Format ("JWX Tests");
+      return Format ("JWK Tests");
    end Name;
 
 end JWX_JWK_Tests;

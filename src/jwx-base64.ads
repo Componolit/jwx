@@ -21,13 +21,12 @@ is
       Result  :    out JWX.Byte_Array)
      with
        Pre =>
-         (Encoded'Length > 0 and
-            Encoded'Length < Natural'Last / 9 and
-              Encoded'Last > 7 and
-                Encoded'Last < Natural'Last - 4 and
-                  Result'Length >= 3 * ((Encoded'Length + 3) / 4) and
-            Result'Length >= 9 * Encoded'Length / 12 - 3) and then
-     Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3;
+            ((Encoded'Length > 0
+          and Encoded'Length < Natural'Last / 9
+          and Encoded'Last < Natural'Last - 4
+          and Result'Length >= 3 * ((Encoded'Length + 3) / 4)
+          and Result'Length >= 9 * Encoded'Length / 12 - 3))
+          and then Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3;
    -- Decode Base64 encoded string into byte array
 
    procedure Decode_Url
@@ -36,13 +35,12 @@ is
       Result  :    out JWX.Byte_Array)
      with
        Pre =>
-         (Encoded'Length > 0 and
-            Encoded'Length < Natural'Last / 9 and
-              Encoded'Last > 7 and
-                Encoded'Last < Natural'Last - 4 and
-                  Result'Length >= 3 * ((Encoded'Length + 3) / 4) and
-            Result'Length >= 9 * Encoded'Length / 12 - 3) and then
-     Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3;
+            ((Encoded'Length > 0
+          and Encoded'Length < Natural'Last / 9
+          and Encoded'Last < Natural'Last - 4
+          and Result'Length >= 3 * ((Encoded'Length + 3) / 4)
+          and Result'Length >= 9 * Encoded'Length / 12 - 3))
+          and then Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3;
    -- Decode Base64URL encoded string into byte array
 
 end JWX.Base64;

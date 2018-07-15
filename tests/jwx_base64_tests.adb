@@ -17,14 +17,13 @@ with JWX_Test_Utils; use JWX_Test_Utils;
 
 package body JWX_BASE64_Tests is
 
-   subtype Result_Type is Byte_Array (1..50);
    subtype String_Type is String (1..50);
 
    procedure Test_Vector (Input  : String;
                           Output : String)
    is
       L : Natural;
-      R : Result_Type;
+      R : Byte_Array (1 .. 3 * ((Input'Length + 3) / 4));
       S : String_Type;
    begin
       Decode (Encoded => Input, Length => L, Result => R);
@@ -100,9 +99,10 @@ package body JWX_BASE64_Tests is
    end Test_Wikipedia_Test_Vector_5;
 
    procedure Test_Vector_Implicit (Input  : String;
-                          Output : String)
+                                   Output : String)
    is
       L : Natural;
+      subtype Result_Type is Byte_Array (1 .. 3 * ((Input'Length + 3) / 4));
       R : Result_Type;
       S : String_Type;
    begin
@@ -179,10 +179,10 @@ package body JWX_BASE64_Tests is
    end Test_Wikipedia_Implicit_Padding_Test_Vector_5;
 
    procedure Test_Vector_Url (Input  : String;
-                          Output : String)
+                              Output : String)
    is
       L : Natural;
-      R : Result_Type;
+      R : Byte_Array (1 .. 3 * ((Input'Length + 3) / 4));
       S : String_Type;
    begin
       Decode_Url (Encoded => Input, Length => L, Result => R);
