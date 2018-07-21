@@ -15,6 +15,7 @@ package body JWX.JSON
                                   Context_Index,
                                   Offset))
 is
+
    type Context_Element_Type (Kind : Kind_Type := Kind_Invalid) is
    record
       Next_Member : Index_Type := Null_Index;
@@ -129,6 +130,20 @@ is
       (Kind        => Kind_Array,
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
+
+
+   procedure Prf_Mult_Protect (Arg1  : Long_Integer;
+                               Arg2  : Long_Integer;
+                               Upper : Long_Integer)
+     with
+       Global => null,
+       Pre    => (Arg1 >= 0 and Arg2 > 0 and Upper >= 0 and Arg1 < Upper)
+                 and then Arg1 <= Upper / Arg2,
+       Post   => Arg1 * Arg2 >= 0 and Arg1 * Arg2 <= Upper;
+
+   procedure Prf_Mult_Protect (Arg1  : Long_Integer;
+                               Arg2  : Long_Integer;
+                               Upper : Long_Integer) is null;
 
    ---------
    -- Get --
@@ -407,9 +422,10 @@ is
      (Match   :    out Match_Type;
       Result  :    out Long_Float)
    is
-      Divisor     : Long_Integer := 10;
+      Divisor     : Long_Integer := 1;
+      Tmp         : Long_Integer := 0;
       Old_Offset  : constant Natural := Offset;
-      Digts       : constant String := "0123456789";
+
    begin
       Result := 0.0;
       Match  := Match_None;
@@ -418,7 +434,7 @@ is
          return;
       end if;
 
-      Match  := Match_Invalid;
+      Match := Match_Invalid;
       if Offset >= Natural'Last
       then
          return;
@@ -427,23 +443,17 @@ is
       Offset := Offset + 1;
 
       loop
-         pragma Loop_Invariant (Result >= 0.0 and Result < 1.0);
+         pragma Loop_Invariant (Divisor > Tmp);
+         pragma Loop_Invariant (Tmp >= 0);
 
          if Data'First > Integer'Last - Offset or
             Offset > Data'Length - 1
          then
             if Match /= Match_OK then
                Offset := Old_Offset;
+               return;
             end if;
-            return;
-         end if;
-
-         if Divisor <= 0 or
-            Divisor >= Long_Integer'Last/10
-         then
-            Match := Match_Invalid;
-            Offset := Old_Offset;
-            return;
+            exit;
          end if;
 
          if Data (Data'First + Offset) < '0' or
@@ -451,17 +461,39 @@ is
          then
             if Match /= Match_OK then
                Offset := Old_Offset;
+               return;
             end if;
+            exit;
+         end if;
+
+         if Tmp >= Long_Integer'Last / 10
+         then
+            Match := Match_Invalid;
             return;
          end if;
 
-         pragma Assert (Divisor > 0);
-         Result := Result +
-            Long_Float (To_Number (Data (Data'First + Offset))) / Long_Float (Divisor);
+         Prf_Mult_Protect (Arg1  => Tmp,
+                           Arg2  => 10,
+                           Upper => Long_Integer'Last);
+
+         Tmp := 10 * Tmp + To_Number (Data (Data'First + Offset));
+         Offset := Offset + 1;
+
+         if Divisor >= Long_Integer'Last / 10
+         then
+            Match := Match_Invalid;
+            Offset := Old_Offset;
+            return;
+         end if;
+
          Divisor := Divisor * 10;
-         Offset  := Offset + 1;
-         Match   := Match_OK;
+
+         -- At least one decimal place matched.
+         Match := Match_OK;
       end loop;
+
+      pragma Assert (Long_Float (Divisor) > Long_Float (Tmp));
+      Result := Long_Float (Tmp) / Long_Float (Divisor);
 
    end Parse_Fractional_Part;
 
@@ -553,7 +585,7 @@ is
          Num_Matches := Num_Matches + 1;
       end loop;
 
-      -- No digits found
+      -- No
       if Num_Matches = 0
       then
          Match  := Match_None;
@@ -582,7 +614,10 @@ is
       Result   :    out Long_Integer;
       Negative :    out Boolean)
    with
-      Post => (if Match = Match_OK then Result > 0);
+       Post => (case Match is
+                  when Match_OK   => Result > 0,
+                  when Match_None => Result = 1 and Negative = False,
+                  when others     => True);
 
    procedure Parse_Exponent_Part
      (Match    :    out Match_Type;
@@ -594,7 +629,7 @@ is
       Integer_Negative : Boolean;
       Old_Offset       : constant Natural := Offset;
    begin
-      Result   := 0;
+      Result   := 1;
       Negative := False;
       Match    := Match_None;
 
@@ -638,12 +673,17 @@ is
       Result := 1;
       for I in 1 .. Scale
       loop
+         pragma Loop_Invariant (Result > 0);
+
          if Result > Long_Integer'Last / 10
          then
             Offset := Old_Offset;
             return;
          end if;
-         pragma Assert (Result <= Long_Integer'Last / 10);
+
+         Prf_Mult_Protect (Arg1  => Result,
+                           Arg2  => 10,
+                           Upper => Long_Integer'Last);
          Result := Result * 10;
       end loop;
 
@@ -686,20 +726,17 @@ is
          return;
       end if;
 
+      Match := Match_Invalid;
       if Match_Frac = Match_Invalid
       then
-         Match := Match_Invalid;
          return;
       end if;
 
       Parse_Exponent_Part (Match_Exponent, Scale, Scale_Negative);
       if Match_Exponent = Match_Invalid
       then
-         Match := Match_Invalid;
          return;
       end if;
-
-      pragma Assert ((if Match_Exponent = Match_OK then Scale > 0));
 
       --  Convert to float if either we have fractional part or dividing by the
       --  scale would yield a non-integer number.
@@ -709,21 +746,15 @@ is
       then
          if Long_Float (Integer_Component) >= Long_Float'Last
          then
-            Match := Match_Invalid;
             return;
          end if;
 
-         pragma Assert (Long_Float (Integer_Component) < Long_Float'Last);
-         pragma Assert (Fractional_Component >= 0.0);
-         pragma Assert (Fractional_Component <  1.0);
          declare
             Tmp : Long_Float := Long_Float (Integer_Component) + Fractional_Component;
          begin
-            if Negative then
-               Tmp := -Tmp;
-            end if;
             if Match_Exponent = Match_OK
             then
+               pragma Assert (Scale >= 1);
                if Scale_Negative
                then
                   Tmp := Tmp / Long_Float (Scale);
@@ -731,20 +762,30 @@ is
                   Tmp := Tmp * Long_Float (Scale);
                end if;
             end if;
+            if Negative then
+               Tmp := -Tmp;
+            end if;
             Set (Float_Element (Tmp));
          end;
       else
-         if Negative then
-            Integer_Component := -Integer_Component;
-         end if;
          if Match_Exponent = Match_OK
          then
             if Scale_Negative
             then
                Integer_Component := Integer_Component / Scale;
             else
+               if Integer_Component >= Long_Integer'Last / Scale
+               then
+                  return;
+               end if;
+               Prf_Mult_Protect (Arg1  => Integer_Component,
+                                 Arg2  => Scale,
+                                 Upper => Long_Integer'Last);
                Integer_Component := Integer_Component * Scale;
             end if;
+         end if;
+         if Negative then
+            Integer_Component := -Integer_Component;
          end if;
          Set (Integer_Element (Integer_Component));
       end if;
@@ -763,8 +804,6 @@ is
       Global => (In_Out => (Context,
                             Context_Index,
                             Offset));
-   --                 Input =>  (Data,
-   --                            Context_Size));
 
    procedure Parse_String (Match : out Match_Type)
    is
@@ -780,12 +819,20 @@ is
       end if;
 
       Match := Match_Invalid;
-      if Offset >= Natural'Last
+      if Offset >= Natural'Last or
+         Offset >= Data'Length
       then
          return;
       end if;
 
       Offset := Offset + 1;
+
+      if Offset >= Data'Length
+      then
+         Offset := Old_Offset;
+         return;
+      end if;
+
       String_Start := Data'First + Offset;
 
       loop
@@ -793,7 +840,6 @@ is
             Offset > Data'Length - 1
          then
             Offset := Old_Offset;
-            Match  := Match_Invalid;
             return;
          end if;
 
@@ -806,7 +852,6 @@ is
          Offset > Data'Length - 1
       then
          Offset := Old_Offset;
-         Match  := Match_Invalid;
          return;
       end if;
 
@@ -820,12 +865,17 @@ is
       if not Match_Set ("""")
       then
          Offset := Old_Offset;
-         Match  := Match_Invalid;
          return;
       end if;
       Offset := Offset + 1;
 
-      String_End := Data'First + Offset - 2;
+      if Offset > Data'Length
+      then
+         Offset := Old_Offset;
+         return;
+      end if;
+
+      String_End := Data'First + (Offset - 2);
 
       Set (String_Element (String_Start, String_End));
       Context_Index := Context_Index + 1;
@@ -872,6 +922,8 @@ is
       Offset := Offset + 1;
 
       loop
+         Skip_Whitespace;
+
          if Offset >= Natural'Last or
             Data'First > Integer'Last - Offset or
             Offset > Data'Length - 1
@@ -881,7 +933,6 @@ is
          end if;
 
          -- Check for ending '}'
-         Skip_Whitespace;
          if Match_Set ("}")
          then
             Offset := Offset + 1;
@@ -976,6 +1027,8 @@ is
       Offset := Offset + 1;
 
       loop
+         Skip_Whitespace;
+
          if Offset >= Natural'Last or
             Data'First >= Integer'Last - Offset or
             Offset > Data'Length - 1
@@ -985,10 +1038,8 @@ is
          end if;
 
          -- Check for ending ']'
-         Skip_Whitespace;
          if Match_Set ("]")
          then
-            pragma Assert (Offset < Natural'Last);
             Offset := Offset + 1;
             exit;
          end if;
