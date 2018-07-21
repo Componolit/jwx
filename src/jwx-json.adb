@@ -131,6 +131,7 @@ is
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
 
+   pragma Warnings (Off, "postcondition does not check the outcome of calling");
 
    procedure Prf_Mult_Protect (Arg1  : Long_Integer;
                                Arg2  : Long_Integer;
@@ -140,6 +141,8 @@ is
        Pre    => (Arg1 >= 0 and Arg2 > 0 and Upper >= 0 and Arg1 < Upper)
                  and then Arg1 <= Upper / Arg2,
        Post   => Arg1 * Arg2 >= 0 and Arg1 * Arg2 <= Upper;
+
+   pragma Warnings (On, "postcondition does not check the outcome of calling");
 
    procedure Prf_Mult_Protect (Arg1  : Long_Integer;
                                Arg2  : Long_Integer;
