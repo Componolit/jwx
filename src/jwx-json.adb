@@ -27,10 +27,10 @@ is
             | Kind_Array => null;
          when Kind_Boolean =>
             Boolean_Value  : Boolean      := False;
-         when Kind_Float =>
-            Float_Value    : Long_Float   := 0.0;
+         when Kind_Real =>
+            Real_Value     : Real_Type    := 0.0;
          when Kind_Integer =>
-            Integer_Value  : Long_Integer := 0;
+            Integer_Value  : Integer_Type := 0;
          when Kind_String =>
             String_Start   : Integer      := 0;
             String_End     : Integer      := 0;
@@ -78,13 +78,13 @@ is
        Next_Value    => Null_Index);
 
    -------------------
-   -- Float_Element --
+   -- Real_Element --
    -------------------
 
-   function Float_Element (Value : Long_Float) return Context_Element_Type is
-   -- Construct float element
-      (Kind        => Kind_Float,
-       Float_Value => Value,
+   function Real_Element (Value : Real_Type) return Context_Element_Type is
+   -- Construct real element
+      (Kind        => Kind_Real,
+       Real_Value  => Value,
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
 
@@ -92,7 +92,7 @@ is
    -- Integer_Element --
    ---------------------
 
-   function Integer_Element (Value : Long_Integer) return Context_Element_Type is
+   function Integer_Element (Value : Integer_Type) return Context_Element_Type is
    -- Construct integer element
       (Kind          => Kind_Integer,
        Integer_Value => Value,
@@ -133,10 +133,11 @@ is
 
    pragma Warnings (Off, "postcondition does not check the outcome of calling");
 
-   procedure Prf_Mult_Protect (Arg1  : Long_Integer;
-                               Arg2  : Long_Integer;
-                               Upper : Long_Integer)
+   procedure Prf_Mult_Protect (Arg1  : Integer_Type;
+                               Arg2  : Integer_Type;
+                               Upper : Integer_Type)
      with
+       Ghost,
        Global => null,
        Pre    => (Arg1 >= 0 and Arg2 > 0 and Upper >= 0 and Arg1 < Upper)
                  and then Arg1 <= Upper / Arg2,
@@ -144,9 +145,9 @@ is
 
    pragma Warnings (On, "postcondition does not check the outcome of calling");
 
-   procedure Prf_Mult_Protect (Arg1  : Long_Integer;
-                               Arg2  : Long_Integer;
-                               Upper : Long_Integer) is null;
+   procedure Prf_Mult_Protect (Arg1  : Integer_Type;
+                               Arg2  : Integer_Type;
+                               Upper : Integer_Type) is null;
 
    ---------
    -- Get --
@@ -224,25 +225,25 @@ is
       return Get (Index).Boolean_Value;
    end Get_Boolean;
 
-   ---------------
-   -- Get_Float --
-   ---------------
+   --------------
+   -- Get_Real --
+   --------------
 
-   function Get_Float (Index : Index_Type := Null_Index) return Long_Float
+   function Get_Real (Index : Index_Type := Null_Index) return Real_Type
    is
    begin
       if Get_Kind (Index) = Kind_Integer
       then
-         return Long_Float (Get (Index).Integer_Value);
+         return Real_Type (Get (Index).Integer_Value);
       end if;
-      return Get (Index).Float_Value;
-   end Get_Float;
+      return Get (Index).Real_Value;
+   end Get_Real;
 
    -----------------
    -- Get_Integer --
    -----------------
 
-   function Get_Integer (Index : Index_Type := Null_Index) return Long_Integer
+   function Get_Integer (Index : Index_Type := Null_Index) return Integer_Type
    is
    begin
       return Get (Index).Integer_Value;
@@ -398,7 +399,7 @@ is
    -- To_Number --
    ---------------
 
-   function To_Number (Value : Character) return Long_Integer
+   function To_Number (Value : Character) return Integer_Type
       is (Character'Pos (Value) - Character'Pos ('0'))
    with
       Pre  => Value >= '0' and Value <= '9',
@@ -411,7 +412,7 @@ is
 
    procedure Parse_Fractional_Part
      (Match   : out Match_Type;
-      Result  : out Long_Float)
+      Result  : out Real_Type)
    with
        Pre =>
          Data'First < Integer'Last - Offset and
@@ -419,14 +420,14 @@ is
        Post =>
          (case Match is
             when Match_OK => Result >= 0.0 and Result < 1.0,
-            when others   => Offset =  Offset'Old);
+            when others   => Result = 0.0 and Offset = Offset'Old);
 
    procedure Parse_Fractional_Part
      (Match   :    out Match_Type;
-      Result  :    out Long_Float)
+      Result  :    out Real_Type)
    is
-      Divisor     : Long_Integer := 1;
-      Tmp         : Long_Integer := 0;
+      Divisor     : Integer_Type := 1;
+      Tmp         : Integer_Type := 0;
       Old_Offset  : constant Natural := Offset;
 
    begin
@@ -469,20 +470,21 @@ is
             exit;
          end if;
 
-         if Tmp >= Long_Integer'Last / 10
+         if Tmp >= Integer_Type'Last / 10
          then
             Match := Match_Invalid;
+            Offset := Old_Offset;
             return;
          end if;
 
          Prf_Mult_Protect (Arg1  => Tmp,
                            Arg2  => 10,
-                           Upper => Long_Integer'Last);
+                           Upper => Integer_Type'Last);
 
          Tmp := 10 * Tmp + To_Number (Data (Data'First + Offset));
          Offset := Offset + 1;
 
-         if Divisor >= Long_Integer'Last / 10
+         if Divisor >= Integer_Type'Last / 10
          then
             Match := Match_Invalid;
             Offset := Old_Offset;
@@ -495,8 +497,12 @@ is
          Match := Match_OK;
       end loop;
 
-      pragma Assert (Long_Float (Divisor) > Long_Float (Tmp));
-      Result := Long_Float (Tmp) / Long_Float (Divisor);
+      Result := Real_Type (Tmp) / Real_Type (Divisor);
+      if Result >= 1.0 then
+         Result := 0.0;
+         Match  := Match_Invalid;
+         Offset := Old_Offset;
+      end if;
 
    end Parse_Fractional_Part;
 
@@ -507,7 +513,7 @@ is
    procedure Parse_Integer
      (Check_Leading :        Boolean;
       Match         :    out Match_Type;
-      Result        :    out Long_Integer;
+      Result        :    out Integer_Type;
       Negative      :    out Boolean)
    with
       Post => Result >= 0;
@@ -515,7 +521,7 @@ is
    procedure Parse_Integer
      (Check_Leading :        Boolean;
       Match         :    out Match_Type;
-      Result        :    out Long_Integer;
+      Result        :    out Integer_Type;
       Negative      :    out Boolean)
    is
       Leading_Zero : Boolean := False;
@@ -575,7 +581,7 @@ is
 
          -- Check for overflow
          if Num_Matches >= Natural'Last or
-            Result >= Long_Integer'Last/10
+            Result >= Integer_Type'Last/10
          then
             Match := Match_Invalid;
             Offset := Old_Offset;
@@ -614,7 +620,7 @@ is
 
    procedure Parse_Exponent_Part
      (Match    :    out Match_Type;
-      Result   :    out Long_Integer;
+      Result   :    out Integer_Type;
       Negative :    out Boolean)
    with
        Post => (case Match is
@@ -624,10 +630,10 @@ is
 
    procedure Parse_Exponent_Part
      (Match    :    out Match_Type;
-      Result   :    out Long_Integer;
+      Result   :    out Integer_Type;
       Negative :    out Boolean)
    is
-      Scale            : Long_Integer;
+      Scale            : Integer_Type;
       Match_Exponent   : Match_Type;
       Integer_Negative : Boolean;
       Old_Offset       : constant Natural := Offset;
@@ -678,7 +684,7 @@ is
       loop
          pragma Loop_Invariant (Result > 0);
 
-         if Result > Long_Integer'Last / 10
+         if Result > Integer_Type'Last / 10
          then
             Offset := Old_Offset;
             return;
@@ -686,7 +692,7 @@ is
 
          Prf_Mult_Protect (Arg1  => Result,
                            Arg2  => 10,
-                           Upper => Long_Integer'Last);
+                           Upper => Integer_Type'Last);
          Result := Result * 10;
       end loop;
 
@@ -700,9 +706,9 @@ is
 
    procedure Parse_Number (Match : out Match_Type)
    is
-      Fractional_Component : Long_Float := 0.0;
-      Integer_Component    : Long_Integer;
-      Scale                : Long_Integer;
+      Fractional_Component : Real_Type := 0.0;
+      Integer_Component    : Integer_Type;
+      Scale                : Integer_Type;
 
       Match_Int      : Match_Type;
       Match_Frac     : Match_Type := Match_None;
@@ -747,28 +753,31 @@ is
          (Match_Exponent = Match_OK and then
           (Scale_Negative and Integer_Component mod Scale > 0))
       then
-         if Long_Float (Integer_Component) >= Long_Float'Last
+         if Real_Type (Integer_Component) >= Real_Type'Last
          then
             return;
          end if;
 
          declare
-            Tmp : Long_Float := Long_Float (Integer_Component) + Fractional_Component;
+            Tmp : Real_Type := Real_Type (Integer_Component) + Fractional_Component;
          begin
             if Match_Exponent = Match_OK
             then
-               pragma Assert (Scale >= 1);
                if Scale_Negative
                then
-                  Tmp := Tmp / Long_Float (Scale);
+                  Tmp := Tmp / Real_Type (Scale);
                else
-                  Tmp := Tmp * Long_Float (Scale);
+                  if Tmp >= Real_Type'Last / Real_Type (Scale)
+                  then
+                     return;
+                  end if;
+                  Tmp := Tmp * Real_Type (Scale);
                end if;
             end if;
             if Negative then
                Tmp := -Tmp;
             end if;
-            Set (Float_Element (Tmp));
+            Set (Real_Element (Tmp));
          end;
       else
          if Match_Exponent = Match_OK
@@ -777,13 +786,13 @@ is
             then
                Integer_Component := Integer_Component / Scale;
             else
-               if Integer_Component >= Long_Integer'Last / Scale
+               if Integer_Component >= Integer_Type'Last / Scale
                then
                   return;
                end if;
                Prf_Mult_Protect (Arg1  => Integer_Component,
                                  Arg2  => Scale,
-                                 Upper => Long_Integer'Last);
+                                 Upper => Integer_Type'Last);
                Integer_Component := Integer_Component * Scale;
             end if;
          end if;

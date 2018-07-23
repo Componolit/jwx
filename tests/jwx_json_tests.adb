@@ -256,8 +256,8 @@ package body JWX_JSON_Tests is
    begin
       Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
-		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (Get_Float = 123.45, "Invalid value: " & Get_Float'Img);
+		Assert (Get_Kind = Kind_Real, "Invalid kind: " & Get_Kind'Img);
+		Assert (Get_Real = 123.45, "Invalid value: " & Get_Real'Img);
 	end Test_Parse_Num_With_Neg_Exp_Frac;
 
    ---------------------------------------------------------------------------
@@ -333,7 +333,7 @@ package body JWX_JSON_Tests is
 
    ---------------------------------------------------------------------------
 
-   procedure Test_Parse_Small_Positive_Float (T : in out Test_Cases.Test_Case'Class)
+   procedure Test_Parse_Small_Positive_Real (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "3.14";
       package J is new JWX.JSON (Data);
@@ -342,13 +342,13 @@ package body JWX_JSON_Tests is
    begin
       Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
-		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (Get_Float = 3.14, "Invalid value: " & Get_Float'Img);
-	end Test_Parse_Small_Positive_Float;
+		Assert (Get_Kind = Kind_Real, "Invalid kind: " & Get_Kind'Img);
+		Assert (Get_Real = 3.14, "Invalid value: " & Get_Real'Img);
+	end Test_Parse_Small_Positive_Real;
 
    ---------------------------------------------------------------------------
 
-   procedure Test_Parse_Small_Negative_Float (T : in out Test_Cases.Test_Case'Class)
+   procedure Test_Parse_Small_Negative_Real (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "-3.14";
       package J is new JWX.JSON (Data);
@@ -357,13 +357,13 @@ package body JWX_JSON_Tests is
    begin
       Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
-		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (Get_Float = -3.14, "Invalid value: " & Get_Float'Img);
-	end Test_Parse_Small_Negative_Float;
+		Assert (Get_Kind = Kind_Real, "Invalid kind: " & Get_Kind'Img);
+		Assert (Get_Real = -3.14, "Invalid value: " & Get_Real'Img);
+	end Test_Parse_Small_Negative_Real;
 
    ---------------------------------------------------------------------------
 
-   procedure Test_Parse_Very_Small_Positive_Float (T : in out Test_Cases.Test_Case'Class)
+   procedure Test_Parse_Very_Small_Positive_Real (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "0.00000000001";
       package J is new JWX.JSON (Data);
@@ -372,13 +372,13 @@ package body JWX_JSON_Tests is
    begin
       Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
-		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (Get_Float = 0.00000000001, "Invalid value: " & Get_Float'Img);
-	end Test_Parse_Very_Small_Positive_Float;
+		Assert (Get_Kind = Kind_Real, "Invalid kind: " & Get_Kind'Img);
+		Assert (Get_Real = 0.00000000001, "Invalid value: " & Get_Real'Img);
+	end Test_Parse_Very_Small_Positive_Real;
 
    ---------------------------------------------------------------------------
 
-   procedure Test_Parse_Too_Small_Positive_Float (T : in out Test_Cases.Test_Case'Class)
+   procedure Test_Parse_Too_Small_Positive_Real (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "0.0000000000000000000000000000000001";
       package J is new JWX.JSON (Data);
@@ -387,11 +387,11 @@ package body JWX_JSON_Tests is
    begin
       Parse (Match);
 		Assert (Match = Match_Invalid, "Must fail: " & Match'Img);
-	end Test_Parse_Too_Small_Positive_Float;
+	end Test_Parse_Too_Small_Positive_Real;
 
    ---------------------------------------------------------------------------
 
-   procedure Test_Parse_Very_Small_Negative_Float (T : in out Test_Cases.Test_Case'Class)
+   procedure Test_Parse_Very_Small_Negative_Real (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "-0.00000000001";
       package J is new JWX.JSON (Data);
@@ -400,13 +400,13 @@ package body JWX_JSON_Tests is
    begin
       Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
-		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (Get_Float = -0.00000000001, "Invalid value: " & Get_Float'Img);
-	end Test_Parse_Very_Small_Negative_Float;
+		Assert (Get_Kind = Kind_Real, "Invalid kind: " & Get_Kind'Img);
+		Assert (Get_Real = -0.00000000001, "Invalid value: " & Get_Real'Img);
+	end Test_Parse_Very_Small_Negative_Real;
 
    ---------------------------------------------------------------------------
 
-   procedure Test_Parse_Too_Small_Negative_Float (T : in out Test_Cases.Test_Case'Class)
+   procedure Test_Parse_Too_Small_Negative_Real (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "-0.0000000000000000000000000000000001";
       package J is new JWX.JSON (Data);
@@ -415,11 +415,11 @@ package body JWX_JSON_Tests is
    begin
       Parse (Match);
 		Assert (Match = Match_Invalid, "Must fail: " & Match'Img);
-	end Test_Parse_Too_Small_Negative_Float;
+	end Test_Parse_Too_Small_Negative_Real;
 
    ---------------------------------------------------------------------------
 
-   procedure Test_Parse_Zero_Float (T : in out Test_Cases.Test_Case'Class)
+   procedure Test_Parse_Zero_Real (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := " 0.0 ";
       package J is new JWX.JSON (Data);
@@ -428,13 +428,13 @@ package body JWX_JSON_Tests is
    begin
       Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
-		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (Get_Float = 0.0, "Invalid value: " & Get_Float'Img);
-	end Test_Parse_Zero_Float;
+		Assert (Get_Kind = Kind_Real, "Invalid kind: " & Get_Kind'Img);
+		Assert (Get_Real = 0.0, "Invalid value: " & Get_Real'Img);
+	end Test_Parse_Zero_Real;
 
    ---------------------------------------------------------------------------
 
-   procedure Test_Parse_Float_With_Exp_With_Leading_Zero (T : in out Test_Cases.Test_Case'Class)
+   procedure Test_Parse_Real_With_Exp_With_Leading_Zero (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "123.5e+02";
       package J is new JWX.JSON (Data);
@@ -443,9 +443,9 @@ package body JWX_JSON_Tests is
    begin
       Parse (Match);
 		Assert (Match = Match_OK, "No match: " & Match'Img);
-		Assert (Get_Kind = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (Get_Float = 12350.0, "Invalid value: " & Get_Float'Img);
-	end Test_Parse_Float_With_Exp_With_Leading_Zero;
+		Assert (Get_Kind = Kind_Real, "Invalid kind: " & Get_Kind'Img);
+		Assert (Get_Real = 12350.0, "Invalid value: " & Get_Real'Img);
+	end Test_Parse_Real_With_Exp_With_Leading_Zero;
 
    ---------------------------------------------------------------------------
 
@@ -462,7 +462,7 @@ package body JWX_JSON_Tests is
 
    ---------------------------------------------------------------------------
 
-   procedure Test_Leading_Zero_Float (T : in out Test_Cases.Test_Case'Class)
+   procedure Test_Leading_Zero_Real (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "000.06854";
       package J is new JWX.JSON (Data);
@@ -471,7 +471,7 @@ package body JWX_JSON_Tests is
    begin
       Parse (Match);
 		Assert (Match = Match_Invalid, "Must fail: " & Match'Img);
-	end Test_Leading_Zero_Float;
+	end Test_Leading_Zero_Real;
 
    ---------------------------------------------------------------------------
 
@@ -580,12 +580,12 @@ package body JWX_JSON_Tests is
 		Assert (Get_String (Result) = "zip", "Invalid string: " & Get_String (Result));
 
       Result := Query_Object ("Latitude");
-		Assert (Get_Kind (Result) = Kind_Float, "Invalid kind: " & Get_Kind (Result)'Img);
-		Assert (Get_Float (Result) = 37.7668, "Invalid float: " & Get_Float (Result)'Img);
+		Assert (Get_Kind (Result) = Kind_Real, "Invalid kind: " & Get_Kind (Result)'Img);
+		Assert (Get_Real (Result) = 37.7668, "Invalid real: " & Get_Real (Result)'Img);
 
       Result := Query_Object ("Longitude");
-		Assert (Get_Kind (Result) = Kind_Float, "Invalid kind: " & Get_Kind (Result)'Img);
-		Assert (Get_Float (Result) = -122.3959, "Invalid float: " & Get_Float (Result)'Img);
+		Assert (Get_Kind (Result) = Kind_Real, "Invalid kind: " & Get_Kind (Result)'Img);
+		Assert (Get_Real (Result) = -122.3959, "Invalid real: " & Get_Real (Result)'Img);
 
       Result := Query_Object ("Address");
 		Assert (Get_Kind (Result) = Kind_String, "Invalid kind: " & Get_Kind (Result)'Img);
@@ -698,8 +698,8 @@ package body JWX_JSON_Tests is
 		Assert (Get_Integer (Result) = 116, "Invalid value: " & Get_Integer (Result)'Img);
 
       Result := Pos (2);
-      Assert (Get_Kind (Result) = Kind_Float, "Invalid kind: " & Get_Kind (Result)'Img);
-		Assert (Get_Float (Result) = -4.5, "Invalid value: " & Get_Float (Result)'Img);
+      Assert (Get_Kind (Result) = Kind_Real, "Invalid kind: " & Get_Kind (Result)'Img);
+		Assert (Get_Real (Result) = -4.5, "Invalid value: " & Get_Real (Result)'Img);
 
       Result := Pos (3);
       Assert (Get_Kind (Result) = Kind_String, "Invalid kind: " & Get_Kind (Result)'Img);
@@ -787,8 +787,8 @@ package body JWX_JSON_Tests is
 		Assert (Elements = 20, "Invalid number of elements: " & Elements'Img);
 
       Result := Query_Object ("area");
-		Assert (Get_Kind (Result) = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (abs (Get_Float (Result) - 1246700.0) < Float'Epsilon, "Invalid value: " & Get_Float (Result)'Img);
+		Assert (Get_Kind (Result) = Kind_Real, "Invalid kind: " & Get_Kind'Img);
+		Assert (Get_Real (Result) /= 1246700.0, "Invalid value: " & Get_Real (Result)'Img);
 	end Test_Complex_Country;
 
    ---------------------------------------------------------------------------
@@ -810,8 +810,8 @@ package body JWX_JSON_Tests is
 		Assert (Elements (Result) = 1, "Invalid number of elements: " & Elements (Result)'Img);
 
       Result := Query_Object ("area", Result);
-		Assert (Get_Kind (Result) = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (Get_Float (Result) = 123.0, "Invalid value: " & Get_Float (Result)'Img);
+		Assert (Get_Kind (Result) = Kind_Real, "Invalid kind: " & Get_Kind'Img);
+		Assert (Get_Real (Result) = 123.0, "Invalid value: " & Get_Real (Result)'Img);
 	end Test_Mixed_Objects;
 
    ---------------------------------------------------------------------------
@@ -835,8 +835,8 @@ package body JWX_JSON_Tests is
 
       Result := Query_Object ("area", Result);
 		Assert (Result /= Null_Index, "Element not found");
-		Assert (Get_Kind (Result) = Kind_Float, "Invalid kind: " & Get_Kind'Img);
-		Assert (abs (Get_Float (Result) - 1246700.0) < Float'Epsilon, "Invalid value: " & Get_Float (Result)'Img);
+		Assert (Get_Kind (Result) = Kind_Real, "Invalid kind: " & Get_Kind'Img);
+		Assert (Get_Real (Result) /= 1246700.0, "Invalid value: " & Get_Real (Result)'Img);
 	end Test_Complex_Two_Countries;
 
    ---------------------------------------------------------------------------
@@ -935,16 +935,16 @@ package body JWX_JSON_Tests is
       Register_Routine (T, Test_Parse_Big_Negative_Integer'Access, "Parse big negative integer");
       Register_Routine (T, Test_Parse_Too_Big_Integer'Access, "Too big integer");
       Register_Routine (T, Test_Parse_Too_Small_Integer 'Access, "Too small integer");
-      Register_Routine (T, Test_Parse_Small_Positive_Float'Access, "Parse small positive float");
-      Register_Routine (T, Test_Parse_Small_Negative_Float 'Access, "Parse small negative float");
-      Register_Routine (T, Test_Parse_Very_Small_Positive_Float'Access, "Parse very small positive float");
-      Register_Routine (T, Test_Parse_Too_Small_Positive_Float'Access, "Too small positive float");
-      Register_Routine (T, Test_Parse_Very_Small_Negative_Float'Access, "Parse very small negative float");
-      Register_Routine (T, Test_Parse_Too_Small_Negative_Float'Access, "Too small negative float");
-      Register_Routine (T, Test_Parse_Zero_Float'Access, "Parse zero float");
-      Register_Routine (T, Test_Parse_Float_With_Exp_With_Leading_Zero'Access, "Parse float with exponent with leading zero");
+      Register_Routine (T, Test_Parse_Small_Positive_Real'Access, "Parse small positive real");
+      Register_Routine (T, Test_Parse_Small_Negative_Real 'Access, "Parse small negative real");
+      Register_Routine (T, Test_Parse_Very_Small_Positive_Real'Access, "Parse very small positive real");
+      Register_Routine (T, Test_Parse_Too_Small_Positive_Real'Access, "Too small positive real");
+      Register_Routine (T, Test_Parse_Very_Small_Negative_Real'Access, "Parse very small negative real");
+      Register_Routine (T, Test_Parse_Too_Small_Negative_Real'Access, "Too small negative real");
+      Register_Routine (T, Test_Parse_Zero_Real'Access, "Parse zero real");
+      Register_Routine (T, Test_Parse_Real_With_Exp_With_Leading_Zero'Access, "Parse real with exponent with leading zero");
       Register_Routine (T, Test_Leading_Zero_Integer'Access, "Integer with leading zero");
-      Register_Routine (T, Test_Leading_Zero_Float 'Access, "Float with leading zero");
+      Register_Routine (T, Test_Leading_Zero_Real 'Access, "Real with leading zero");
       Register_Routine (T, Test_Missing_Fractional_Part 'Access, "Missing fractional part");
       Register_Routine (T, Test_Simple_String'Access, "Parse simple string");
       Register_Routine (T, Test_Unclosed_String'Access, "Unclosed string");
