@@ -29,7 +29,7 @@ is
    type Kind_Type is (Kind_Invalid,
                       Kind_Null,
                       Kind_Boolean,
-                      Kind_Float,
+                      Kind_Real,
                       Kind_Integer,
                       Kind_String,
                       Kind_Object,
@@ -66,14 +66,14 @@ is
    with
       Pre => Get_Kind (Index) = Kind_Boolean;
 
-   -- Return value of float context element
-   function Get_Float (Index : Index_Type := Null_Index) return Long_Float
+   -- Return value of real context element
+   function Get_Real (Index : Index_Type := Null_Index) return Real_Type
    with
-      Pre => Get_Kind (Index) = Kind_Float or
+      Pre => Get_Kind (Index) = Kind_Real or
              Get_Kind (Index) = Kind_Integer;
 
    -- Return value of integer context element
-   function Get_Integer (Index : Index_Type := Null_Index) return Long_Integer
+   function Get_Integer (Index : Index_Type := Null_Index) return Integer_Type
    with
       Pre => Get_Kind (Index) = Kind_Integer;
 

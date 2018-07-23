@@ -105,7 +105,7 @@ is
                return;
             end if;
 
-            if Get_Integer (Value) < Now
+            if Long_Integer (Get_Integer (Value)) < Now
             then
                return;
             end if;
