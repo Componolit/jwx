@@ -119,8 +119,7 @@ is
             ((Encoded'Length > 0
           and Encoded'Length < Natural'Last / 9
           and Encoded'Last < Natural'Last - 4
-          and Result'Length >= 3 * ((Encoded'Length + 3) / 4)
-          and Result'Length >= 9 * Encoded'Length / 12 - 3))
+          and Result'Length >= 3 * ((Encoded'Length + 3) / 4)))
           and then Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3;
 
    procedure Decode_Gen
