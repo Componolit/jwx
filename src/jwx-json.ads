@@ -12,12 +12,12 @@
 generic
 
    Input_Data   : String;
-   Context_Size : Natural := Input_Data'Length/3 + 2;
+   Context_Size : Natural := Input_Data'Length / 3 + 2;
 
 package JWX.JSON
    with
       Abstract_State => State,
-      Initializes    => (State, Data)
+      Initializes    => (State, Data, CS, Null_Index, End_Index)
 is
 
 
@@ -40,7 +40,8 @@ is
                        Match_Invalid,
                        Match_Out_Of_Memory);
 
-   type Index_Type is new Natural range 1 .. Context_Size;
+   CS : constant Natural := Context_Size;
+   type Index_Type is new Natural range 1 .. CS;
    Null_Index : constant Index_Type := Index_Type'First;
    End_Index  : constant Index_Type := Index_Type'Last;
 
@@ -58,7 +59,7 @@ is
    -- Return kind of current element of a context
    function Get_Kind (Index : Index_Type := Null_Index) return Kind_Type
    with
-      Global => (Input => State),
+      Global => (Input => (State)),
       Post   => Has_Kind (Index, Get_Kind'Result);
 
    -- Return value of a boolean context element

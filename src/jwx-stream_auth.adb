@@ -22,7 +22,7 @@ is
    is
       First : Natural := Buf'Last;
       Last  : Natural := Buf'First;
-      Auth  : Auth_Result_Type := Auth_Noent;
+      Found : Boolean := False;
    begin
       -- At least space for 'id_token=' must be available
       if Buf'Length < 10
@@ -36,25 +36,43 @@ is
          if Buf (I .. I + 8) = "id_token="
          then
             First := I + 9;
-         end if;
-      end loop;
-
-      -- Search end of ID token (next ampersand)
-      for I in First .. Buf'Last
-      loop
-         if Buf (I) = '&' or
-            Buf (I) = ' '
-         then
-            Last := I - 1;
-            Auth := Auth_Fail;
+            Found := True;
+            pragma Assert (First >= Buf'First);
             exit;
          end if;
       end loop;
 
-      if Auth = Auth_Noent
+      if not Found or
+         not (First in Buf'Range)
       then
          return Auth_Noent;
       end if;
+
+      -- Search end of ID token (next ampersand)
+      Found := False;
+      for I in First .. Buf'Last
+      loop
+         pragma Loop_Invariant (First >= Buf'First);
+         pragma Loop_Invariant (I <= Buf'Last);
+         if Buf (I) = '&' or
+            Buf (I) = ' '
+         then
+            Last  := I - 1;
+            Found := True;
+            exit;
+         end if;
+      end loop;
+
+      if not Found or
+         not (Last in Buf'Range) or
+         not (First <= Last)
+      then
+         return Auth_Noent;
+      end if;
+
+      pragma Assert (First <= Last);
+      pragma Assert (First >= Buf'First);
+      pragma Assert (Last <= Buf'Last);
 
       declare
          B : constant String := Buf (First .. Last);

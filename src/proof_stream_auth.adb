@@ -21,7 +21,7 @@ is
                             Issuer    => "Invalid");
       use HA;
    begin
-      OK := Authenticated ("Message", 12345678) = Auth_OK;
+      OK := Authenticated ("Invalid Message", 12345678) = Auth_OK;
    end Test;
 
 end Proof_Stream_Auth;

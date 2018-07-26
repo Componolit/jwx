@@ -18,6 +18,9 @@ is
    type Auth_Result_Type is (Auth_OK, Auth_Noent, Auth_Fail, Auth_Invalid);
 
    function Authenticated (Buf : String;
-                           Now : Long_Integer) return Auth_Result_Type;
+                           Now : Long_Integer) return Auth_Result_Type
+     with
+       Pre => Buf'Last < Natural'Last - 9 and
+              Buf'Length > 9;
 
 end JWX.Stream_Auth;

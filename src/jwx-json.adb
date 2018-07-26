@@ -379,7 +379,8 @@ is
 
    function Match_Set (Set : String) return Boolean
    with
-      Post => (if Match_Set'Result then (for some E of Set => E = Data (Data'First + Offset)));
+      Global => (Input => (Data, Offset)),
+      Post   => (if Match_Set'Result then (for some E of Set => E = Data (Data'First + Offset)));
 
    function Match_Set (Set : String) return Boolean
    is
@@ -813,7 +814,8 @@ is
 
    procedure Parse_String (Match : out Match_Type)
    with
-      Global => (In_Out => (Context,
+      Global => (Input  => (Data, CS),
+                 In_Out => (Context,
                             Context_Index,
                             Offset));
 
