@@ -16,7 +16,7 @@ use type LSC.SHA256.Message_Index;
 
 package JWX.LSC
 with
-   SPARK_Mode => On
+   SPARK_Mode
 is
    package SC renames Standard.LSC;
 

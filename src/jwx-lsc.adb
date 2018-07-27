@@ -13,7 +13,7 @@ with JWX;
 
 package body JWX.LSC
 with
-   SPARK_Mode => On
+   SPARK_Mode
 is
    ----------------------------------------
    -- JWX_Byte_Array_To_LSC_Word32_Array --

@@ -20,6 +20,8 @@ is
 
    package Token is new JWX.JWSCS (Data);
 
+   function Valid return Boolean is (Token.Valid);
+
    ----------------------
    -- Validate_Compact --
    ----------------------
@@ -36,9 +38,9 @@ is
 
       declare
          Valid           : Boolean;
-         Jose_Data       : constant String := Token.Jose_Data;
-         Signature_Input : constant String := Token.Signature_Input;
-         Signature       : constant String := Token.Signature;
+         Jose_Data       : constant JWX.Data_Type := Token.Jose_Data;
+         Signature_Input : constant JWX.Data_Type := Token.Signature_Input;
+         Signature       : constant JWX.Data_Type := Token.Signature;
 
          package J is new JWX.JOSE (Jose_Data);
          package L is new JWX.Crypto (Payload => Signature_Input,

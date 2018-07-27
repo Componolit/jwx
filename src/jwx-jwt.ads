@@ -10,13 +10,14 @@
 --
 
 generic
-   Data     : String;
-   Key_Data : String;
-   Audience : String;
-   Issuer   : String;
+   Data     : JWX.Data_Type;
+   Key_Data : JWX.Data_Type;
+   Audience : JWX.Data_Type;
+   Issuer   : JWX.Data_Type;
    Now      : Long_Integer;
 package JWX.JWT
 is
+
    type Result_Type is (Result_Invalid,
                         Result_Invalid_Key,
                         Result_OK,
@@ -27,8 +28,7 @@ is
                         Result_Invalid_Issuer,
                         Result_Expired);
 
-   procedure Validate_Compact (Result : out Result_Type)
-   with
-      Pre => Key_Data'First <= Key_Data'Last;
+   -- Return result
+   function Result return Result_Type;
 
 end JWX.JWT;

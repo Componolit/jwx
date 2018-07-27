@@ -12,20 +12,24 @@
 package JWX
 is
    type UInt6 is mod 2**6
-      with Size => 6;
+   with Size => 6;
 
    type Byte is mod 2**8
-      with Size => 8;
+   with Size => 8;
 
    type Integer_Type is range -2**46 .. 2**46 - 1;
 
-   type Real_Type is delta 0.00001 range Long_Float (Integer_Type'First) .. Long_Float (Integer_Type'Last)
-      with Size => 64;
+   type Real_Type is delta 0.00001 range
+     Long_Float (Integer_Type'First) .. Long_Float (Integer_Type'Last)
+   with Size => 64;
 
    subtype Array_Index is Natural range Natural'First .. Natural'Last - 1;
 
    type Byte_Array is array (Array_Index range <>) of Byte
-      with Pack;
+   with Pack;
+
+   subtype Data_Index is Positive range 1 .. Natural'Last / 9 - 1;
+   subtype Data_Type is String;
 
    type Alg_Type is (Alg_Invalid,
                      Alg_None,

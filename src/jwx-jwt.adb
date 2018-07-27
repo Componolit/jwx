@@ -16,6 +16,12 @@ with JWX.Util;
 
 package body JWX.JWT
 is
+   State : Result_Type;
+
+   procedure Validate_Compact (Result : out Result_Type)
+   with
+      Pre => Key_Data'First <= Key_Data'Last;
+
    procedure Validate_Compact (Result : out Result_Type)
    is
       package J is new JWX.JWS (Data     => Data,
@@ -93,7 +99,7 @@ is
                -- Check issuer
                Result := Result_Invalid_Issuer;
                Value := Query_Object ("iss");
-               if Value = End_Index
+               if Value = Token.End_Index
                then
                   return;
                end if;
@@ -107,7 +113,7 @@ is
                -- Check audience
                Result := Result_Invalid_Audience;
                Value := Query_Object ("aud");
-               if Value = End_Index
+               if Value = Token.End_Index
                then
                   return;
                end if;
@@ -121,7 +127,7 @@ is
                -- Check expiration
                Result := Result_Expired;
                Value := Query_Object ("exp");
-               if Value = End_Index
+               if Value = Token.End_Index
                then
                   return;
                end if;
@@ -140,4 +146,16 @@ is
 
    end Validate_Compact;
 
+   ------------
+   -- Result --
+   ------------
+
+   function Result return Result_Type
+   is
+   begin
+      return State;
+   end Result;
+
+begin
+   Validate_Compact (State);
 end JWX.JWT;
