@@ -32,9 +32,7 @@ package body JWX_JWT_Tests is
                                 Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
                                 Now      => 1528404620);
       use J;
-      Result : Result_Type;
    begin
-      Validate_Compact (Result => Result);
       Assert (Result = Result_OK, "Validation failed: " & Result'Img);
    end Test_Validate_JWT;
 
@@ -56,9 +54,7 @@ package body JWX_JWT_Tests is
                                 Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
                                 Now      => 1528404620);
       use J;
-      Result : Result_Type;
    begin
-      Validate_Compact (Result => Result);
       Assert (Result = Result_Invalid_Audience, "Invalid audience expected: " & Result'Img);
    end Test_JWT_Invalid_Audience;
 
@@ -80,9 +76,7 @@ package body JWX_JWT_Tests is
                                 Issuer   => "https://invalid.eu.auth0.com/",
                                 Now      => 1528404620);
       use J;
-      Result : Result_Type;
    begin
-      Validate_Compact (Result => Result);
       Assert (Result = Result_Invalid_Issuer, "Invalid issuer expected: " & Result'Img);
    end Test_JWT_Invalid_Issuer;
 
@@ -104,9 +98,7 @@ package body JWX_JWT_Tests is
                                 Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
                                 Now      => 1528408620);
       use J;
-      Result : Result_Type;
    begin
-      Validate_Compact (Result => Result);
       Assert (Result = Result_Expired, "Expiry not detected: " & Result'Img);
    end Test_JWT_Expired;
 

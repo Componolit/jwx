@@ -16,6 +16,8 @@ is
    procedure Do_Parse (Data  :     String;
                        Match : out Boolean)
    with
-      Pre => Data'First <= Data'Last;
+       Pre => Data'First >= 0 and
+              Data'Last < Natural'Last and
+              Data'First <= Data'Last;
 
 end Proof_JSON;

@@ -10,8 +10,8 @@
 --
 
 package body JWX.Util
-   with
-      SPARK_Mode
+with
+   SPARK_Mode
 is
    -------------------
    -- To_Byte_Array --

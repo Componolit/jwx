@@ -15,7 +15,6 @@ with JWX.Util;
 
 package body JWX.JOSE
 is
-   JOSE_Data   : JWX.Byte_Array (1 .. 3 * ((Data'Length + 3) / 4));
    JOSE_Valid  : Boolean      := False;
    Alg         : JWX.Alg_Type := JWX.Alg_Invalid;
 
@@ -32,44 +31,59 @@ is
    procedure Decode
    is
       use JWX.Base64;
-      JOSE_Length : Natural;
-      JOSE_Text   : String (1 .. JOSE_Data'Length);
    begin
-      -- Decode JOSE header
-      Decode_Url (Encoded => Data,
-                  Length  => JOSE_Length,
-                  Result  => JOSE_Data);
-      if JOSE_Length = 0
+
+      if Data'Length <= 0 or
+        Data'Length >= Natural'Last / 9 or
+        Data'Last >= Natural'Last - 4
       then
          return;
       end if;
 
-      -- Parse JOSE header
-      Util.To_String (Data   => JOSE_Data (JOSE_Data'First .. JOSE_Data'First + JOSE_Length - 1),
-                      Result => JOSE_Text);
-
       declare
-         JT : constant String := JOSE_Text;
-         package J is new JWX.JSON (JT);
-         Match_JOSE : J.Match_Type;
-         JOSE_Alg   : J.Index_Type;
-         use type J.Match_Type;
-         use type J.Index_Type;
+         JOSE_Data : JWX.Byte_Array (1 .. 3 * ((Data'Length + 3) / 4));
+         JOSE_Text   : String (1 .. JOSE_Data'Length + 2);
+         JOSE_Length : Natural;
       begin
-         J.Parse (Match_JOSE);
-         if Match_JOSE /= J.Match_OK
+         -- Decode JOSE header
+         Decode_Url (Encoded => Data,
+                     Length  => JOSE_Length,
+                     Result  => JOSE_Data);
+         if JOSE_Length = 0
          then
             return;
          end if;
 
-         JOSE_Alg := J.Query_Object ("alg");
-         if JOSE_Alg = J.End_Index
-         then
-            return;
-         end if;
+         -- Parse JOSE header
+         Util.To_String (Data   => JOSE_Data (JOSE_Data'First .. JOSE_Data'First + JOSE_Length - 1),
+                         Result => JOSE_Text);
 
-         Alg := Algorithm (J.Get_String (JOSE_Alg));
-         JOSE_Valid := True;
+         declare
+            JT : constant String := JOSE_Text;
+            package J is new JWX.JSON (JT);
+            use J;
+            Match_JOSE : Match_Type;
+            JOSE_Alg   : Index_Type;
+            use type Match_Type;
+            use type Index_Type;
+         begin
+            Parse (Match_JOSE);
+            if Match_JOSE /= Match_OK or else
+              Get_Kind /= Kind_Object
+            then
+               return;
+            end if;
+
+            JOSE_Alg := Query_Object ("alg");
+            if JOSE_Alg = End_Index or else
+              Get_Kind (JOSE_Alg) /= Kind_String
+            then
+               return;
+            end if;
+
+            Alg := Algorithm (Get_String (JOSE_Alg));
+            JOSE_Valid := True;
+         end;
       end;
 
    end Decode;

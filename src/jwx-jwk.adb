@@ -13,22 +13,22 @@ with JWX.JSON;
 with JWX.Base64;
 
 package body JWX.JWK
-   with
-      Refined_State => (State => (Key_Data.State,
-                                  Key_Loaded,
-                                  Key_Index,
-                                  Key_Array,
-                                  Key_Kind,
-                                  Key_ID,
-                                  Key_Curve,
-                                  Key_X,
-                                  Key_Y,
-                                  Key_D,
-                                  Key_N,
-                                  Key_E,
-                                  Key_K,
-                                  Key_Use,
-                                  Key_Alg))
+with
+   Refined_State => (State => (Key_Data.State,
+                               Key_Loaded,
+                               Key_Index,
+                               Key_Array,
+                               Key_Kind,
+                               Key_ID,
+                               Key_Curve,
+                               Key_X,
+                               Key_Y,
+                               Key_D,
+                               Key_N,
+                               Key_E,
+                               Key_K,
+                               Key_Use,
+                               Key_Alg))
 is
 
    package Key_Data is new JSON (Data);
@@ -56,8 +56,9 @@ is
    procedure Valid_EC (Valid : out Boolean)
    with
       Pre  => Key_Kind = Kind_EC,
-      Post => Get_Kind (Key_X) = Kind_String and
-              Get_Kind (Key_Y) = Kind_String;
+       Post => (if Valid then
+                  Get_Kind (Key_X) = Kind_String and
+                  Get_Kind (Key_Y) = Kind_String);
 
    procedure Valid_EC (Valid : out Boolean)
    is
@@ -110,6 +111,11 @@ is
 
       --  Check for 'd' (optional)
       Key_D := Query_Object ("d", Key_Index);
+      if Key_D /= End_Index and then
+        Get_Kind (Key_D) /= Kind_String
+      then
+         return;
+      end if;
 
       case Key_Curve is
          when Curve_P256 =>
@@ -144,8 +150,9 @@ is
    procedure Valid_RSA (Valid : out Boolean)
    with
       Pre  => Key_Kind = Kind_RSA,
-      Post => Get_Kind (Key_N) = Kind_String and
-              Get_Kind (Key_E) = Kind_String;
+      Post => (if Valid then
+                  Get_Kind (Key_N) = Kind_String and
+                  Get_Kind (Key_E) = Kind_String);
 
    procedure Valid_RSA (Valid : out Boolean)
    is
@@ -159,18 +166,27 @@ is
 
       --  Check for 'n'
       Key_N := Query_Object ("n", Key_Index);
-      if Key_N = End_Index then
+      if Key_N = End_Index or else
+        Get_Kind (Key_N) /= Kind_String
+      then
          return;
       end if;
 
       --  Check for 'e'
       Key_E := Query_Object ("e", Key_Index);
-      if Key_E = End_Index then
+      if Key_E = End_Index or else
+        Get_Kind (Key_E) /= Kind_String
+      then
          return;
       end if;
 
       --  Check for 'd' (optional)
       Key_D := Query_Object ("d", Key_Index);
+      if Key_E /= End_Index and then
+        Get_Kind (Key_D) /= Kind_String
+      then
+         return;
+      end if;
 
       Valid := True;
    end Valid_RSA;
@@ -182,7 +198,7 @@ is
    procedure Valid_Oct (Valid : out Boolean)
    with
       Pre  => Key_Kind = Kind_OCT,
-      Post => Get_Kind (Key_K) = Kind_String;
+      Post => (if Valid then Get_Kind (Key_K) = Kind_String);
 
    procedure Valid_Oct (Valid : out Boolean)
    is
@@ -196,7 +212,9 @@ is
 
      --  Check for 'k'
       Key_K := Query_Object ("k", Key_Index);
-      if Key_K = End_Index then
+      if Key_K = End_Index or else
+        Get_Kind (Key_K) /= Kind_String
+      then
          return;
       end if;
 
@@ -209,9 +227,17 @@ is
 
    function Key_Valid return Boolean is
       (case Key_Kind is
-          when Kind_EC      => Get_Kind (Key_X) = Kind_String and Get_Kind (Key_Y) = Kind_String,
-          when Kind_RSA     => Get_Kind (Key_N) = Kind_String and Get_Kind (Key_E) = Kind_String,
-          when Kind_Oct     => Get_Kind (Key_K) = Kind_String,
+          when Kind_EC      => Get_Kind (Key_ID) = Kind_String and
+                               Get_Kind (Key_X)  = Kind_String and
+                               Get_Kind (Key_Y)  = Kind_String,
+
+          when Kind_RSA     => Get_Kind (Key_ID) = Kind_String and
+                               Get_Kind (Key_N)  = Kind_String and
+                               Get_Kind (Key_E)  = Kind_String,
+
+          when Kind_Oct     => Get_Kind (Key_ID) = Kind_String and
+                               Get_Kind (Key_K)  = Kind_String,
+
           when Kind_Invalid => False);
 
    ------------
@@ -236,6 +262,37 @@ is
       return Get_String (Key_ID);
    end ID;
 
+   ------------------
+   -- Decode_Field --
+   ------------------
+
+   procedure Decode_Field (Encoded :     String;
+                           Length  : out Natural;
+                           Result  : out JWX.Byte_Array)
+   with
+      Post => Length <= Result'Length;
+
+   procedure Decode_Field (Encoded :     String;
+                           Length  : out Natural;
+                           Result  : out JWX.Byte_Array)
+   is
+   begin
+      if (Encoded'Length <= 0 or
+          Encoded'Length >= Natural'Last / 9 or
+          Encoded'Last >= Natural'Last - 4 or
+          Result'Length < 3 * ((Encoded'Length + 3) / 4)) or else
+          Result'First >= Natural'Last - 9 * Encoded'Length / 12 - 3
+      then
+         Length := 0;
+         Result := (Result'Range => 0);
+         return;
+      end if;
+
+      Base64.Decode_Url (Encoded => Encoded,
+                         Length  => Length,
+                         Result  => Result);
+   end Decode_Field;
+
    -------
    -- X --
    -------
@@ -245,9 +302,9 @@ is
    is
       use JWX;
    begin
-      Base64.Decode_Url (Encoded => Get_String (Key_X),
-                         Length  => Length,
-                         Result  => Value);
+      Decode_Field (Encoded => Get_String (Key_X),
+                    Length  => Length,
+                    Result  => Value);
    end X;
 
    -------
@@ -259,9 +316,9 @@ is
    is
       use JWX;
    begin
-      Base64.Decode_Url (Encoded => Get_String (Key_Y),
-                         Length  => Length,
-                         Result  => Value);
+      Decode_Field (Encoded => Get_String (Key_Y),
+                    Length  => Length,
+                    Result  => Value);
    end Y;
 
    -------
@@ -273,9 +330,9 @@ is
    is
       use JWX;
    begin
-      Base64.Decode_Url (Encoded => Get_String (Key_N),
-                         Length  => Length,
-                         Result  => Value);
+      Decode_Field (Encoded => Get_String (Key_N),
+                    Length  => Length,
+                    Result  => Value);
    end N;
 
    -------
@@ -287,9 +344,9 @@ is
    is
       use JWX;
    begin
-      Base64.Decode_Url (Encoded => Get_String (Key_E),
-                         Length  => Length,
-                         Result  => Value);
+      Decode_Field (Encoded => Get_String (Key_E),
+                    Length  => Length,
+                    Result  => Value);
    end E;
 
    -------
@@ -301,9 +358,17 @@ is
    is
       use JWX;
    begin
-      Base64.Decode_Url (Encoded => Get_String (Key_D),
-                         Length  => Length,
-                         Result  => Value);
+      if Key_D /= End_Index or else
+         Get_Kind (Key_D) /= Kind_String
+      then
+         Value  := (Value'Range => 0);
+         Length := 0;
+         return;
+      end if;
+
+      Decode_Field (Encoded => Get_String (Key_D),
+                    Length  => Length,
+                    Result  => Value);
    end D;
 
    -------
@@ -315,9 +380,9 @@ is
    is
       use JWX;
    begin
-      Base64.Decode_Url (Encoded => Get_String (Key_K),
-                         Length  => Length,
-                         Result  => Value);
+      Decode_Field (Encoded => Get_String (Key_K),
+                    Length  => Length,
+                    Result  => Value);
    end K;
 
    -----------------
@@ -405,6 +470,11 @@ is
       then
          return 1;
       else
+         if Key_Array /= End_Index or else
+           Get_Kind (Key_Array) /= Kind_Array
+         then
+            return 0;
+         end if;
          return Length (Key_Array);
       end if;
    end Num_Keys;
@@ -416,7 +486,7 @@ is
    procedure Select_Key (Valid : out Boolean;
                          Index :     Positive := 1)
    is
-      Kty   : Index_Type;
+      Kty : Index_Type;
    begin
       Valid := False;
 
@@ -430,13 +500,17 @@ is
       Key_Array := Query_Object ("keys");
       if Key_Array = End_Index
       then
-         --  There is only on key - using anything but 1 here is invalid
+         --  There is only one key - using anything but 1 here is invalid
          if Index /= 1
          then
             return;
          end if;
          Key_Index := Null_Index;
       else
+         if Get_Kind (Key_Array) /= Kind_Array
+         then
+            return;
+         end if;
          Key_Index := Pos (Index, Key_Array);
          if Key_Index = End_Index
          then
@@ -452,6 +526,10 @@ is
 
       --  Retrieve key id 'kid'
       Key_ID := Query_Object ("kid", Key_Index);
+      if Get_Kind (Key_ID) /= Kind_String
+      then
+         return;
+      end if;
 
       --  Retrieve key type 'kty'
       Kty := Query_Object ("kty", Key_Index);

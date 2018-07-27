@@ -12,8 +12,8 @@
 with JWX;
 
 package JWX.Util
-   with
-      SPARK_Mode
+with
+   SPARK_Mode
 is
    procedure To_Byte_Array
       (Data   :     String;

@@ -10,7 +10,7 @@
 --
 
 generic
-   Data : String;
+   Data : JWX.Data_Type;
 package JWX.JWSCS
 is
    -- Is the token valid
@@ -22,22 +22,22 @@ is
       Pre => Valid;
 
    -- Raw data of JOSE header
-   function JOSE_Data return String
+   function JOSE_Data return JWX.Data_Type
    with
       Pre => Valid;
 
    -- Encoded payload
-   function Payload return String
+   function Payload return JWX.Data_Type
    with
       Pre => Valid;
 
    -- Encoded signature input (JOSE header + '.' + payload)
-   function Signature_Input return String
+   function Signature_Input return JWX.Data_Type
    with
       Pre => Valid;
 
    -- Encoded signature
-   function Signature return String
+   function Signature return JWX.Data_Type
    with
       Pre => Valid;
 

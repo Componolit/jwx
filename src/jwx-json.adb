@@ -10,10 +10,10 @@
 --
 
 package body JWX.JSON
-   with
-      Refined_State => (State => (Context,
-                                  Context_Index,
-                                  Offset))
+with
+   Refined_State => (State => (Context,
+                               Context_Index,
+                               Offset))
 is
 
    type Context_Element_Type (Kind : Kind_Type := Kind_Invalid) is
@@ -42,7 +42,10 @@ is
    Context_Index : Index_Type;
    Offset        : Natural;
 
-   procedure Parse_Internal (Match : out Match_Type);
+   procedure Parse_Internal (Match : out Match_Type)
+   with
+      Pre => Data'First >= 0 and
+             Data'Last < Natural'Last;
 
    ---------------------
    -- Invalid_Element --
@@ -136,12 +139,12 @@ is
    procedure Prf_Mult_Protect (Arg1  : Integer_Type;
                                Arg2  : Integer_Type;
                                Upper : Integer_Type)
-     with
-       Ghost,
-       Global => null,
-       Pre    => (Arg1 >= 0 and Arg2 > 0 and Upper >= 0 and Arg1 < Upper)
+   with
+      Ghost,
+      Global => null,
+      Pre    => (Arg1 >= 0 and Arg2 > 0 and Upper >= 0 and Arg1 < Upper)
                  and then Arg1 <= Upper / Arg2,
-       Post   => Arg1 * Arg2 >= 0 and Arg1 * Arg2 <= Upper;
+      Post   => Arg1 * Arg2 >= 0 and Arg1 * Arg2 <= Upper;
 
    pragma Warnings (On, "postcondition does not check the outcome of calling");
 
@@ -152,6 +155,10 @@ is
    ---------
    -- Get --
    ---------
+
+   function Get (Index : Index_Type := Null_Index) return Context_Element_Type
+   with
+      Global => (Input => (Context, Context_Index));
 
    function Get (Index : Index_Type := Null_Index) return Context_Element_Type
    -- Return current element of a context
@@ -175,7 +182,7 @@ is
    function Has_Kind (Index : Index_Type;
                       Kind  : Kind_Type) return Boolean
    is
-        (Get (Index).Kind = Kind);
+      (Get (Index).Kind = Kind);
 
    ---------
    -- Set --
@@ -379,8 +386,10 @@ is
 
    function Match_Set (Set : String) return Boolean
    with
-      Global => (Input => (Data, Offset)),
-      Post   => (if Match_Set'Result then (for some E of Set => E = Data (Data'First + Offset)));
+      Global => (Input => (Offset)),
+      Pre    => Data'First >= 0 and Data'Last < Natural'Last,
+      Post   => (if Match_Set'Result then
+                    (for some E of Set => E = Data (Data'First + Offset)));
 
    function Match_Set (Set : String) return Boolean
    is
@@ -415,10 +424,12 @@ is
      (Match   : out Match_Type;
       Result  : out Real_Type)
    with
-       Pre =>
+      Pre =>
+         Data'First >= 0 and
+         Data'Last < Natural'Last and
          Data'First < Integer'Last - Offset and
          Offset < Data'Length,
-       Post =>
+      Post =>
          (case Match is
             when Match_OK => Result >= 0.0 and Result < 1.0,
             when others   => Result = 0.0 and Offset = Offset'Old);
@@ -517,6 +528,8 @@ is
       Result        :    out Integer_Type;
       Negative      :    out Boolean)
    with
+      Pre  => Data'First >= 0 and
+              Data'Last < Natural'Last,
       Post => Result >= 0;
 
    procedure Parse_Integer
@@ -624,7 +637,9 @@ is
       Result   :    out Integer_Type;
       Negative :    out Boolean)
    with
-       Post => (case Match is
+      Pre  => Data'First >= 0 and
+              Data'Last < Natural'Last,
+      Post => (case Match is
                   when Match_OK   => Result > 0,
                   when Match_None => Result = 1 and Negative = False,
                   when others     => True);
@@ -704,6 +719,11 @@ is
    ------------------
    -- Parse_Number --
    ------------------
+
+   procedure Parse_Number (Match : out Match_Type)
+   with
+      Pre => Data'First >= 0 and
+             Data'Last < Natural'Last;
 
    procedure Parse_Number (Match : out Match_Type)
    is
@@ -814,10 +834,11 @@ is
 
    procedure Parse_String (Match : out Match_Type)
    with
-      Global => (Input  => (Data, CS),
-                 In_Out => (Context,
+      Global => (In_Out => (Context,
                             Context_Index,
-                            Offset));
+                            Offset)),
+      Pre    => Data'First >= 0 and
+                Data'Last < Natural'Last;
 
    procedure Parse_String (Match : out Match_Type)
    is
@@ -900,6 +921,11 @@ is
    ------------------
    -- Parse_Object --
    ------------------
+
+   procedure Parse_Object (Match : out Match_Type)
+   with
+      Pre => Data'First >= 0 and
+             Data'Last < Natural'Last;
 
    procedure Parse_Object (Match : out Match_Type)
    is
@@ -1006,6 +1032,10 @@ is
    ------------------
    -- Parse_Array --
    ------------------
+   procedure Parse_Array (Match : out Match_Type)
+   with
+      Pre => Data'First >= 0 and
+             Data'Last < Natural'Last;
 
    procedure Parse_Array (Match : out Match_Type)
    is

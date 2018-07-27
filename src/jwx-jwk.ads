@@ -12,9 +12,9 @@
 generic
    Data : String;
 package JWX.JWK
-   with
-      Abstract_State => State,
-      Initializes    => State
+with
+   Abstract_State => State,
+   Initializes    => State
 is
    type Kind_Type is (Kind_Invalid,
                       Kind_EC,
@@ -67,50 +67,48 @@ is
    procedure X (Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre => Key_Valid and then
-             Kind = Kind_EC;
+      Pre  => Key_Valid and then Kind = Kind_EC,
+      Post => Length <= Value'Length;
 
    --  Return Y coordinate of EC key
    procedure Y (Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre => Key_Valid and then
-             Kind = Kind_EC;
+      Pre  => Key_Valid and then Kind = Kind_EC,
+      Post => Length <= Value'Length;
 
    --  Return curve type
    function Curve return EC_Curve_Type
    with
-      Pre => Key_Valid and then
-             Kind = Kind_EC;
+      Pre => Key_Valid and then Kind = Kind_EC;
 
    --  Return modulus N of RSA key
    procedure N (Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre => Key_Valid and then
-             Kind = Kind_RSA;
+      Pre  => Key_Valid and then Kind = Kind_RSA,
+      Post => Length <= Value'Length;
 
    --  Return exponent E of RSA key
    procedure E (Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre => Key_Valid and then
-             Kind = Kind_RSA;
+      Pre  => Key_Valid and then Kind = Kind_RSA,
+      Post => Length <= Value'Length;
 
    --  Return D value of RSA (private exponent) or EC key (private key)
    procedure D (Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre => Key_Valid and then
-             (Kind = Kind_EC or
-              Kind = Kind_RSA);
+      Pre  => Key_Valid and then (Kind = Kind_EC or Kind = Kind_RSA),
+      Post => Length <= Value'Length;
 
    --  Return K value of a plain secret key
    procedure K (Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre => Key_Valid and then
-             Kind = Kind_OCT;
+      Pre  => Key_Valid and then Kind = Kind_OCT,
+      Post => Length <= Value'Length;
 
    --  Is this a keyset
    function Keyset return Boolean
@@ -120,13 +118,13 @@ is
    --  Number of keys in key set
    function Num_Keys return Natural
    with
-      Pre => Loaded;
+      Pre => Key_Valid;
 
    --  Select a key
    procedure Select_Key (Valid : out Boolean;
                          Index :     Positive := 1)
    with
-      Global => (Input => State),
+      Global => (In_Out => (State)),
       Pre    => Loaded,
       Post   => (if Valid then Key_Valid);
 

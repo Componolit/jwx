@@ -15,11 +15,10 @@ generic
    Context_Size : Natural := Input_Data'Length / 3 + 2;
 
 package JWX.JSON
-   with
-      Abstract_State => State,
-      Initializes    => (State, Data, CS, Null_Index, End_Index)
+with
+   Abstract_State => (State),
+   Initializes    => (State)
 is
-
 
    -- This is a workaround for a bug in GNAT prior to Community 2018, where a
    -- generic formal parameter is not considered a legal component of refined
@@ -40,15 +39,16 @@ is
                        Match_Invalid,
                        Match_Out_Of_Memory);
 
-   CS : constant Natural := Context_Size;
-   type Index_Type is new Natural range 1 .. CS;
+   type Index_Type is new Natural range 1 .. Context_Size;
    Null_Index : constant Index_Type := Index_Type'First;
    End_Index  : constant Index_Type := Index_Type'Last;
 
    -- Parse a JSON file
    procedure Parse (Match : out Match_Type)
    with
-       Pre     => Data'First <= Data'Last;
+      Pre => Data'First >= 0 and
+             Data'Last < Natural'Last and
+             Data'First <= Data'Last;
 
    -- Assert that a @Index@ has a certain kind
    function Has_Kind (Index : Index_Type;

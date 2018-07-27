@@ -12,7 +12,7 @@
 with JWX;
 
 generic
-   Data : String;
+   Data : JWX.Data_Type;
 package JWX.JOSE
 is
    -- Valid JOSE header

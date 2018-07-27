@@ -17,7 +17,7 @@ is
    -- Authenticated --
    -------------------
 
-   function Authenticated (Buf : String;
+   function Authenticated (Buf : JWX.Data_Type;
                            Now : Long_Integer) return Auth_Result_Type
    is
       First : Natural := Buf'Last;
@@ -75,22 +75,19 @@ is
       pragma Assert (Last <= Buf'Last);
 
       declare
-         B : constant String := Buf (First .. Last);
+         B : constant JWX.Data_Type := Buf (First .. Last);
          package P is new JWX.JWT (Data     => B,
                                    Key_Data => Key_Data,
                                    Audience => Audience,
                                    Issuer   => Issuer,
                                    Now      => Now);
          use P;
-         Auth_Result : Result_Type;
       begin
-         Validate_Compact (Result => Auth_Result);
-
-         case Auth_Result
+         case Result
          is
-            when Result_Fail        => return Auth_Fail;
-            when Result_OK          => return Auth_OK;
-            when others             => return Auth_Invalid;
+            when Result_Fail => return Auth_Fail;
+            when Result_OK   => return Auth_OK;
+            when others      => return Auth_Invalid;
          end case;
       end;
 

@@ -10,8 +10,8 @@
 --
 
 generic
-   Data     : String;
-   Key_Data : String;
+   Data     : JWX.Data_Type;
+   Key_Data : JWX.Data_Type;
 package JWX.JWS
 is
 
@@ -20,11 +20,18 @@ is
                         Result_OK,
                         Result_Fail);
 
+   -- Valid
+   function Valid return Boolean;
+
+   -- Validate signature
    procedure Validate_Compact (Result : out Result_Type)
    with
-      Pre => Key_Data'First <= Key_Data'Last;
+      Pre => Key_Data'First <= Key_Data'Last,
+      Post => (if Result = Result_OK then Valid);
 
    -- Return payload
-   function Payload return String;
+   function Payload return String
+   with
+      Pre => Valid;
 
 end JWX.JWS;
