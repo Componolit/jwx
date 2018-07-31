@@ -38,33 +38,38 @@ package body JWX_JWK_Tests is
       D_Length : Natural;
       K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
       K_Crv : Key.EC_Curve_Type := Key.EC_Curve_Type'Value (Crv);
-      Valid : Boolean;
+      Keys : constant Key_Array_Type := Parse_Keys;
    begin
-      Select_Key (Valid);
-      Assert (Valid, "Key invalid");
-      Assert (Kind = Kind_EC, "Invalid kind: " & Kind'Img);
-      Assert (ID = Key_ID, "Invalid key ID: " & ID);
 
-      X (X_Val, X_Length);
-      Assert (X_Length = X_Ref'Length, "Wrong X size: " & X_Length'Img);
-      Assert (X_Val (1 .. X_Length) = X_Ref, "Invalid X");
+      Assert (Keys'Length = 1, "Invalid number of keys: " & Keys'Length'Img);
 
-      Y (Y_Val, Y_Length);
-      Assert (Y_Length = Y_Ref'Length, "Wrong Y size: " & Y_Length'Img);
-      Assert (Y_Val (1 .. Y_Length) = Y_Ref, "Invalid Y");
+      declare
+         K : Key_Type := Keys (1);
+      begin
+         Assert (Kind (K) = Kind_EC, "Invalid kind: " & Kind (K)'Img);
+         Assert (ID (K) = Key_ID, "Invalid key ID: " & ID (K));
 
-      Assert (Private_Key = Priv, "Wrong key type: Private=" & Private_Key'Img);
+         X (K, X_Val, X_Length);
+         Assert (X_Length = X_Ref'Length, "Wrong X size: " & X_Length'Img);
+         Assert (X_Val (1 .. X_Length) = X_Ref, "Invalid X");
 
-      if Priv
-      then
-         D (D_Val, D_Length);
-         Assert (D_Length = D_Ref'Length, "Wrong D size: " & D_Length'Img);
-         Assert (D_Val (1 .. D_Length) = D_Ref, "Invalid D");
-      end if;
+         Y (K, Y_Val, Y_Length);
+         Assert (Y_Length = Y_Ref'Length, "Wrong Y size: " & Y_Length'Img);
+         Assert (Y_Val (1 .. Y_Length) = Y_Ref, "Invalid Y");
 
-      Assert (Usage = K_Usg, "Wrong usage type: " & Usage'Img);
-      Assert (Algorithm = Alg, "Wrong algorithm: " & Algorithm'Img);
-      Assert (Curve = K_Crv, "Wrong curve: " & Curve'Img);
+         Assert (Private_Key (K) = Priv, "Wrong key type: Private=" & Private_Key (K)'Img);
+
+         if Priv
+         then
+            D (K, D_Val, D_Length);
+            Assert (D_Length = D_Ref'Length, "Wrong D size: " & D_Length'Img);
+            Assert (D_Val (1 .. D_Length) = D_Ref, "Invalid D");
+         end if;
+
+         Assert (Usage (K) = K_Usg, "Wrong usage type: " & Usage (K)'Img);
+         Assert (Algorithm (K) = Alg, "Wrong algorithm: " & Algorithm (K)'Img);
+         Assert (Curve (K) = K_Crv, "Wrong curve: " & Curve (K)'Img);
+      end;
    end Test_EC;
 
    --------------------------------------------------------------------------------------------------------------------
@@ -89,34 +94,36 @@ package body JWX_JWK_Tests is
       D_Val : Byte_Array (1 .. D_Ref'Length + 4);
       D_Length : Natural;
       K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
-      Valid : Boolean;
+      Keys : constant Key_Array_Type := Parse_Keys;
    begin
-      Assert (Loaded, "Invalid key file");
+      Assert (Keys'Length = 1, "Invalid key length: " & Keys'Length'Img);
 
-      Select_Key (Valid);
-      Assert (Valid, "Key invalid");
-      Assert (Kind = Kind_RSA, "Invalid kind: " & Kind'Img);
-      Assert (ID = Key_ID, "Invalid key ID: " & ID);
+      declare
+         K : constant Key_Type := Keys (1);
+      begin
+         Assert (Kind (K) = Kind_RSA, "Invalid kind: " & Kind (K)'Img);
+         Assert (ID (K) = Key_ID, "Invalid key ID: " & ID (K));
 
-      N (N_Val, N_Length);
-      Assert (N_Length = N_Ref'Length, "Wrong N size: " & N_Length'Img);
-      Assert (N_Val (1 .. N_Length) = N_Ref, "Invalid N");
+         N (K, N_Val, N_Length);
+         Assert (N_Length = N_Ref'Length, "Wrong N size: " & N_Length'Img);
+         Assert (N_Val (1 .. N_Length) = N_Ref, "Invalid N");
 
-      E (E_Val, E_Length);
-      Assert (E_Length = E_Ref'Length, "Wrong E size: " & E_Length'Img);
-      Assert (E_Val (1 .. E_Length) = E_Ref, "Invalid E");
+         E (K, E_Val, E_Length);
+         Assert (E_Length = E_Ref'Length, "Wrong E size: " & E_Length'Img);
+         Assert (E_Val (1 .. E_Length) = E_Ref, "Invalid E");
 
-      Assert (Private_Key = Priv, "Wrong key type: Private=" & Private_Key'Img);
+         Assert (Private_Key (K) = Priv, "Wrong key type: Private=" & Private_Key (K)'Img);
 
-      if Priv
-      then
-         D (D_Val, D_Length);
-         Assert (D_Length = D_Ref'Length, "Wrong D size: " & D_Length'Img);
-         Assert (D_Val (1 .. D_Length) = D_Ref, "Invalid D");
-      end if;
+         if Priv
+         then
+            D (K, D_Val, D_Length);
+            Assert (D_Length = D_Ref'Length, "Wrong D size: " & D_Length'Img);
+            Assert (D_Val (1 .. D_Length) = D_Ref, "Invalid D");
+         end if;
 
-      Assert (Usage = K_Usg, "Wrong usage type: " & Usage'Img);
-      Assert (Algorithm = Alg, "Wrong algorithm: " & Algorithm'Img);
+         Assert (Usage (K) = K_Usg, "Wrong usage type: " & Usage (K)'Img);
+         Assert (Algorithm (K) = Alg, "Wrong algorithm: " & Algorithm (K)'Img);
+      end;
    end Test_RSA;
 
    --------------------------------------------------------------------------------------------------------------------
@@ -134,23 +141,25 @@ package body JWX_JWK_Tests is
       K_Val : Byte_Array (1 .. K_Ref'Length + 4);
       K_Length : Natural;
       K_Usg : Key.Use_Type := Key.Use_Type'Value (Usg);
-      Valid : Boolean;
+      Keys : constant Key_Array_Type := Parse_Keys;
    begin
-      Assert (Loaded, "Invalid key file");
+      Assert (Keys'Length = 1, "Invalid number of keys: " & Keys'Length'Img);
 
-      Select_Key (Valid);
-      Assert (Valid, "Key invalid");
-      Assert (Kind = Kind_Oct, "Invalid kind: " & Kind'Img);
-      Assert (ID = Key_ID, "Invalid key ID: " & ID);
+      declare
+         L : constant Key_Type := Keys (1);
+      begin
+         Assert (Kind (L) = Kind_Oct, "Invalid kind: " & Kind (L)'Img);
+         Assert (ID (L) = Key_ID, "Invalid key ID: " & ID (L));
 
-      Assert (Private_Key, "OCT must be private");
+         Assert (Private_Key (L), "OCT must be private");
 
-      K (K_Val, K_Length);
-      Assert (K_Length = K_Ref'Length, "Wrong K size: " & K_Length'Img);
-      Assert (K_Val (1 .. K_Length) = K_Ref, "Invalid K");
+         K (L, K_Val, K_Length);
+         Assert (K_Length = K_Ref'Length, "Wrong K size: " & K_Length'Img);
+         Assert (K_Val (1 .. K_Length) = K_Ref, "Invalid K");
 
-      Assert (Usage = K_Usg, "Wrong usage type: " & Usage'Img);
-      Assert (Algorithm = Alg, "Wrong algorithm: " & Algorithm'Img);
+         Assert (Usage (L) = K_Usg, "Wrong usage type: " & Usage (L)'Img);
+         Assert (Algorithm (L) = Alg, "Wrong algorithm: " & Algorithm (L)'Img);
+      end;
    end Test_Oct;
 
    --------------------------------------------------------------------------------------------------------------------

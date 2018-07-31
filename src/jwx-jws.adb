@@ -18,29 +18,28 @@ use JWX;
 package body JWX.JWS
 is
 
-   package Token is new JWX.JWSCS (Data);
-
-   function Valid return Boolean is (Token.Valid);
-
    ----------------------
    -- Validate_Compact --
    ----------------------
 
-   procedure Validate_Compact (Result : out Result_Type)
+   function Validate_Compact (Data     : String;
+                              Key_Data : String) return Result_Type
    is
+      Valid  : Boolean;
+      Result : Result_Type;
+      package Token is new JWX.JWSCS (Data);
    begin
-      Result := Result_Invalid;
-
-      if not Token.Valid
+      Token.Split (Valid);
+      if not Valid
       then
-         return;
+         return Result_Invalid;
       end if;
 
       declare
          Valid           : Boolean;
-         Jose_Data       : constant JWX.Data_Type := Token.Jose_Data;
-         Signature_Input : constant JWX.Data_Type := Token.Signature_Input;
-         Signature       : constant JWX.Data_Type := Token.Signature;
+         Jose_Data       : constant String := Token.Jose_Data;
+         Signature_Input : constant String := Token.Signature_Input;
+         Signature       : constant String := Token.Signature;
 
          package J is new JWX.JOSE (Jose_Data);
          package L is new JWX.Crypto (Payload => Signature_Input,
@@ -49,28 +48,21 @@ is
       begin
          if not J.Valid
          then
-            return;
+            return Result_Invalid;
          end if;
 
+         pragma Warnings (Off, "unused assignment to ""Key_");
          L.Valid (J.Algorithm, Valid);
-         if Valid then
-            Result := Result_OK;
-            return;
+         pragma Warnings (On, "unused assignment to ""Key_");
+         if not Valid then
+            return Result_Fail;
          end if;
       end;
 
-      Result := Result_Fail;
+      return Result_Type'(Error => Error_OK,
+                          First => Token.Payload_First,
+                          Last  => Token.Payload_Last);
 
    end Validate_Compact;
-
-   -------------
-   -- Payload --
-   -------------
-
-   function Payload return String
-   is
-   begin
-      return Token.Payload;
-   end Payload;
 
 end JWX.JWS;

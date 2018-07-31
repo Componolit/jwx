@@ -67,7 +67,9 @@ is
             use type Match_Type;
             use type Index_Type;
          begin
+            pragma Warnings (Off, "unused assignment to ""Offset""");
             Parse (Match_JOSE);
+            pragma Warnings (On, "unused assignment to ""Offset""");
             if Match_JOSE /= Match_OK or else
               Get_Kind /= Kind_Object
             then

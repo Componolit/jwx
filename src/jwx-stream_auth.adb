@@ -17,12 +17,15 @@ is
    -- Authenticated --
    -------------------
 
-   function Authenticated (Buf : JWX.Data_Type;
+   function Authenticated (Buf : String;
                            Now : Long_Integer) return Auth_Result_Type
    is
       First : Natural := Buf'Last;
       Last  : Natural := Buf'First;
       Found : Boolean := False;
+
+      Result : JWX.JWT.Result_Type;
+      use type JWT.Result_Type;
    begin
       -- At least space for 'id_token=' must be available
       if Buf'Length < 10
@@ -63,9 +66,10 @@ is
          end if;
       end loop;
 
-      if not Found or
-         not (Last in Buf'Range) or
-         not (First <= Last)
+      if (not Found or
+          not (Last in Buf'Range) or
+          not (First <= Last)) or else
+         Last - First < 4
       then
          return Auth_Noent;
       end if;
@@ -73,23 +77,19 @@ is
       pragma Assert (First <= Last);
       pragma Assert (First >= Buf'First);
       pragma Assert (Last <= Buf'Last);
+      pragma Assert (Buf (First .. Last)'Length >= 5);
 
-      declare
-         B : constant JWX.Data_Type := Buf (First .. Last);
-         package P is new JWX.JWT (Data     => B,
-                                   Key_Data => Key_Data,
-                                   Audience => Audience,
-                                   Issuer   => Issuer,
-                                   Now      => Now);
-         use P;
-      begin
-         case Result
-         is
-            when Result_Fail => return Auth_Fail;
-            when Result_OK   => return Auth_OK;
-            when others      => return Auth_Invalid;
-         end case;
-      end;
+      Result := JWT.Validate_Compact (Data     => Buf (First .. Last),
+                                      Key_Data => Key_Data,
+                                      Audience => Audience,
+                                      Issuer   => Issuer,
+                                      Now      => Now);
+      case Result
+      is
+         when JWT.Result_Fail => return Auth_Fail;
+         when JWT.Result_OK   => return Auth_OK;
+         when others          => return Auth_Invalid;
+      end case;
 
    end Authenticated;
 

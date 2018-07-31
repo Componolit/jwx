@@ -19,7 +19,9 @@ is
       use P;
    begin
       Match := False;
+      pragma Warnings (Off, "unused assignment to ""Offset""");
       Parse (M);
+      pragma Warnings (On, "unused assignment to ""Offset""");
       if M /= Match_OK
       then
          return;

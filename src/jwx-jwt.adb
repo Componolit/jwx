@@ -16,50 +16,44 @@ with JWX.Util;
 
 package body JWX.JWT
 is
-   State : Result_Type;
 
-   procedure Validate_Compact (Result : out Result_Type)
-   with
-      Pre => Key_Data'First <= Key_Data'Last;
-
-   procedure Validate_Compact (Result : out Result_Type)
+   function Validate_Compact (Data     : String;
+                              Key_Data : String;
+                              Audience : String;
+                              Issuer   : String;
+                              Now      : Long_Integer) return Result_Type
    is
-      package J is new JWX.JWS (Data     => Data,
-                                Key_Data => Key_Data);
-      use J;
-      Validate_Result : J.Result_Type;
+      use JWS;
+      R : JWS.Result_Type;
    begin
-      Result := Result_Invalid;
-
       if Data'Length >= Integer'Last - 2 or
         Data'Length <= 0
       then
-         return;
+         return Result_Invalid;
       end if;
 
-      J.Validate_Compact (Validate_Result);
-      if Validate_Result /= J.Result_OK
+      R := JWS.Validate_Compact (Data, Key_Data);
+      if R.Error /= Error_OK
       then
-         case Validate_Result is
-            when J.Result_Invalid     => Result := Result_Invalid;
-            when J.Result_Invalid_Key => Result := Result_Invalid_Key;
-            when J.Result_Fail        => Result := Result_Fail;
-            when J.Result_OK          => null;
+         case R.Error is
+            when Error_Invalid     => return Result_Invalid;
+            when Error_Invalid_Key => return Result_Invalid_Key;
+            when Error_Fail        => return Result_Fail;
+            when Error_OK          => null;
          end case;
-         return;
       end if;
 
       pragma Assert (Data'Length < Integer'Last);
       declare
          Len : Natural;
-         Payload : constant String := J.Payload;
+         Payload : constant String := Data (R.First .. R.Last);
       begin
 
          if Payload'Length <= 0 or
            Payload'Length >= Natural'Last / 9 or
            Payload'Last >= Natural'Last - 4
          then
-            return;
+            return Result_Invalid;
          end if;
 
          declare
@@ -71,8 +65,7 @@ is
             Decode_Url (Payload, Len, Decoded);
             if Len = 0
             then
-               Result := Result_Invalid_Base64;
-               return;
+               return Result_Invalid_Base64;
             end if;
 
             pragma Assert (JSON_Input'Length >= 3 * ((Payload'Length + 3) / 4));
@@ -85,77 +78,62 @@ is
                Match : Match_Type;
                Value : Index_Type;
             begin
+               pragma Warnings (Off, "unused assignment to ""Offset""");
                Parse (Match);
+               pragma Warnings (On, "unused assignment to ""Offset""");
                if Match /= Match_OK
                then
-                  return;
+                  return Result_Invalid;
                end if;
                if Get_Kind /= Kind_Object
                then
-                  Result := Result_Invalid_Object;
-                  return;
+                  return Result_Invalid_Object;
                end if;
 
                -- Check issuer
-               Result := Result_Invalid_Issuer;
                Value := Query_Object ("iss");
                if Value = Token.End_Index
                then
-                  return;
+                  return Result_Invalid_Issuer;
                end if;
 
                if Get_Kind (Value) /= Kind_String or else
                  Get_String (Value) /= Issuer
                then
-                  return;
+                  return Result_Invalid_Issuer;
                end if;
 
                -- Check audience
-               Result := Result_Invalid_Audience;
                Value := Query_Object ("aud");
                if Value = Token.End_Index
                then
-                  return;
+                  return Result_Invalid_Audience;
                end if;
 
                if Get_Kind (Value) /= Kind_String or else
                  Get_String (Value) /= Audience
                then
-                  return;
+                  return Result_Invalid_Audience;
                end if;
 
                -- Check expiration
-               Result := Result_Expired;
                Value := Query_Object ("exp");
                if Value = Token.End_Index
                then
-                  return;
+                  return Result_Expired;
                end if;
 
                if Get_Kind (Value) /= Kind_Integer or else
                  Long_Integer (Get_Integer (Value)) < Now
                then
-                  return;
+                  return Result_Expired;
                end if;
              end;
          end;
 
-         Result := Result_OK;
-         return;
+         return Result_OK;
       end;
 
    end Validate_Compact;
 
-   ------------
-   -- Result --
-   ------------
-
-   function Result return Result_Type
-   is
-   begin
-      return State;
-   end Result;
-
-begin
-   Validate_Compact (State);
 end JWX.JWT;

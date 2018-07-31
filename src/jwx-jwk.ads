@@ -12,9 +12,6 @@
 generic
    Data : String;
 package JWX.JWK
-with
-   Abstract_State => State,
-   Initializes    => State
 is
    type Kind_Type is (Kind_Invalid,
                       Kind_EC,
@@ -30,102 +27,117 @@ is
                           Curve_P384,
                           Curve_P521);
 
-   --  Key object loaded
-   function Loaded return Boolean;
-   
-   --  Valid key
-   function Key_Valid return Boolean
+   type Key_Type is private;
+   Invalid_Key : constant Key_Type;
+
+   type Key_Array_Type is array (Natural range <>) of Key_Type;
+   Empty_Key_Array : constant Key_Array_Type;
+
+   -- Parse keys
+   function Parse_Keys return Key_Array_Type
    with
-      Ghost;
+      Pre => Data'First >= 0 and
+             Data'First <= Data'Last and
+             Data'Last < Natural'Last;
 
    --  Kind
-   function Kind return Kind_Type
-   with
-      Pre => Key_Valid;
+   function Kind (Key : Key_Type) return Kind_Type;
 
    --  Return key ID
-   function ID return String
-   with
-      Pre => Key_Valid;
+   function ID (Key : Key_Type) return String;
 
    --  Private key
-   function Private_Key return Boolean
-   with
-      Pre => Key_Valid;
+   function Private_Key (Key : Key_Type) return Boolean;
 
    --  Key usage
-   function Usage return Use_Type
-   with
-      Pre => Key_Valid;
+   function Usage (Key : Key_Type) return Use_Type;
 
    --  Algorithm
-   function Algorithm return Alg_Type
-   with
-      Pre => Key_Valid;
+   function Algorithm (Key : Key_Type) return Alg_Type;
 
    --  Return X coordinate of EC key
-   procedure X (Value  : out Byte_Array;
+   procedure X (Key    : Key_Type;
+                Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre  => Key_Valid and then Kind = Kind_EC,
+      Pre  => Kind (Key) = Kind_EC,
       Post => Length <= Value'Length;
 
    --  Return Y coordinate of EC key
-   procedure Y (Value  : out Byte_Array;
+   procedure Y (Key    : Key_Type;
+                Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre  => Key_Valid and then Kind = Kind_EC,
+      Pre  => Kind (Key) = Kind_EC,
       Post => Length <= Value'Length;
 
    --  Return curve type
-   function Curve return EC_Curve_Type
-   with
-      Pre => Key_Valid and then Kind = Kind_EC;
+   function Curve (Key : Key_Type) return EC_Curve_Type
+     with
+       Pre => Kind (Key) = Kind_EC;
 
    --  Return modulus N of RSA key
-   procedure N (Value  : out Byte_Array;
+   procedure N (Key    : Key_Type;
+                Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre  => Key_Valid and then Kind = Kind_RSA,
+      Pre  => Kind (Key) = Kind_RSA,
       Post => Length <= Value'Length;
 
    --  Return exponent E of RSA key
-   procedure E (Value  : out Byte_Array;
+   procedure E (Key    : Key_Type;
+                Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre  => Key_Valid and then Kind = Kind_RSA,
+      Pre  => Kind (Key) = Kind_RSA,
       Post => Length <= Value'Length;
 
    --  Return D value of RSA (private exponent) or EC key (private key)
-   procedure D (Value  : out Byte_Array;
+   procedure D (Key    : Key_Type;
+                Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre  => Key_Valid and then (Kind = Kind_EC or Kind = Kind_RSA),
+      Pre  => Kind (Key) = Kind_EC or Kind (Key) = Kind_RSA,
       Post => Length <= Value'Length;
 
    --  Return K value of a plain secret key
-   procedure K (Value  : out Byte_Array;
+   procedure K (Key    : Key_Type;
+                Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre  => Key_Valid and then Kind = Kind_OCT,
+      Pre  => Kind (Key) = Kind_OCT,
       Post => Length <= Value'Length;
 
-   --  Is this a keyset
-   function Keyset return Boolean
-   with
-      Pre => Loaded;
+private
 
-   --  Number of keys in key set
-   function Num_Keys return Natural
-   with
-      Pre => Key_Valid;
+   type Key_Type (Kind : Kind_Type := Kind_Invalid) is
+      record
+         ID    : Range_Type;
+         Usage : Range_Type;
+         Alg   : Range_Type;
+         case Kind is
+         when Kind_EC =>
+            X     : Range_Type;
+            Y     : Range_Type;
+            DE    : Range_Type;
+            Curve : EC_Curve_Type;
+         when Kind_RSA =>
+            N     : Range_Type;
+            E     : Range_Type;
+            DR    : Range_Type;
+         when Kind_Oct =>
+            K     : Range_Type;
+         when Kind_Invalid =>
+            null;
+         end case;
+      end record;
 
-   --  Select a key
-   procedure Select_Key (Valid : out Boolean;
-                         Index :     Positive := 1)
-   with
-      Global => (In_Out => (State)),
-      Pre    => Loaded,
-      Post   => (if Valid then Key_Valid);
+   Invalid_Key : constant Key_Type :=
+     Key_Type'(Kind  => Kind_Invalid,
+               ID    => Empty_Range,
+               Usage => Empty_Range,
+               Alg   => Empty_Range);
+
+   Empty_Key_Array : constant Key_Array_Type := (1 .. 0 => Invalid_Key);
 
 end JWX.JWK;
