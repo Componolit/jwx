@@ -227,16 +227,16 @@ is
 
    function Key_Valid return Boolean is
       (case Key_Kind is
-          when Kind_EC      => Get_Kind (Key_ID) = Kind_String and
-                               Get_Kind (Key_X)  = Kind_String and
-                               Get_Kind (Key_Y)  = Kind_String,
+          when Kind_EC      => (Key_ID = End_Index or else Get_Kind (Key_ID) = Kind_String) and
+                                Get_Kind (Key_X) = Kind_String and
+                                Get_Kind (Key_Y) = Kind_String,
 
-          when Kind_RSA     => Get_Kind (Key_ID) = Kind_String and
-                               Get_Kind (Key_N)  = Kind_String and
-                               Get_Kind (Key_E)  = Kind_String,
+          when Kind_RSA     => (Key_ID = End_Index or else Get_Kind (Key_ID) = Kind_String) and
+                               Get_Kind (Key_N) = Kind_String and
+                               Get_Kind (Key_E) = Kind_String,
 
-          when Kind_Oct     => Get_Kind (Key_ID) = Kind_String and
-                               Get_Kind (Key_K)  = Kind_String,
+          when Kind_Oct     => (Key_ID = End_Index or else Get_Kind (Key_ID) = Kind_String) and
+                               Get_Kind (Key_K) = Kind_String,
 
           when Kind_Invalid => False);
 
@@ -358,7 +358,7 @@ is
    is
       use JWX;
    begin
-      if Key_D /= End_Index or else
+      if Key_D = End_Index or else
          Get_Kind (Key_D) /= Kind_String
       then
          Value  := (Value'Range => 0);
@@ -526,14 +526,16 @@ is
 
       --  Retrieve key id 'kid'
       Key_ID := Query_Object ("kid", Key_Index);
-      if Get_Kind (Key_ID) /= Kind_String
+      if Key_ID /= End_Index and then
+         Get_Kind (Key_ID) /= Kind_String
       then
          return;
       end if;
 
       --  Retrieve key type 'kty'
       Kty := Query_Object ("kty", Key_Index);
-      if Get_Kind (Kty) /= Kind_String
+      if Kty = End_Index or else
+         Get_Kind (Kty) /= Kind_String
       then
          return;
       end if;
@@ -553,9 +555,20 @@ is
 
       --  Retrieve key usage 'use'
       Key_Use := Query_Object ("use", Key_Index);
+      if Key_Use /= End_Index and then
+         Get_Kind (Key_Use) /= Kind_String
+      then
+         return;
+      end if;
 
       --  Algortihm 'alg'
       Key_Alg := Query_Object ("alg", Key_Index);
+      if Key_Alg /= End_Index and then
+         Get_Kind (Key_Alg) /= Kind_String
+      then
+         return;
+      end if;
+
 
       -- Revieve curve
       case Key_Kind is
