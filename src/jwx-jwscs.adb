@@ -11,20 +11,20 @@
 
 package body JWX.JWSCS
 is
-   Token_Valid : Boolean;
-   First       : Natural;
-   Second      : Natural;
+   First       : Natural := 0;
+   Second      : Natural := 0;
+   D           : constant String := Data;
 
-   --------------------
-   -- Get_Separators --
-   --------------------
+   -----------
+   -- Split --
+   -----------
 
-   procedure Get_Separators
+   procedure Split (Token_Valid : out Boolean)
    is
       Found : Boolean := False;
    begin
       Token_Valid := False;
-      First := Data_Index'First;
+      First  := Data_Index'First;
       Second := Data_Index'First;
 
       --  Find first separator
@@ -39,7 +39,7 @@ is
       end loop;
 
       if not Found or
-         not (First in Data'First .. Data'Last - 1)
+         not (First in Data'First + 1 .. Data'Last - 1)
       then
          return;
       end if;
@@ -57,7 +57,7 @@ is
       end loop;
 
       if not Found or
-         not (Second in Data'First .. Data'Last - 1)
+         not (Second in First + 1 .. Data'Last - 1)
       then
          return;
       end if;
@@ -71,20 +71,26 @@ is
          end if;
       end loop;
 
+      --  At least one byte of payload
+      if not (First + 1 <= Second - 1)
+      then
+         return;
+      end if;
+
       Token_Valid := True;
-   end Get_Separators;
+   end Split;
 
    -----------
    -- Valid --
    -----------
 
    function Valid return Boolean is
-     ((Token_Valid and
-       First < Second and
-       Data'Length > 0 and
-       Data'First < Natural'Last) and then
-      (First in Data'First + 1 .. Data'Last - 1 and
-       Second in Data'First + 1 .. Data'Last - 1));
+     (First < Data'Last and then
+        (First + 1 <= Second - 1 and
+           Data'Length > 0 and
+           Data'First < Natural'Last) and then
+              (First in Data'First + 1 .. Data'Last - 1 and
+               Second in Data'First + 1 .. Data'Last - 1));
 
    -----------------
    -- JOSE_Length --
@@ -96,26 +102,36 @@ is
    -- JOSE_Data --
    ---------------
 
-   function JOSE_Data return Data_Type is (Data (Data'First .. First - 1));
+   function JOSE_Data return String is (Data (Data'First .. First - 1));
 
    -------------
    -- Payload --
    -------------
 
-   function Payload return Data_Type is (Data (First + 1 .. Second - 1));
+   function Payload return String is (Data (First + 1 .. Second - 1));
+
+   -------------------
+   -- Payload_First --
+   -------------------
+
+   function Payload_First return Positive is (First + 1);
+
+   ------------------
+   -- Payload_Last --
+   ------------------
+
+   function Payload_Last return Positive is (Second - 1);
 
    ---------------------
    -- Signature_Input --
    ---------------------
 
-   function Signature_Input return Data_Type is (Data (Data'First .. Second - 1));
+   function Signature_Input return String is (Data (Data'First .. Second - 1));
 
    ---------------
    -- Signature --
    ---------------
 
-   function Signature return Data_Type is (Data (Second + 1 .. Data'Last));
+   function Signature return String is (Data (Second + 1 .. Data'Last));
 
-begin
-   Get_Separators;
 end JWX.JWSCS;

@@ -10,10 +10,6 @@
 --
 
 package body JWX.JSON
-with
-   Refined_State => (State => (Context,
-                               Context_Index,
-                               Offset))
 is
 
    type Context_Element_Type (Kind : Kind_Type := Kind_Invalid) is
@@ -39,9 +35,6 @@ is
 
    type Context_Type is array (Index_Type) of Context_Element_Type;
 
-   Context_Index : Index_Type;
-   Offset        : Natural;
-
    procedure Parse_Internal (Match : out Match_Type)
    with
       Pre => Data'First >= 0 and
@@ -57,7 +50,9 @@ is
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
 
-   Context : Context_Type := (others => Invalid_Element);
+   Context       : Context_Type := (others => Invalid_Element);
+   Context_Index : Index_Type := Index_Type'First;
+   Offset        : Natural    := 0;
 
    ------------------
    -- Null_Element --
@@ -141,7 +136,6 @@ is
                                Upper : Integer_Type)
    with
       Ghost,
-      Global => null,
       Pre    => (Arg1 >= 0 and Arg2 > 0 and Upper >= 0 and Arg1 < Upper)
                  and then Arg1 <= Upper / Arg2,
       Post   => Arg1 * Arg2 >= 0 and Arg1 * Arg2 <= Upper;
@@ -156,9 +150,7 @@ is
    -- Get --
    ---------
 
-   function Get (Index : Index_Type := Null_Index) return Context_Element_Type
-   with
-      Global => (Input => (Context, Context_Index));
+   function Get (Index : Index_Type := Null_Index) return Context_Element_Type;
 
    function Get (Index : Index_Type := Null_Index) return Context_Element_Type
    -- Return current element of a context
@@ -255,6 +247,26 @@ is
    begin
       return Get (Index).Integer_Value;
    end Get_Integer;
+
+   ---------------
+   -- Get_Range --
+   ---------------
+
+   function Get_Range (Index : Index_Type := Null_Index) return Range_Type
+   is
+      Element : constant Context_Element_Type := Get (Index);
+   begin
+      if Element.String_Start in Data'Range and
+         Element.String_End in Data'Range and
+         Element.String_End < Positive'Last and
+         Element.String_Start <= Element.String_End
+      then
+         return Range_Type'(First => Element.String_Start,
+                            Last  => Element.String_End);
+      else
+         return Empty_Range;
+      end if;
+   end Get_Range;
 
    ----------------
    -- Get_String --
@@ -386,7 +398,6 @@ is
 
    function Match_Set (Set : String) return Boolean
    with
-      Global => (Input => (Offset)),
       Pre    => Data'First >= 0 and Data'Last < Natural'Last,
       Post   => (if Match_Set'Result then
                     (for some E of Set => E = Data (Data'First + Offset)));
@@ -834,11 +845,8 @@ is
 
    procedure Parse_String (Match : out Match_Type)
    with
-      Global => (In_Out => (Context,
-                            Context_Index,
-                            Offset)),
-      Pre    => Data'First >= 0 and
-                Data'Last < Natural'Last;
+      Pre => Data'First >= 0 and
+             Data'Last < Natural'Last;
 
    procedure Parse_String (Match : out Match_Type)
    is
@@ -1217,6 +1225,7 @@ is
       Count   : Natural := 0;
    begin
       loop
+         pragma Loop_Variant (Decreases => Natural'Last - Count);
          exit when
             Count >= Natural'Last or
             Element.Next_Value = End_Index;
@@ -1258,6 +1267,4 @@ is
       return Last_Index;
    end Pos;
 
-begin
-   Reset;
 end JWX.JSON;

@@ -1,11 +1,11 @@
-GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j2 --codepeer=on --output-header --no-inlining --proof=progressive --steps=1000
+GNATPROVE_OPTS = --prover=z3,cvc4 -j2 --codepeer=off --output-header --no-inlining --proof=progressive --steps=100
 COMMON_OPTS = -Xlibtype=dynamic
 
 EXAMPLES = b64 json area jwt authproxy
 
 all: proj.gpr
 	@time gnatprove $(COMMON_OPTS) -Pproj $(GNATPROVE_OPTS) | tee proof.log.tmp
-	@egrep -q '\(medium\|warning\|error\):' proof.log.tmp
+	@egrep -v -q '\(medium\|warning\|error\):' proof.log.tmp
 	@mv proof.log.tmp proof.log
 
 clean:

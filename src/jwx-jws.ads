@@ -9,29 +9,45 @@
 -- GNU Affero General Public License version 3.
 --
 
-generic
-   Data     : JWX.Data_Type;
-   Key_Data : JWX.Data_Type;
 package JWX.JWS
 is
 
-   type Result_Type is (Result_Invalid,
-                        Result_Invalid_Key,
-                        Result_OK,
-                        Result_Fail);
+   type Error_Type is (Error_Invalid,
+                       Error_Invalid_Key,
+                       Error_OK,
+                       Error_Fail);
 
-   -- Valid
-   function Valid return Boolean;
+   type Result_Type (Error : Error_Type := Error_Invalid) is
+   record
+      case Error is
+         when Error_OK =>
+            First : Positive := Positive'Last;
+            Last  : Positive := 1;
+         when others =>
+            null;
+      end case;
+   end record;
+
+   Result_Invalid     : constant Result_Type := (Error => Error_Invalid);
+   Result_Fail        : constant Result_Type := (Error => Error_Fail);
+   Result_Invalid_Key : constant Result_Type := (Error => Error_Invalid_Key);
+
+   function Valid_Result (Data   : String;
+                          Result : Result_Type) return Boolean
+   is
+      ((if Result.Error = Error_OK then
+           Result.First >= Data'First and
+           Result.Last  <= Data'Last and
+           Result.First <= Result.Last));
 
    -- Validate signature
-   procedure Validate_Compact (Result : out Result_Type)
+   function Validate_Compact (Data     : String;
+                              Key_Data : String) return Result_Type
    with
-      Pre => Key_Data'First <= Key_Data'Last,
-      Post => (if Result = Result_OK then Valid);
-
-   -- Return payload
-   function Payload return String
-   with
-      Pre => Valid;
+      Pre  => Data'Length >= 5 and
+              Key_Data'First >= 0 and
+              Key_Data'Last < Natural'Last and
+              Key_Data'First <= Key_Data'Last,
+      Post => Valid_Result (Data, Validate_Compact'Result);
 
 end JWX.JWS;

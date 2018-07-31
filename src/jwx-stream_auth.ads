@@ -10,14 +10,14 @@
 --
 
 generic
-   Key_Data       : JWX.Data_Type;
-   Audience       : JWX.Data_Type;
-   Issuer         : JWX.Data_Type;
+   Key_Data       : String;
+   Audience       : String;
+   Issuer         : String;
 package JWX.Stream_Auth
 is
    type Auth_Result_Type is (Auth_OK, Auth_Noent, Auth_Fail, Auth_Invalid);
 
-   function Authenticated (Buf : JWX.Data_Type;
+   function Authenticated (Buf : String;
                            Now : Long_Integer) return Auth_Result_Type
    with
       Pre => Buf'First >= JWX.Data_Index'First and

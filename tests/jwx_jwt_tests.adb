@@ -13,6 +13,7 @@ with AUnit.Assertions; use AUnit.Assertions;
 with JWX.JWT;
 with JWX_Test_Utils; use JWX_Test_Utils;
 use JWX;
+use type JWX.JWT.Result_Type;
 
 package body JWX_JWT_Tests is
 
@@ -24,16 +25,15 @@ package body JWX_JWT_Tests is
       -- Do not pass in last character in Data as this is a new line which
       -- is not expected (JWX.JWSCS expects the token to end at the last
       -- character)
-      Data : String := Tmp (Tmp'First .. Tmp'Last - 1);
-
-      package J is new JWX.JWT (Data     => Data,
-                                Key_Data => Key,
-                                Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
-                                Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
-                                Now      => 1528404620);
-      use J;
+      Data   : String := Tmp (Tmp'First .. Tmp'Last - 1);
+      Result : JWT.Result_Type;
    begin
-      Assert (Result = Result_OK, "Validation failed: " & Result'Img);
+      Result := JWT.Validate_Compact (Data     => Data,
+                                      Key_Data => Key,
+                                      Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
+                                      Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
+                                      Now      => 1528404620);
+      Assert (Result = JWT.Result_OK, "Validation failed: " & Result'Img);
    end Test_Validate_JWT;
 
    --------------------------------------------------------------------------------------------------------------------
@@ -48,14 +48,14 @@ package body JWX_JWT_Tests is
       -- character)
       Data : String := Tmp (Tmp'First .. Tmp'Last - 1);
 
-      package J is new JWX.JWT (Data     => Data,
-                                Key_Data => Key,
-                                Audience => "deadbeefkvjtHejID0lKzVioMfTmuXaM",
-                                Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
-                                Now      => 1528404620);
-      use J;
+      Result : JWT.Result_Type;
    begin
-      Assert (Result = Result_Invalid_Audience, "Invalid audience expected: " & Result'Img);
+      Result := JWT.Validate_Compact (Data     => Data,
+                                      Key_Data => Key,
+                                      Audience => "deadbeefkvjtHejID0lKzVioMfTmuXaM",
+                                      Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
+                                      Now      => 1528404620);
+      Assert (Result = JWT.Result_Invalid_Audience, "Invalid audience expected: " & Result'Img);
    end Test_JWT_Invalid_Audience;
 
    --------------------------------------------------------------------------------------------------------------------
@@ -70,14 +70,14 @@ package body JWX_JWT_Tests is
       -- character)
       Data : String := Tmp (Tmp'First .. Tmp'Last - 1);
 
-      package J is new JWX.JWT (Data     => Data,
-                                Key_Data => Key,
-                                Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
-                                Issuer   => "https://invalid.eu.auth0.com/",
-                                Now      => 1528404620);
-      use J;
+      Result : JWT.Result_Type;
    begin
-      Assert (Result = Result_Invalid_Issuer, "Invalid issuer expected: " & Result'Img);
+      Result := JWT.Validate_Compact (Data     => Data,
+                                      Key_Data => Key,
+                                      Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
+                                      Issuer   => "https://invalid.eu.auth0.com/",
+                                      Now      => 1528404620);
+      Assert (Result = JWT.Result_Invalid_Issuer, "Invalid issuer expected: " & Result'Img);
    end Test_JWT_Invalid_Issuer;
 
    --------------------------------------------------------------------------------------------------------------------
@@ -92,14 +92,14 @@ package body JWX_JWT_Tests is
       -- character)
       Data : String := Tmp (Tmp'First .. Tmp'Last - 1);
 
-      package J is new JWX.JWT (Data     => Data,
-                                Key_Data => Key,
-                                Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
-                                Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
-                                Now      => 1528408620);
-      use J;
+      Result : JWT.Result_Type;
    begin
-      Assert (Result = Result_Expired, "Expiry not detected: " & Result'Img);
+      Result := JWT.Validate_Compact (Data     => Data,
+                                      Key_Data => Key,
+                                      Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
+                                      Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
+                                      Now      => 1528408620);
+      Assert (Result = JWT.Result_Expired, "Expiry not detected: " & Result'Img);
    end Test_JWT_Expired;
 
    --------------------------------------------------------------------------------------------------------------------

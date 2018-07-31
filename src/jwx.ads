@@ -29,7 +29,24 @@ is
    with Pack;
 
    subtype Data_Index is Positive range 1 .. Natural'Last / 9 - 1;
-   subtype Data_Type is String;
+
+   type Range_Type is
+   record
+      First : Positive;
+      Last  : Positive;
+   end record;
+   Empty_Range : constant Range_Type := (First => Positive'Last,
+                                         Last  => Positive'First);
+
+   function In_Range (R : Range_Type;
+                      S : String) return Boolean
+   is (R.First >= S'First and
+       R.Last  <= S'Last and
+       R.First <= R.Last);
+
+   function Length (R : Range_Type) return Positive is (R.Last - R.First + 1)
+   with
+     Pre => R.Last < Positive'Last and then R.First <= R.Last;
 
    type Alg_Type is (Alg_Invalid,
                      Alg_None,

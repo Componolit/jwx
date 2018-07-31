@@ -10,7 +10,7 @@
 --
 
 with AUnit.Assertions; use AUnit.Assertions;
-with JWX.JWS;
+with JWX.JWS; use JWX.JWS;
 with JWX_Test_Utils; use JWX_Test_Utils;
 use JWX;
 
@@ -25,14 +25,10 @@ package body JWX_JWS_Tests is
       -- is not expected (JWX.JWSCS expects the token to end at the last
       -- character)
       Data : String := Tmp (Tmp'First .. Tmp'Last - 1);
-
-      package J is new JWX.JWS (Data, Key);
-      use J;
       Result : Result_Type;
    begin
-      Validate_Compact (Result => Result);
-
-      Assert (Result = Result_OK, "Validation failed: " & Result'Img);
+      Result := Validate_Compact (Data, Key);
+      Assert (Result.Error = Error_OK, "Validation failed: " & Result.Error'Img);
    end Test_Parse_RFC7515_Vector_1;
 
    --------------------------------------------------------------------------------------------------------------------
@@ -41,12 +37,10 @@ package body JWX_JWS_Tests is
    is
       Data : String := Read_File ("tests/data/JWS_RFC7515_example_2.dat");
       Key  : String := Read_File ("tests/data/JWS_RFC7515_example_1_key.json");
-      package J is new JWX.JWS (Data, Key);
-      use J;
       Result : Result_Type;
    begin
-      Validate_Compact (Result => Result);
-      Assert (Result /= Result_OK, "Validation must fail");
+      Result := Validate_Compact (Data, Key);
+      Assert (Result.Error /= Error_OK, "Validation must fail");
    end Test_Parse_RFC7515_Vector_1_Invalid;
 
    --------------------------------------------------------------------------------------------------------------------

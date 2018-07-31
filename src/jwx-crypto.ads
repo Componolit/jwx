@@ -14,13 +14,14 @@ generic
    Auth    : String;
    Key     : String;
 package JWX.Crypto
-with
-   Abstract_State => State,
-   Initializes    => State
 is
 
    --  Validate authenticator using algorithm @Alg@
    procedure Valid (Alg   : Alg_Type;
-                    Valid : out Boolean);
+                    Valid : out Boolean)
+   with
+      Pre => Key'First >= 0 and
+             Key'Last < Natural'Last and
+             Key'First <= Key'Last;
 
 end JWX.Crypto;

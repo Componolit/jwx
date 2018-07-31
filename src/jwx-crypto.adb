@@ -21,22 +21,24 @@ with LSC.HMAC_SHA256;
 use type LSC.SHA256.Message_Index;
 
 package body JWX.Crypto
-   with
-      Refined_State => (State => (K.State))
 is
-   package K is new JWX.JWK (Key);
-
    -----------------------
    -- Valid_HMAC_SHA256 --
    -----------------------
 
    procedure Valid_HMAC_SHA256 (Valid : out Boolean)
    with
-      Pre => Payload'Last < Natural'Last - 1 and
-             Auth'Length <= Natural'Last -3;
+      Pre => Key'First >= 0 and
+             Key'Last < Natural'Last and
+             Key'First <= Key'Last and
+             Payload'Last < Natural'Last - 1 and
+             Auth'Length <= Natural'Last - 3;
 
    procedure Valid_HMAC_SHA256 (Valid : out Boolean)
    is
+      package K is new JWX.JWK (Key);
+      Keys : K.Key_Array_Type := K.Parse_Keys;
+
       Payload_Raw : JWX.Byte_Array (1 .. Payload'Length);
       Key_Raw     : JWX.Byte_Array (1 .. (Key'Length/4 + 1) * 3);
       Auth_Raw    : JWX.Byte_Array (1 .. 3 * ((Auth'Length + 3) / 4));
@@ -48,7 +50,6 @@ is
 
       Auth_Length    : Natural;
       Key_Length     : Natural;
-      Key_Valid      : Boolean;
 
       use JWX.LSC;
       use SC.Types;
@@ -56,71 +57,73 @@ is
    begin
       Valid := False;
 
-      if not K.Loaded
+      if Keys'Length = 0
       then
          return;
       end if;
 
-      K.Select_Key (Key_Valid);
+      declare
+         Key : K.Key_Type := Keys (Keys'First);
+      begin
+         if (K.Algorithm (Key) /= Alg_HS256 or
+             K.Kind (Key) /= K.Kind_OCT)
+         then
+            return;
+         end if;
 
-      if not Key_Valid or else
-        (K.Algorithm /= Alg_HS256 or
-         K.Kind /= K.Kind_OCT)
-      then
-         return;
-      end if;
+         K.K (Key, Key_Raw, Key_Length);
+         if (Key_Length = 0 or
+             Key_Raw'First >= Integer'Last - 4 * Key_LSC'Length or
+             Payload_Raw'Length <= 0 or
+             Payload_LSC'Last <= Payload_LSC'First or
+             Auth'Length <= 0 or
+             Auth'Length >= Natural'Last / 9 or
+             Auth'Last >= Natural'Last - 4 or
+             Payload_LSC'Length > SC.SHA256.Message_Index (Integer'Last) / 64) or else
+             Payload_Raw'First >= Integer'Last - 64 * Payload_LSC'Length - 64
+         then
+            return;
+         end if;
 
-      K.K (Key_Raw, Key_Length);
-      if (Key_Length = 0 or
-        Key_Raw'First >= Integer'Last - 4 * Key_LSC'Length or
-        Payload_Raw'Length <= 0 or
-        Payload_LSC'Last <= Payload_LSC'First or
-        Auth'Length <= 0 or
-        Auth'Length >= Natural'Last / 9 or
-        Auth'Last >= Natural'Last - 4 or
-        Payload_LSC'Length > SC.SHA256.Message_Index (Integer'Last) / 64) or else
-        Payload_Raw'First >= Integer'Last - 64 * Payload_LSC'Length - 64
-      then
-         return;
-      end if;
+         --  Convert key into LSC compatible format
+         LSC.JWX_Byte_Array_To_LSC_Word32_Array
+           (Input  => Key_Raw (Key_Raw'First .. Key_Raw'First + Key_Length - 1),
+            Output => Key_LSC);
 
-      --  Convert key into LSC compatible format
-      LSC.JWX_Byte_Array_To_LSC_Word32_Array
-         (Input  => Key_Raw (Key_Raw'First .. Key_Raw'First + Key_Length - 1),
-          Output => Key_LSC);
+         --  Convert string to JWX byte array
+         JWX.Util.To_Byte_Array (Payload, Payload_Raw);
 
-      --  Convert string to JWX byte array
-      JWX.Util.To_Byte_Array (Payload, Payload_Raw);
+         --  Convert payload into LSC compatible format
+         LSC.JWX_Byte_Array_To_LSC_SHA256_Message
+           (Input  => Payload_Raw,
+            Output => Payload_LSC);
 
-      --  Convert payload into LSC compatible format
-      LSC.JWX_Byte_Array_To_LSC_SHA256_Message
-         (Input  => Payload_Raw,
-          Output => Payload_LSC);
+         --  Decode authenticator
+         Base64.Decode_Url (Encoded => Auth,
+                            Length  => Auth_Length,
+                            Result  => Auth_Raw);
+         if Auth_Length /= 32
+         then
+            return;
+         end if;
 
-      --  Decode authenticator
-      Base64.Decode_Url (Encoded => Auth,
-                         Length  => Auth_Length,
-                         Result  => Auth_Raw);
-      if Auth_Length /= 32
-      then
-         return;
-      end if;
+         --  Convert authenticator LSC compatible format
+         LSC.JWX_Byte_Array_To_LSC_Word32_Array
+           (Input  => Auth_Raw,
+            Output => Auth_Input);
 
-      --  Convert authenticator LSC compatible format
-      LSC.JWX_Byte_Array_To_LSC_Word32_Array
-         (Input  => Auth_Raw,
-          Output => Auth_Input);
+         Auth_Calc := SC.HMAC_SHA256.Pseudorandom
+           (Key     => Key_LSC,
+            Message => Payload_LSC,
+            Length  => SC.SHA256.Message_Index (Payload'Length) * 8);
 
-      Auth_Calc := SC.HMAC_SHA256.Pseudorandom
-         (Key     => Key_LSC,
-          Message => Payload_LSC,
-          Length  => SC.SHA256.Message_Index (Payload'Length) * 8);
+         --  Validate
+         if Auth_Input /= Auth_Calc
+         then
+            return;
+         end if;
 
-      --  Validate
-      if Auth_Input /= Auth_Calc
-      then
-         return;
-      end if;
+      end;
 
       Valid := True;
    end Valid_HMAC_SHA256;

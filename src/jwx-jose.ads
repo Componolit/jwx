@@ -12,7 +12,7 @@
 with JWX;
 
 generic
-   Data : JWX.Data_Type;
+   Data : String;
 package JWX.JOSE
 is
    -- Valid JOSE header
@@ -21,6 +21,6 @@ is
    -- Algorithm defined in JOSE header
    function Algorithm return JWX.Alg_Type
    with
-      Pre => Valid; 
+      Pre => Valid;
 
 end JWX.JOSE;

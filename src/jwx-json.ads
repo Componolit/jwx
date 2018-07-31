@@ -15,9 +15,6 @@ generic
    Context_Size : Natural := Input_Data'Length / 3 + 2;
 
 package JWX.JSON
-with
-   Abstract_State => (State),
-   Initializes    => (State)
 is
 
    -- This is a workaround for a bug in GNAT prior to Community 2018, where a
@@ -59,7 +56,6 @@ is
    -- Return kind of current element of a context
    function Get_Kind (Index : Index_Type := Null_Index) return Kind_Type
    with
-      Global => (Input => (State)),
       Post   => Has_Kind (Index, Get_Kind'Result);
 
    -- Return value of a boolean context element
@@ -83,6 +79,16 @@ is
    with
       Pre => Get_Kind (Index) = Kind_String;
 
+   -- Get range of stringe object inside Data
+   function Get_Range (Index : Index_Type := Null_Index) return Range_Type
+   with
+      Pre => Get_Kind (Index) = Kind_String,
+      Post => (if Get_Range'Result /= Empty_Range then
+                  Get_Range'Result.First >= Data'First and
+                  Get_Range'Result.Last  <= Data'Last and
+                  Get_Range'Result.First <= Get_Range'Result.Last and
+                  Get_Range'Result.Last < Positive'Last);
+
    -- Query object
    function Query_Object (Name  : String;
                           Index : Index_Type := Null_Index) return Index_Type
@@ -97,7 +103,9 @@ is
    -- Return length of an array
    function Length (Index : Index_Type := Null_Index) return Natural
    with
-      Pre => Get_Kind (Index) = Kind_Array;
+      Pre => Get_Kind (Index) = Kind_Array,
+      Annotate => (GNATprove, Terminating);
+
 
    -- Return object at given position of an array
    function Pos (Position : Natural;

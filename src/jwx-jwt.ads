@@ -9,12 +9,6 @@
 -- GNU Affero General Public License version 3.
 --
 
-generic
-   Data     : JWX.Data_Type;
-   Key_Data : JWX.Data_Type;
-   Audience : JWX.Data_Type;
-   Issuer   : JWX.Data_Type;
-   Now      : Long_Integer;
 package JWX.JWT
 is
 
@@ -28,7 +22,16 @@ is
                         Result_Invalid_Issuer,
                         Result_Expired);
 
-   -- Return result
-   function Result return Result_Type;
+
+   function Validate_Compact (Data     : String;
+                              Key_Data : String;
+                              Audience : String;
+                              Issuer   : String;
+                              Now      : Long_Integer) return Result_Type
+   with
+      Pre => Data'Length >= 5 and
+             Key_Data'First >= 0 and
+             Key_Data'Last < Natural'Last and
+             Key_Data'First <= Key_Data'Last;
 
 end JWX.JWT;
