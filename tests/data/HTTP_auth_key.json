@@ -1,3 +1,4 @@
 { "kty": "oct",
+  "alg": "HS256",
   "k": "dmdjMzU1ejIxOVNHTS1LZllfN3ZLNXJ3Mk1qTnVXbUhMRUZnRlI5ZWFLYTdKTXZESld2TmJZbDA4RzBCeFVHZQ"
 }
