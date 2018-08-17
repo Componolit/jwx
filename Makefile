@@ -9,14 +9,18 @@ all: JWX.gpr
 	@egrep -v -q '\(medium\|warning\|error\):' proof.log.tmp
 	@mv proof.log.tmp proof.log
 
-clean:
+clean: JWX.gpr
 	@make -C contrib/libsparkcrypto clean
 	@gprclean $(COMMON_OPTS) -PJWX
 	@gnatprove  $(COMMON_OPTS) -PJWX --clean
-	@rm -rf obj adalib
+	@rm -rf obj adalib proof.log* undefined.ciu graph.vcg
 
-doc: JWX.gpr
-	@gnatdoc --no-subprojects -w --enable-build $(COMMON_OPTS) -PJWX
+doc: doc/api/index.html
+
+doc/api/index.html: JWX.gpr
+	@gprbuild -P JWX -Xlibtype=dynamic
+	@gnatdoc -q -P JWX --no-subprojects -Xlibtype=dynamic -XRTS=native -Xcallgraph=none -w -l --enable-build
+	@gnatdoc -P JWX --no-subprojects -Xlibtype=dynamic -XRTS=native -Xcallgraph=none -w -l --enable-build
 
 stack: COMMON_OPTS += -Xcallgraph=su_da
 stack: CALLGRAPH = su_da
