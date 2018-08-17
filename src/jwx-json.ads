@@ -13,6 +13,7 @@ generic
 
    Input_Data   : String;
    Context_Size : Natural := Input_Data'Length / 3 + 2;
+   Depth_Max    : Natural := 100;
 
 package JWX.JSON
 is
@@ -45,15 +46,17 @@ is
    type Match_Type is (Match_OK,
                        Match_None,
                        Match_Invalid,
-                       Match_Out_Of_Memory);
+                       Match_Out_Of_Memory,
+                       Match_Depth_Limit);
    --  Result of a parsing operation
    --
    --  @value Match_OK             JSON document parsed successfully
    --  @value Match_None           No JSON data found
    --  @value Match_Invalid        Malformed JSON data found
-   --  @value Match_Out_Of_Memory  Out of context buffer memory, increase generic
-   --                             Context_Size parameter when instanciating
-   --                             package
+   --  @value Match_Out_Of_Memory  Out of context buffer memory, increase
+   --                              generic Context_Size parameter when
+   --                              instanciating package
+   --  @value Match_Depth_Limit    Recursion depth exceeded
 
    type Index_Type is new Natural range 1 .. Context_Size;
    Null_Index : constant Index_Type := Index_Type'First;

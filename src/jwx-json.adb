@@ -35,7 +35,8 @@ is
 
    type Context_Type is array (Index_Type) of Context_Element_Type;
 
-   procedure Parse_Internal (Match : out Match_Type)
+   procedure Parse_Internal (Match : out Match_Type;
+                             Depth : Natural)
    with
       Pre => Data'First >= 0 and
              Data'Last < Natural'Last;
@@ -946,12 +947,15 @@ is
    -- Parse_Object --
    ------------------
 
-   procedure Parse_Object (Match : out Match_Type)
+   procedure Parse_Object (Match : out Match_Type;
+                           Depth : Natural := 0)
    with
       Pre => Data'First >= 0 and
-             Data'Last < Natural'Last;
+             Data'Last < Natural'Last and
+             Depth < Natural'Last;
 
-   procedure Parse_Object (Match : out Match_Type)
+   procedure Parse_Object (Match : out Match_Type;
+                           Depth : Natural := 0)
    is
       Object_Index    : Index_Type;
       Previous_Member : Index_Type;
@@ -1027,7 +1031,7 @@ is
          Offset := Offset + 1;
 
          --  Parse member
-         Parse_Internal (Match_Member);
+         Parse_Internal (Match_Member, Depth + 1);
          if Match_Member /= Match_OK then
             Offset := Old_Offset;
             return;
@@ -1056,12 +1060,15 @@ is
    ------------------
    -- Parse_Array --
    ------------------
-   procedure Parse_Array (Match : out Match_Type)
+   procedure Parse_Array (Match : out Match_Type;
+                          Depth : Natural := 0)
    with
       Pre => Data'First >= 0 and
-             Data'Last < Natural'Last;
+             Data'Last < Natural'Last and
+             Depth < Natural'Last;
 
-   procedure Parse_Array (Match : out Match_Type)
+   procedure Parse_Array (Match : out Match_Type;
+                          Depth : Natural := 0)
    is
       AI               : Index_Type;
       Previous_Element : Index_Type;
@@ -1117,7 +1124,7 @@ is
          Previous_Element := Context_Index;
 
          --  Parse element
-         Parse_Internal (Match_Element);
+         Parse_Internal (Match_Element, Depth + 1);
          if Match_Element /= Match_OK then
             Offset := Old_Offset;
             return;
@@ -1147,9 +1154,17 @@ is
    -- Parse_Internal --
    --------------------
 
-   procedure Parse_Internal (Match : out Match_Type)
+   procedure Parse_Internal (Match : out Match_Type;
+                             Depth : Natural)
    is
    begin
+      --  Check recursion depth
+      if Depth > Depth_Max
+      then
+         Match := Match_Depth_Limit;
+         return;
+      end if;
+
       Skip_Whitespace;
 
       Parse_Null (Match);
@@ -1182,7 +1197,8 @@ is
    procedure Parse (Match : out Match_Type)
    is
    begin
-      Parse_Internal (Match);
+      Parse_Internal (Match => Match,
+                      Depth => 0);
       if Context_Index > Context'First
       then
          Reset;
