@@ -1,15 +1,16 @@
-**This is a preview of the JWX library which is under active development.**.
-
-JWX is a library for handling [JSON](https://www.json.org/) data. It is
-implemented in the [SPARK](http://spark-2014.org) programming language which
-can be used to show the absence of runtime errors. As a result, JWX is
-particularly suited for processing untrusted information.
+JWX is a library for handling [JSON](https://www.json.org/) data and more. It
+is implemented in the [SPARK](http://spark-2014.org) programming language and
+has been prove to contain no runtime errors. As a result, JWX is particularly
+suited for processing untrusted information.
 
 In the current version, parsing of Base64 (RFC 4648) data, JSON (RFC 8259)
 documents, JSON Web Keys (JWK, RFC 7517) and limited support for JSON Web
 Signatures (JWS, RFC 7515) and JSON Web Tokens (JWT, RFC 7519) is implemented.
 In the future, JSON Web Encryption (JWE, RFC 7516) and potentially [JSON
 Schema](http://json-schema.org) is anticipated.
+
+JWX is available under the AGPLv3 license. For commercial licensing and support
+mail to jwx@componolit.com.
 
 # Examples
 
@@ -63,23 +64,21 @@ end JSON;
 
 ```Ada
 with Ada.Text_IO; use Ada.Text_IO;
-with JWX.JWT;
+with JWX.JWT; use JWX.JWT;
 with JWX_Test_Utils;
 
 procedure JWT is
    Tmp  : String := JWX_Test_Utils.Read_File ("tests/data/JWT_test_data.dat");
    Key  : String := JWX_Test_Utils.Read_File ("tests/data/HTTP_auth_key.json");
    Data : String := Tmp (Tmp'First .. Tmp'Last - 1);
-
-   package J is new JWX.JWT (Data     => Data,
-                             Key_Data => Key,
-                             Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
-                             Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
-                             Now      => 1528404620);
-   use J;
-   Result : Result_Type;
+   package J renames Standard.JWX.JWT;
+   Result : J.Result_Type;
 begin
-   Validate_Compact (Result => Result);
+   Result := J.Validate_Compact (Data     => Data,
+                                 Key_Data => Key,
+                                 Audience => "4cCy0QeXkvjtHejID0lKzVioMfTmuXaM",
+                                 Issuer   => "https://cmpnlt-demo.eu.auth0.com/",
+                                 Now      => 1528404620);
    if Result = Result_OK then
       Put_Line ("Token is valid");
    end if;
@@ -90,37 +89,27 @@ end JWT;
 
 The following known limitations exist in JWX:
 
-* The code is valid SPARK, but absence of runtime errors is still to be proven
 * Generation of Base64, JSON, JWS, JWT etc. is not supported (only validation)
 * JWS and JWT only support HMAC-SHA256 (no other HMAC modes, RSA or ECDSA)
 * JWS JSON serialization is not supported (only JWS compact serialization)
 * Only the registered claims `iss`, `exp` and `aud` are supported
 * No scopes or custom claims are supported
-* No proper API documentation exists
 
 # Building
 
-To build JWX, [libsparkcrypto](https://github.com/Componolit/libsparkcrypto) is
-required. Check out the `componolit` branch and install the library to a local
-destination (we assume this is `${LIBSPARKCRYPTO_INSTALL_PATH}`):
+Check out JWX and build it:
 
 ```
-$ cd ${LIBSPARKCRYPTO_DIR}
-$ make DESTDIR=${LIBSPARKCRYPTO_INSTALL_PATH} NO_TESTS=1 NO_SPARK=1 SHARED=1 install
-```
-
-Then, check out JWX and build it:
-
-```
-$ cd ${JWX_DIR}
-$ ADA_PROJECT_PATH=${LIBSPARKCRYPTO_INSTALL_PATH} make
+$ git clone --recursive https://github.com/Componolit/jwx.git
+$ cd jwx
+$ make
 ```
 
 To build the test cases, AUnit must be in your project path. To build an run
 the tests do:
 
 ```
-$ ADA_PROJECT_PATH=${LIBSPARKCRYPTO_INSTALL_PATH} make test
+$ make test
 ```
 
 # License
