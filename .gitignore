@@ -2,3 +2,15 @@ adalib
 obj
 proof.log
 proof.log.tmp
+*.o
+*.ali
+b__*.ad?
+*.stdout
+*.stderr
+*.bexch
+examples/area
+examples/b64
+examples/json
+examples/jwt
+examples/authproxy
+examples/gnatprove

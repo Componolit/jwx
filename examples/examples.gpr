@@ -1,10 +1,9 @@
+with "../JWX";
 with "../obj/lsc/libsparkcrypto";
 
 project Examples is
 
-   for Source_Dirs use (".");
-   for Object_Dir use "../obj";
-   for Source_Dirs use (".", "../src", "../tests");
+   for Source_Dirs use (".", "../tests");
    for Main use ("b64.adb", "json.adb", "area.adb", "jwt.adb", "authproxy");
 
 end Examples;
