@@ -2,6 +2,21 @@ with "obj/lsc/libsparkcrypto";
 
 project JWX is
 
+   type Callgraph_Type is ("none", "su", "su_da");
+   Callgraph : Callgraph_Type := external ("callgraph", "none");
+
+   Callgraph_Switches := ();
+   case Callgraph is
+      when "none" =>
+         Callgraph_Switches := ();
+
+      when "su" =>
+         Callgraph_Switches := ("-fcallgraph-info=su");
+
+      when "su_da" =>
+         Callgraph_Switches := ("-fcallgraph-info=su,da");
+   end case;
+
    Ada_Switches :=
    (
       "-gnatA"	 -- Avoid processing gnat.adc, if present file will be ignored
@@ -51,7 +66,6 @@ project JWX is
      ,"-gnatyu"    -- check no unnecessary blank lines
      ,"-gnatyx"    -- check extra parentheses around conditionals
 
-     ,"-fcallgraph-info=su,da" -- generate call graph for stack checking
      ,"-fstack-check"          -- dynamic stack checking
    );
 
@@ -72,7 +86,7 @@ project JWX is
    end Builder;
 
    package Compiler is
-      for Default_Switches ("Ada") use Ada_Switches;
+      for Default_Switches ("Ada") use Ada_Switches & Callgraph_Switches;
    end Compiler;
 
    package Stack is

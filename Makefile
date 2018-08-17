@@ -2,6 +2,7 @@ GNATPROVE_OPTS = --prover=z3,cvc4 -j2 --codepeer=off --output-header --no-inlini
 COMMON_OPTS = -Xlibtype=dynamic
 
 EXAMPLES = b64 json area jwt authproxy
+CALLGRAPH = none
 
 all: JWX.gpr
 	@time gnatprove $(COMMON_OPTS) -PJWX $(GNATPROVE_OPTS) | tee proof.log.tmp
@@ -17,6 +18,8 @@ clean:
 doc: JWX.gpr
 	@gnatdoc --no-subprojects -w --enable-build $(COMMON_OPTS) -PJWX
 
+stack: COMMON_OPTS += -Xcallgraph=su_da
+stack: CALLGRAPH = su_da
 stack: JWX.gpr
 	@gprbuild $(COMMON_OPTS) -PJWX
 	@gnatstack -PJWX
@@ -38,6 +41,6 @@ contrib/libsparkcrypto/Makefile:
 	@git submodule update
 
 obj/lsc/libsparkcrypto.gpr: contrib/libsparkcrypto/Makefile
-	@make -C contrib/libsparkcrypto/ NO_SPARK=1 NO_TESTS=1 DESTDIR=$(PWD)/obj/lsc install
+	@make -C contrib/libsparkcrypto/ NO_SPARK=1 NO_TESTS=1 DESTDIR=$(PWD)/obj/lsc CALLGRAPH=$(CALLGRAPH) install
 
 .PHONY: test
