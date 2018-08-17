@@ -11,7 +11,7 @@
 
 with AUnit.Assertions; use AUnit.Assertions;
 with JWX.Crypto;
-with JWX.LSC;
+with JWX.Libsparkcrypto;
 with JWX.Util;
 with JWX_Test_Utils; use JWX_Test_Utils;
 
@@ -40,7 +40,7 @@ is
    is
       use LSC.SHA256;
       use LSC.Types;
-      use JWX.LSC;
+      use JWX.Libsparkcrypto;
       use JWX.Util;
       Block : Block_Type;
       Input : String := "Hi There";
@@ -57,13 +57,13 @@ is
    is
       use LSC.SHA256;
       use LSC.Types;
-      use JWX.LSC;
+      use JWX.Libsparkcrypto;
       use JWX.Util;
       Block : Block_Type;
       Input : String := "what do ya want for nothing?";
       BA    : JWX.Byte_Array (1 .. Input'Length);
 
-      Result : SC.SHA256.Block_Type :=
+      Result : LSC.SHA256.Block_Type :=
         (M (16#77686174#), M (16#20646f20#), M (16#79612077#), M (16#616e7420#),
          M (16#666f7220#), M (16#6e6f7468#), M (16#696e673f#), others => 0);
    begin
@@ -78,7 +78,7 @@ is
    is
       use LSC.SHA256;
       use LSC.Types;
-      use JWX.LSC;
+      use JWX.Libsparkcrypto;
       use JWX.Util;
 
       Expected : MT := (
@@ -118,19 +118,19 @@ is
    procedure Test_HMAC_SHA256 (T : in out Test_Cases.Test_Case'Class)
    is
       use JWX.Util;
-      use JWX.LSC;
-      use SC.Types;
-      use type SC.SHA256.Message_Index;
+      use JWX.Libsparkcrypto;
+      use LSC.Types;
+      use type LSC.SHA256.Message_Index;
 
       Key_Input : String := Read_File ("tests/data/hmac_sha256-key-1.dat");
       Key_BA    : JWX.Byte_Array (1 .. Key_Input'Length);
-      Key       : SC.SHA256.Block_Type;
+      Key       : LSC.SHA256.Block_Type;
 
       Msg_Input : String := Read_File ("tests/data/hmac_sha256-message-1.dat");
       Msg_BA    : JWX.Byte_Array (1 .. Msg_Input'Length);
       Msg       : MT;
 
-      Auth          : SC.HMAC_SHA256.Auth_Type;
+      Auth          : LSC.HMAC_SHA256.Auth_Type;
       Expected_Auth : JWX.Byte_Array := (16#15#, 16#66#, 16#78#, 16#70#, 16#c4#, 16#95#, 16#7c#, 16#0f#,
                                          16#46#, 16#de#, 16#0f#, 16#26#, 16#c1#, 16#98#, 16#04#, 16#ae#);
    begin
@@ -141,7 +141,7 @@ is
       JWX_Byte_Array_To_LSC_SHA256_Message (Msg_BA, Msg);
 
       JWX_Byte_Array_To_LSC_Word32_Array (Expected_Auth, Auth);
-      Assert (Auth = SC.HMAC_SHA256.Authenticate (Key, Msg, Msg_Input'Length * 8), "Auth failed");
+      Assert (Auth = LSC.HMAC_SHA256.Authenticate (Key, Msg, Msg_Input'Length * 8), "Auth failed");
 
    end Test_HMAC_SHA256;
 

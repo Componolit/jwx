@@ -11,7 +11,7 @@
 
 with JWX;
 
-package body JWX.LSC
+package body JWX.Libsparkcrypto
 with
    SPARK_Mode
 is
@@ -21,11 +21,11 @@ is
 
    procedure JWX_Byte_Array_To_LSC_Word32_Array
       (Input  :     JWX.Byte_Array;
-       Output : out SC.Types.Word32_Array_Type;
+       Output : out LSC.Types.Word32_Array_Type;
        Offset :     Natural := 0)
    is
-      use SC;
-      use SC.Types;
+      use LSC;
+      use LSC.Types;
       Value : Byte_Array32_Type;
    begin
       Output := (others => 0);
@@ -53,11 +53,10 @@ is
 
    procedure JWX_Byte_Array_To_LSC_SHA256_Message
       (Input  :     JWX.Byte_Array;
-       Output : out SC.SHA256.Message_Type)
+       Output : out LSC.SHA256.Message_Type)
    is
-      use SC;
-      use SC.Types;
-      use SC.SHA256;
+      use LSC;
+      use LSC.SHA256;
    begin
       Output := (others => (others => 0));
       for O in Output'First .. Output'Last
@@ -69,4 +68,4 @@ is
       end loop;
    end JWX_Byte_Array_To_LSC_SHA256_Message;
 
-end JWX.LSC;
+end JWX.Libsparkcrypto;

@@ -11,7 +11,7 @@
 
 with JWX.JWK;
 with JWX.Base64;
-with JWX.LSC;
+with JWX.Libsparkcrypto;
 with JWX.Util;
 
 with LSC.Types;
@@ -51,8 +51,7 @@ is
       Auth_Length    : Natural;
       Key_Length     : Natural;
 
-      use JWX.LSC;
-      use SC.Types;
+      use LSC.Types;
       use type K.Kind_Type;
    begin
       Valid := False;
@@ -79,14 +78,14 @@ is
              Auth'Length <= 0 or
              Auth'Length >= Natural'Last / 9 or
              Auth'Last >= Natural'Last - 4 or
-             Payload_LSC'Length > SC.SHA256.Message_Index (Integer'Last) / 64) or else
+             Payload_LSC'Length > LSC.SHA256.Message_Index (Integer'Last) / 64) or else
              Payload_Raw'First >= Integer'Last - 64 * Payload_LSC'Length - 64
          then
             return;
          end if;
 
          --  Convert key into LSC compatible format
-         LSC.JWX_Byte_Array_To_LSC_Word32_Array
+         Libsparkcrypto.JWX_Byte_Array_To_LSC_Word32_Array
            (Input  => Key_Raw (Key_Raw'First .. Key_Raw'First + Key_Length - 1),
             Output => Key_LSC);
 
@@ -94,7 +93,7 @@ is
          JWX.Util.To_Byte_Array (Payload, Payload_Raw);
 
          --  Convert payload into LSC compatible format
-         LSC.JWX_Byte_Array_To_LSC_SHA256_Message
+         Libsparkcrypto.JWX_Byte_Array_To_LSC_SHA256_Message
            (Input  => Payload_Raw,
             Output => Payload_LSC);
 
@@ -108,14 +107,14 @@ is
          end if;
 
          --  Convert authenticator LSC compatible format
-         LSC.JWX_Byte_Array_To_LSC_Word32_Array
+         Libsparkcrypto.JWX_Byte_Array_To_LSC_Word32_Array
            (Input  => Auth_Raw,
             Output => Auth_Input);
 
-         Auth_Calc := SC.HMAC_SHA256.Pseudorandom
+         Auth_Calc := LSC.HMAC_SHA256.Pseudorandom
            (Key     => Key_LSC,
             Message => Payload_LSC,
-            Length  => SC.SHA256.Message_Index (Payload'Length) * 8);
+            Length  => LSC.SHA256.Message_Index (Payload'Length) * 8);
 
          --  Validate
          if Auth_Input /= Auth_Calc
