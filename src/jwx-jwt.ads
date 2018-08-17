@@ -10,6 +10,8 @@
 
 -- @summary JWT validation (RFC 7519)
 package JWX.JWT
+with
+   SPARK_Mode
 is
 
    type Result_Type is (Result_Invalid,

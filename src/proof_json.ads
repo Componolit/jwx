@@ -13,6 +13,8 @@ with JWX.JSON;
 -- @private
 -- @summary Helper package for proving generic JWX.JSON
 package Proof_JSON
+with
+   SPARK_Mode
 is
    procedure Do_Parse (Data  :     String;
                        Match : out Boolean)

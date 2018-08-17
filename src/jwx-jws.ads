@@ -10,6 +10,8 @@
 
 -- @summary JWS validation (RFC 7515)
 package JWX.JWS
+with
+   SPARK_Mode
 is
 
    type Error_Type is (Error_Invalid,

@@ -12,7 +12,8 @@ with JWX;
 
 -- @summary BASE64 decoding (RFC4648)
 package JWX.Base64
-    with SPARK_Mode
+with
+   SPARK_Mode
 is
 
    procedure Decode

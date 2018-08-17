@@ -10,6 +10,8 @@
 
 -- @summary JWX main package
 package JWX
+with
+   SPARK_Mode
 is
    type UInt6 is mod 2**6
    with Size => 6;
