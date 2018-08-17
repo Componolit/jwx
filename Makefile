@@ -3,21 +3,21 @@ COMMON_OPTS = -Xlibtype=dynamic
 
 EXAMPLES = b64 json area jwt authproxy
 
-all: proj.gpr
-	@time gnatprove $(COMMON_OPTS) -Pproj $(GNATPROVE_OPTS) | tee proof.log.tmp
+all: JWX.gpr
+	@time gnatprove $(COMMON_OPTS) -PJWX $(GNATPROVE_OPTS) | tee proof.log.tmp
 	@egrep -v -q '\(medium\|warning\|error\):' proof.log.tmp
 	@mv proof.log.tmp proof.log
 
 clean:
 	@make -C contrib/libsparkcrypto clean
-	@gprclean $(COMMON_OPTS) -Pproj
-	@gnatprove  $(COMMON_OPTS) -Pproj --clean
+	@gprclean $(COMMON_OPTS) -PJWX
+	@gnatprove  $(COMMON_OPTS) -PJWX --clean
 	@rm -rf obj adalib
 
-doc: proj.gpr
-	@gnatdoc --no-subprojects -w --enable-build $(COMMON_OPTS) -Pproj
+doc: JWX.gpr
+	@gnatdoc --no-subprojects -w --enable-build $(COMMON_OPTS) -PJWX
 
-test: proj.gpr
+test: JWX.gpr
 	@gprbuild $(COMMON_OPTS) -P tests/test.gpr -gnata -p
 	@obj/test
 
@@ -27,7 +27,7 @@ $(addprefix obj/,$(EXAMPLES)): obj/lsc/libsparkcrypto.gpr examples/*.ad?
 	@gprbuild $(COMMON_OPTS) -P examples/examples.gpr
 	@gnatprove $(COMMON_OPTS) -P examples/examples.gpr $(GNATPROVE_OPTS)
 
-proj.gpr: obj/lsc/libsparkcrypto.gpr
+JWX.gpr: obj/lsc/libsparkcrypto.gpr
 
 contrib/libsparkcrypto/Makefile:
 	@git submodule init
