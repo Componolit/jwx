@@ -1,9 +1,10 @@
+with JWX;
 with Areas;
 with Ada.Text_IO; use Ada.Text_IO;
 with JWX_Test_Utils; use JWX_Test_Utils;
 
 procedure Area is
-   Area  : Float;
+   Area  : JWX.Real_Type;
    Valid : Boolean;
    Data  : String := Read_File ("tests/data/countries.json");
 begin   

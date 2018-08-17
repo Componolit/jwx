@@ -15,6 +15,6 @@ begin
       Put_Line ("City: " & Get_String (Result)); -- "SAN FRANCISCO"
 
       Result := Query_Object ("Latitude");
-      Put_Line ("Lat.: " & Get_Float (Result)'Img); -- 37.7668
+      Put_Line ("Lat.: " & Get_Real (Result)'Img); -- 37.7668
    end if;
 end JSON;

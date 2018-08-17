@@ -6,10 +6,11 @@ pragma Elaborate_All (JWX.JSON);
 package body Areas is
    procedure Areas (Data   : in out String;
                     Valid  : out Boolean;
-                    Result : out Float)
+                    Result : out JWX.Real_Type)
    is
       package C is new JWX.JSON (Data);
       use C;
+      use type JWX.Real_Type;
 
       Match   : Match_Type;
       Element : Index_Type;
@@ -29,7 +30,7 @@ package body Areas is
       loop
          Element  := Pos (I);
          Area := Query_Object ("area", Element);
-         Result := Result + Get_Float (Area);
+         Result := Result + Get_Real (Area);
       end loop;
 
       Valid := True;
