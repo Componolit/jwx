@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Componolit/jwx.svg?branch=master)](https://travis-ci.org/Componolit/jwx)
+
 JWX is a library for handling [JSON](https://www.json.org/) data and more. It
 is implemented in the [SPARK](http://spark-2014.org) programming language and
 has been prove to contain no runtime errors. As a result, JWX is particularly
