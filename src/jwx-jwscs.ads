@@ -1,7 +1,6 @@
 --
--- \brief  JWS compact serialization (RFC 7515, 7.1)
--- \author Alexander Senier
--- \date   2018-05-20
+-- @author Alexander Senier
+-- @date   2018-05-20
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
@@ -9,57 +8,60 @@
 -- GNU Affero General Public License version 3.
 --
 
+-- @summary JWS compact serialization (RFC 7515, 7.1)
 generic
    Data : String;
 package JWX.JWSCS
 is
-   -- Is the token valid
    function Valid return Boolean
    with
       Ghost;
+   -- Is the token valid
 
-   -- Split the JOSE header
    procedure Split (Token_Valid : out Boolean)
    with
       Pre  => Data'Length >= 5,
       Post => (if Token_Valid then Valid);
+   -- Split the JOSE header
+   --
+   -- @param Token_Valid Head was valid
 
-   -- Length of JOSE header
    function JOSE_Length return Natural
    with
       Pre => Valid;
+   -- Length of JOSE header
 
-   -- Raw data of JOSE header
    function JOSE_Data return String
    with
       Pre => Valid;
+   -- Raw data of JOSE header
 
-   -- Encoded payload
    function Payload return String
    with
       Pre => Valid;
+   -- Encoded payload
 
-   -- Start index of encoded payload
    function Payload_First return Positive
    with
        Pre  => Valid,
        Post => Payload_First'Result >= Data'First;
+   -- Start index of encoded payload
 
-   -- End index of encoded payload
    function Payload_Last return Positive
    with
       Pre  => Valid,
       Post => Payload_First <= Payload_Last'Result and
               Payload_Last'Result <= Data'Last;
+   -- End index of encoded payload
 
-   -- Encoded signature input (JOSE header + '.' + payload)
    function Signature_Input return String
    with
       Pre => Valid;
+   -- Encoded signature input (JOSE header + '.' + payload)
 
-   -- Encoded signature
    function Signature return String
    with
       Pre => Valid;
+   -- Encoded signature
 
 end JWX.JWSCS;

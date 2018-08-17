@@ -1,7 +1,7 @@
 --
--- \brief  JWX binding to libsparkcrypto
--- \author Alexander Senier
--- \date   2018-06-06
+-- @summary JWX binding to libsparkcrypto
+-- @author  Alexander Senier
+-- @date    2018-06-06
 --
 -- Copyright (C) 2018 Componolit GmbH
 --

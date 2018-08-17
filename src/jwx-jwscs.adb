@@ -1,7 +1,7 @@
 --
--- \brief  JWS compact serialization (RFC 7515, 7.1)
--- \author Alexander Senier
--- \date   2018-05-20
+-- @summary JWS compact serialization (RFC 7515, 7.1)
+-- @author  Alexander Senier
+-- @date    2018-05-20
 --
 -- Copyright (C) 2018 Componolit GmbH
 --

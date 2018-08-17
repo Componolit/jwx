@@ -1,7 +1,7 @@
 --
--- \brief  JSON decoding (RFC 7159)
--- \author Alexander Senier
--- \date   2018-05-12
+-- @summary JSON decoding (RFC 7159)
+-- @author  Alexander Senier
+-- @date    2018-05-12
 --
 -- Copyright (C) 2018 Componolit GmbH
 --

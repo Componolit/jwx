@@ -1,7 +1,6 @@
 --
--- \brief  JWX binding to libsparkcrypto
--- \author Alexander Senier
--- \date   2018-06-06
+-- @author Alexander Senier
+-- @date   2018-06-06
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
@@ -9,6 +8,7 @@
 -- GNU Affero General Public License version 3.
 --
 
+-- @summary JWX binding to libsparkcrypto
 with LSC.Types;
 with LSC.SHA256;
 
@@ -20,15 +20,18 @@ with
 is
    package SC renames Standard.LSC;
 
-   --  Convert JWX byte array to LSC word32 array
    procedure JWX_Byte_Array_To_LSC_Word32_Array
       (Input  :     JWX.Byte_Array;
        Output : out SC.Types.Word32_Array_Type;
        Offset :     Natural := 0)
    with
       Pre => Input'First < Integer'Last - Offset - 4 * Output'Length;
+   --  Convert JWX byte array to LSC word32 array
+   --
+   --  @param Input   JWX Input array
+   --  @param Output  LSC output array
+   --  @param Offset  Start converting Input at Offset
 
-   --  Convert JWX byte array to LSC SHA256 message
    procedure JWX_Byte_Array_To_LSC_SHA256_Message
       (Input  :     JWX.Byte_Array;
        Output : out SC.SHA256.Message_Type)
@@ -37,5 +40,9 @@ is
               Output'Last > Output'First and
               Output'Length <= SC.SHA256.Message_Index (Integer'Last) / 64) and then
               Input'First < Integer'Last - 64 * Output'Length - 64);
+   --  Convert JWX byte array to LSC SHA256 message
+   --
+   --  @param Input   JWX Input array
+   --  @param Output  LSC SHA-256 message
 
 end JWX.LSC;

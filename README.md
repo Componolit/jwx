@@ -14,6 +14,8 @@ mail to jwx@componolit.com.
 
 # Examples
 
+API documentation is available [here](doc/api/index.html).
+
 ## Parsing Base64 data
 
 ```Ada

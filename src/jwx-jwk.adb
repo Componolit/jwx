@@ -1,7 +1,7 @@
 --
--- \brief  JWK decoding (RFC 7517)
--- \author Alexander Senier
--- \date   2018-05-13
+-- @summary JWK decoding (RFC 7517)
+-- @author  Alexander Senier
+-- @date    2018-05-13
 --
 -- Copyright (C) 2018 Componolit GmbH
 --

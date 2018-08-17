@@ -1,7 +1,7 @@
 --
--- \brief  JWX utility functions
--- \author Alexander Senier
--- \date   2018-05-16
+-- @summary JWX utility functions
+-- @author  Alexander Senier
+-- @date    2018-05-16
 --
 -- Copyright (C) 2018 Componolit GmbH
 --

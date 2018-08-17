@@ -14,6 +14,9 @@ clean:
 	@gnatprove  $(COMMON_OPTS) -Pproj --clean
 	@rm -rf obj adalib
 
+doc: proj.gpr
+	@gnatdoc --no-subprojects -w --enable-build $(COMMON_OPTS) -Pproj
+
 test: proj.gpr
 	@gprbuild $(COMMON_OPTS) -P tests/test.gpr -gnata -p
 	@obj/test

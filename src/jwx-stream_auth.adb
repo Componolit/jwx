@@ -1,7 +1,7 @@
 --
--- \brief  Text stream authentication checking
--- \author Alexander Senier
--- \date   2018-06-07
+-- @summary Text stream authentication checking
+-- @author  Alexander Senier
+-- @date    2018-06-07
 --
 -- Copyright (C) 2018 Componolit GmbH
 --

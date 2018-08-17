@@ -1,7 +1,6 @@
 --
--- \brief  BASE64 decoding (RFC4648)
--- \author Alexander Senier
--- \date   2018-05-12
+-- @author  Alexander Senier
+-- @date    2018-05-12
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
@@ -11,6 +10,7 @@
 
 with JWX;
 
+-- @summary BASE64 decoding (RFC4648)
 package JWX.Base64
     with SPARK_Mode
 is
@@ -28,6 +28,9 @@ is
         and then Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3,
      Post => Length <= Result'Length;
    -- Decode Base64 encoded string into byte array
+   -- @param Encoded Base64 encoded string
+   -- @param Length  Length of result array. Length is 0 to indicated an error.
+   -- @param Result  Decoded data
 
    procedure Decode_Url
      (Encoded :        String;
@@ -42,5 +45,8 @@ is
          and then Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3,
       Post => Length <= Result'Length;
    -- Decode Base64URL encoded string into byte array
+   -- @param Encoded Base64URL encoded input string
+   -- @param Length  Length of result array. Length is 0 to indicated an error.
+   -- @param Result  Decoded data
 
 end JWX.Base64;

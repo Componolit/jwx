@@ -1,7 +1,7 @@
 --
--- \brief  Helper package for proving generic JWX.JSON
--- \author Alexander Senier
--- \date   2018-05-12
+-- @summary Helper package for proving generic JWX.JSON
+-- @summary Alexander Senier
+-- @date    2018-05-12
 --
 -- Copyright (C) 2018 Componolit GmbH
 --

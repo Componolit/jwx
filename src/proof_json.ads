@@ -1,7 +1,6 @@
 --
--- \brief  Helper package for proving generic JWX.JSON
--- \author Alexander Senier
--- \date   2018-05-12
+-- @author Alexander Senier
+-- @date   2018-05-12
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
@@ -11,6 +10,8 @@
 
 with JWX.JSON;
 
+-- @private
+-- @summary Helper package for proving generic JWX.JSON
 package Proof_JSON
 is
    procedure Do_Parse (Data  :     String;
@@ -19,5 +20,8 @@ is
        Pre => Data'First >= 0 and
               Data'Last < Natural'Last and
               Data'First <= Data'Last;
+   -- @private
+   -- @param Data  Input data
+   -- @param Match Result
 
 end Proof_JSON;

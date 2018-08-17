@@ -1,7 +1,7 @@
 --
--- \brief  Main package
--- \author Alexander Senier
--- \date   2018-05-12
+-- @summary Main package
+-- @author  Alexander Senier
+-- @date    2018-05-12
 --
 -- Copyright (C) 2018 Componolit GmbH
 --

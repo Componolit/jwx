@@ -1,7 +1,7 @@
 --
--- \brief  Validate JWT
--- \author Alexander Senier
--- \date   2018-06-06
+-- @summary Cryptographic validation of JWT payload.
+-- @author  Alexander Senier
+-- @date    2018-06-06
 --
 -- Copyright (C) 2018 Componolit GmbH
 --

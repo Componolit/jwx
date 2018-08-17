@@ -1,7 +1,6 @@
 --
--- \brief  Validate JWT
--- \author Alexander Senier
--- \date   2018-06-06
+-- @author Alexander Senier
+-- @date   2018-06-06
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
@@ -9,6 +8,7 @@
 -- GNU Affero General Public License version 3.
 --
 
+-- @summary Cryptographic validation of JWT payload.
 generic
    Payload : String;
    Auth    : String;
@@ -16,12 +16,15 @@ generic
 package JWX.Crypto
 is
 
-   --  Validate authenticator using algorithm @Alg@
    procedure Valid (Alg   : Alg_Type;
                     Valid : out Boolean)
    with
       Pre => Key'First >= 0 and
              Key'Last < Natural'Last and
              Key'First <= Key'Last;
+   --  Validate authenticator
+   --
+   --  @param Alg    Algorithm to use
+   --  @param Valid  Validation result
 
 end JWX.Crypto;

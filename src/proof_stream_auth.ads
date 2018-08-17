@@ -1,7 +1,6 @@
 --
--- \brief  Helper package for proving generic JWX.Stream_Auth
--- \author Alexander Senier
--- \date   2018-06-07
+-- @author Alexander Senier
+-- @date   2018-06-07
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
@@ -11,10 +10,13 @@
 
 with JWX.Stream_Auth;
 
+-- @private
+-- @summary Helper package for proving generic JWX.Stream_Auth
 package Proof_Stream_Auth
 with
    SPARK_Mode
 is
    procedure Test (OK : out Boolean);
+   -- @param OK OK
 
 end Proof_Stream_Auth;

@@ -1,7 +1,7 @@
 --
--- \brief  Helper package for proving generic JWX.Stream_Auth
--- \author Alexander Senier
--- \date   2018-06-07
+-- @summary Helper package for proving generic JWX.Stream_Auth
+-- @author  Alexander Senier
+-- @date    2018-06-07
 --
 -- Copyright (C) 2018 Componolit GmbH
 --

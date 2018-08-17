@@ -1,7 +1,6 @@
 --
--- \brief  JOSE header decoding (RFC 7515, section 4)
--- \author Alexander Senier
--- \date   2018-06-06
+-- @author Alexander Senier
+-- @date   2018-06-06
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
@@ -11,6 +10,7 @@
 
 with JWX;
 
+-- @summary JOSE header decoding (RFC 7515, section 4)
 generic
    Data : String;
 package JWX.JOSE

@@ -1,7 +1,7 @@
 --
--- \brief  JWT validation (RFC 7519)
--- \author Alexander Senier
--- \date   2018-06-08
+-- @summary JWT validation (RFC 7519)
+-- @author  Alexander Senier
+-- @date    2018-06-08
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
@@ -46,7 +46,7 @@ is
       pragma Assert (Data'Length < Integer'Last);
       declare
          Len : Natural;
-         Payload : constant String := Data (R.First .. R.Last);
+         Payload : constant String := Data (R.Payload.First.. R.Payload.Last);
       begin
 
          if Payload'Length <= 0 or

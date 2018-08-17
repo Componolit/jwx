@@ -1,7 +1,6 @@
 --
--- \brief  JWS validation (RFC 7515)
--- \author Alexander Senier
--- \date   2018-05-16
+-- @author Alexander Senier
+-- @date   2018-05-16
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
@@ -9,6 +8,7 @@
 -- GNU Affero General Public License version 3.
 --
 
+-- @summary JWS validation (RFC 7515)
 package JWX.JWS
 is
 
@@ -16,6 +16,12 @@ is
                        Error_Invalid_Key,
                        Error_OK,
                        Error_Fail);
+   -- Error type for signature operation
+   --
+   -- @value Error_Invalid      Data was malformed
+   -- @value Error_Invalid_Key  Key was invalid
+   -- @value Error_OK           Success
+   -- @value Error_Fail         Unknown error
 
    type Result_Type (Error : Error_Type := Error_Invalid) is
    record
@@ -26,6 +32,10 @@ is
             null;
       end case;
    end record;
+   --  Result of a signature validation
+   --
+   --  @value Error    Error code
+   --  @value Payload  Range of payload data on success
 
    Result_Invalid     : constant Result_Type := (Error => Error_Invalid);
    Result_Fail        : constant Result_Type := (Error => Error_Fail);
@@ -36,8 +46,11 @@ is
    is
       (if Result.Error = Error_OK then
            In_Range (Result.Payload, Data));
+   --  Assert that bounds of validation result are valid
+   --
+   --  @param Data   Input data
+   --  @param Result Validation result defining payload range
 
-   -- Validate signature
    function Validate_Compact (Data     : String;
                               Key_Data : String) return Result_Type
    with
@@ -46,5 +59,9 @@ is
               Key_Data'Last < Natural'Last and
               Key_Data'First <= Key_Data'Last,
       Post => Valid_Result (Data, Validate_Compact'Result);
+   -- Validate a JSON web signature in compact serialization format
+   --
+   -- @param Data      Input data to validate
+   -- @param Key_Data  JSON web key to use for validation
 
 end JWX.JWS;

@@ -1,7 +1,7 @@
 --
--- \brief  BASE64 decoding (RFC4648)
--- \author Alexander Senier
--- \date   2018-05-12
+-- @summary BASE64 decoding (RFC4648)
+-- @author  Alexander Senier
+-- @date    2018-05-12
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
