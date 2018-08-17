@@ -2,7 +2,7 @@
 
 JWX is a library for handling [JSON](https://www.json.org/) data and more. It
 is implemented in the [SPARK](http://spark-2014.org) programming language and
-has been prove to contain no runtime errors. As a result, JWX is particularly
+has been proven to contain no runtime errors. As a result, JWX is particularly
 suited for processing untrusted information.
 
 In the current version, parsing of Base64 (RFC 4648) data, JSON (RFC 8259)
@@ -93,7 +93,7 @@ end JWT;
 
 The following known limitations exist in JWX:
 
-* While absence of runtime errors have been proven, no formal analysis for the stack usage exists
+* While absence of runtime errors has been proven, no formal analysis for the stack usage exists
 * Generation of Base64, JSON, JWS, JWT etc. is not supported (only validation)
 * JWS and JWT only support HMAC-SHA256 (no other HMAC modes, RSA or ECDSA)
 * JWS JSON serialization is not supported (only JWS compact serialization)
