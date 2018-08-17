@@ -1,14 +1,14 @@
 --
--- @author Alexander Senier
--- @date   2018-05-12
+--  @author Alexander Senier
+--  @date   2018-05-12
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
--- @summary JSON decoding (RFC 7159)
+--  @summary JSON decoding (RFC 7159)
 generic
 
    Input_Data   : String;
@@ -17,10 +17,10 @@ generic
 package JWX.JSON
 is
 
-   -- @private
-   -- This is a workaround for a bug in GNAT prior to Community 2018, where a
-   -- generic formal parameter is not considered a legal component of refined
-   -- state.
+   --  @private
+   --  This is a workaround for a bug in GNAT prior to Community 2018, where a
+   --  generic formal parameter is not considered a legal component of refined
+   --  state.
    Data : constant String := Input_Data;
 
    type Kind_Type is (Kind_Invalid,
@@ -31,27 +31,27 @@ is
                       Kind_String,
                       Kind_Object,
                       Kind_Array);
-   -- Kind of a JSON context object
+   --  Kind of a JSON context object
    --
-   -- @value Kind_Invalid  Invalid element
-   -- @value Kind_Null     JSON "null" element
-   -- @value Kind_Boolean  Boolean
-   -- @value Kind_Real     Fractional number
-   -- @value Kind_Integer  Integral number
-   -- @value Kind_String   String
-   -- @value Kind_Object   Structured object
-   -- @value Kind_Array    Array
+   --  @value Kind_Invalid  Invalid element
+   --  @value Kind_Null     JSON "null" element
+   --  @value Kind_Boolean  Boolean
+   --  @value Kind_Real     Fractional number
+   --  @value Kind_Integer  Integral number
+   --  @value Kind_String   String
+   --  @value Kind_Object   Structured object
+   --  @value Kind_Array    Array
 
    type Match_Type is (Match_OK,
                        Match_None,
                        Match_Invalid,
                        Match_Out_Of_Memory);
-   -- Result of a parsing operation
+   --  Result of a parsing operation
    --
-   -- @value Match_OK             JSON document parsed successfully
-   -- @value Match_None           No JSON data found
-   -- @value Match_Invalid        Malformed JSON data found
-   -- @value Match_Out_Of_Memory  Out of context buffer memory, increase generic
+   --  @value Match_OK             JSON document parsed successfully
+   --  @value Match_None           No JSON data found
+   --  @value Match_Invalid        Malformed JSON data found
+   --  @value Match_Out_Of_Memory  Out of context buffer memory, increase generic
    --                             Context_Size parameter when instanciating
    --                             package
 
@@ -64,55 +64,55 @@ is
       Pre => Data'First >= 0 and
              Data'Last < Natural'Last and
              Data'First <= Data'Last;
-   -- Parse a JSON file
+   --  Parse a JSON file
    --
-   -- @param Match  Result of parsing
+   --  @param Match  Result of parsing
 
    function Has_Kind (Index : Index_Type;
                       Kind  : Kind_Type) return Boolean
    with
       Ghost;
-   -- Assert the element associated with Index is of Kind
+   --  Assert the element associated with Index is of Kind
    --
-   -- @param Index  Index of element
-   -- @param Kind   Expected kind
+   --  @param Index  Index of element
+   --  @param Kind   Expected kind
 
    function Get_Kind (Index : Index_Type := Null_Index) return Kind_Type
    with
       Post   => Has_Kind (Index, Get_Kind'Result);
-   -- Return the kind of a context element
+   --  Return the kind of a context element
    --
-   -- @param Index  Index of element, current element by default
-   -- @return Element kind, Invalid_Element if element does not exist
+   --  @param Index  Index of element, current element by default
+   --  @return Element kind, Invalid_Element if element does not exist
 
    function Get_Boolean (Index : Index_Type := Null_Index) return Boolean
    with
       Pre => Get_Kind (Index) = Kind_Boolean;
-   -- Return value of a boolean context element
+   --  Return value of a boolean context element
    --
-   -- @param Index  Index of element, current element by default
+   --  @param Index  Index of element, current element by default
 
    function Get_Real (Index : Index_Type := Null_Index) return Real_Type
    with
       Pre => Get_Kind (Index) = Kind_Real or
              Get_Kind (Index) = Kind_Integer;
-   -- Return value of real context element
+   --  Return value of real context element
    --
-   -- @param Index  Index of element, current element by default
+   --  @param Index  Index of element, current element by default
 
    function Get_Integer (Index : Index_Type := Null_Index) return Integer_Type
    with
       Pre => Get_Kind (Index) = Kind_Integer;
-   -- Return value of integer context element
+   --  Return value of integer context element
    --
-   -- @param Index  Index of element, current element by default
+   --  @param Index  Index of element, current element by default
 
    function Get_String (Index : Index_Type := Null_Index) return String
    with
       Pre => Get_Kind (Index) = Kind_String;
-   -- Return value of a string context element
+   --  Return value of a string context element
    --
-   -- @param Index  Index of element, current element by default
+   --  @param Index  Index of element, current element by default
 
    function Get_Range (Index : Index_Type := Null_Index) return Range_Type
    with
@@ -122,50 +122,50 @@ is
                   Get_Range'Result.Last  <= Data'Last and
                   Get_Range'Result.First <= Get_Range'Result.Last and
                   Get_Range'Result.Last < Positive'Last);
-   -- Get range of string object inside Data
+   --  Get range of string object inside Data
    --
-   -- This is an alternative to Get_String which does not return the actual
-   -- string data, but a range object demarcating the beginning and the end
-   -- index of the string withing the input document held in Data. This is
-   -- useful where you cannot cope with unbounded data, e.g. when constructing
-   -- a complex object from a JSON document (cf. JWX.JWK).
+   --  This is an alternative to Get_String which does not return the actual
+   --  string data, but a range object demarcating the beginning and the end
+   --  index of the string withing the input document held in Data. This is
+   --  useful where you cannot cope with unbounded data, e.g. when constructing
+   --  a complex object from a JSON document (cf. JWX.JWK).
    --
-   -- @param Index  Index of element, current element by default
+   --  @param Index  Index of element, current element by default
 
    function Query_Object (Name  : String;
                           Index : Index_Type := Null_Index) return Index_Type
    with
       Pre => Get_Kind (Index) = Kind_Object;
-   -- Query object element
+   --  Query object element
    --
-   -- @param Name   Name of object element to query
-   -- @param Index  Index of element, current element by default
-   -- @return An index pointing to object element with name "Name", End_Index
+   --  @param Name   Name of object element to query
+   --  @param Index  Index of element, current element by default
+   --  @return An index pointing to object element with name "Name", End_Index
    --         if element was not found
 
    function Elements (Index : Index_Type := Null_Index) return Natural
    with
       Pre => Get_Kind (Index) = Kind_Object;
-   -- Return number of elements of an object
+   --  Return number of elements of an object
    --
-   -- @param Index  Index of element, current element by default
+   --  @param Index  Index of element, current element by default
 
    function Length (Index : Index_Type := Null_Index) return Natural
    with
       Pre => Get_Kind (Index) = Kind_Array,
       Annotate => (GNATprove, Terminating);
-   -- Return length of an array
+   --  Return length of an array
    --
-   -- @param Index  Index of element, current element by default
+   --  @param Index  Index of element, current element by default
 
    function Pos (Position : Natural;
                  Index    : Index_Type := Null_Index) return Index_Type
    with
       Pre => Get_Kind (Index) = Kind_Array;
-   -- Return object at given position of an array
+   --  Return object at given position of an array
    --
-   -- @param Position  Position inside array
-   -- @param Index  Index of array element, current element by default
-   -- @return Index to object at Position, End_Index if out of bounds
+   --  @param Position  Position inside array
+   --  @param Index  Index of array element, current element by default
+   --  @return Index to object at Position, End_Index if out of bounds
 
 end JWX.JSON;

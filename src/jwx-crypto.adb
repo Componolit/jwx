@@ -1,12 +1,12 @@
 --
--- @summary Cryptographic validation of JWT payload.
--- @author  Alexander Senier
--- @date    2018-06-06
+--  @summary Cryptographic validation of JWT payload.
+--  @author  Alexander Senier
+--  @date    2018-06-06
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
 with JWX.JWK;
@@ -40,7 +40,7 @@ is
       Keys : K.Key_Array_Type := K.Parse_Keys;
 
       Payload_Raw : JWX.Byte_Array (1 .. Payload'Length);
-      Key_Raw     : JWX.Byte_Array (1 .. (Key'Length/4 + 1) * 3);
+      Key_Raw     : JWX.Byte_Array (1 .. (Key'Length / 4 + 1) * 3);
       Auth_Raw    : JWX.Byte_Array (1 .. 3 * ((Auth'Length + 3) / 4));
 
       Payload_LSC : Standard.LSC.SHA256.Message_Type (1 .. (Payload_Raw'Length - 1) / 64 + 1);
@@ -132,7 +132,7 @@ is
    -- Valid --
    -----------
 
-   procedure Valid (Alg   : Alg_Type;
+   procedure Valid (Alg           : Alg_Type;
                     Valid : out Boolean)
    is
    begin

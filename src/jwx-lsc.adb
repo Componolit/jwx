@@ -1,12 +1,12 @@
 --
--- @summary JWX binding to libsparkcrypto
--- @author  Alexander Senier
--- @date    2018-06-06
+--  @summary JWX binding to libsparkcrypto
+--  @author  Alexander Senier
+--  @date    2018-06-06
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
 with JWX;

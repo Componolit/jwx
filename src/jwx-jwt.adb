@@ -1,12 +1,12 @@
 --
--- @summary JWT validation (RFC 7519)
--- @author  Alexander Senier
--- @date    2018-06-08
+--  @summary JWT validation (RFC 7519)
+--  @author  Alexander Senier
+--  @date    2018-06-08
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
 with JWX.JWS;
@@ -46,7 +46,7 @@ is
       pragma Assert (Data'Length < Integer'Last);
       declare
          Len : Natural;
-         Payload : constant String := Data (R.Payload.First.. R.Payload.Last);
+         Payload : constant String := Data (R.Payload.First .. R.Payload.Last);
       begin
 
          if Payload'Length <= 0 or
@@ -90,7 +90,7 @@ is
                   return Result_Invalid_Object;
                end if;
 
-               -- Check issuer
+               --  Check issuer
                Value := Query_Object ("iss");
                if Value = Token.End_Index
                then
@@ -103,7 +103,7 @@ is
                   return Result_Invalid_Issuer;
                end if;
 
-               -- Check audience
+               --  Check audience
                Value := Query_Object ("aud");
                if Value = Token.End_Index
                then
@@ -116,7 +116,7 @@ is
                   return Result_Invalid_Audience;
                end if;
 
-               -- Check expiration
+               --  Check expiration
                Value := Query_Object ("exp");
                if Value = Token.End_Index
                then
@@ -128,7 +128,7 @@ is
                then
                   return Result_Expired;
                end if;
-             end;
+            end;
          end;
 
          return Result_OK;

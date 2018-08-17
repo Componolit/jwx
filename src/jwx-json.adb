@@ -1,12 +1,12 @@
 --
--- @summary JSON decoding (RFC 7159)
--- @author  Alexander Senier
--- @date    2018-05-12
+--  @summary JSON decoding (RFC 7159)
+--  @author  Alexander Senier
+--  @date    2018-05-12
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
 package body JWX.JSON
@@ -45,7 +45,7 @@ is
    ---------------------
 
    Invalid_Element : constant Context_Element_Type :=
-   -- Construct invalid element
+   --  Construct invalid element
       (Kind        => Kind_Invalid,
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
@@ -59,7 +59,7 @@ is
    ------------------
 
    Null_Element : constant Context_Element_Type :=
-   -- Construct null element
+   --  Construct null element
       (Kind        => Kind_Null,
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
@@ -69,7 +69,7 @@ is
    ---------------------
 
    function Boolean_Element (Value : Boolean) return Context_Element_Type is
-   -- Construct boolean element
+   --  Construct boolean element
       (Kind          => Kind_Boolean,
        Boolean_Value => Value,
        Next_Member   => Null_Index,
@@ -80,7 +80,7 @@ is
    -------------------
 
    function Real_Element (Value : Real_Type) return Context_Element_Type is
-   -- Construct real element
+   --  Construct real element
       (Kind        => Kind_Real,
        Real_Value  => Value,
        Next_Member => Null_Index,
@@ -91,7 +91,7 @@ is
    ---------------------
 
    function Integer_Element (Value : Integer_Type) return Context_Element_Type is
-   -- Construct integer element
+   --  Construct integer element
       (Kind          => Kind_Integer,
        Integer_Value => Value,
        Next_Member   => Null_Index,
@@ -102,7 +102,7 @@ is
    --------------------
 
    function String_Element (String_Start, String_End : Integer) return Context_Element_Type is
-   -- Construct string element
+   --  Construct string element
       (Kind         => Kind_String,
        String_Start => String_Start,
        String_End   => String_End,
@@ -114,7 +114,7 @@ is
    --------------------
 
    Object_Element : constant Context_Element_Type :=
-   -- Construct object element
+   --  Construct object element
       (Kind        => Kind_Object,
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
@@ -124,7 +124,7 @@ is
    -------------------
 
    Array_Element : constant Context_Element_Type :=
-   -- Construct array element
+   --  Construct array element
       (Kind        => Kind_Array,
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
@@ -182,7 +182,7 @@ is
 
    procedure Set (Value : Context_Element_Type;
                   Index : Index_Type := Null_Index)
-   -- Return current element of a context
+   --  Return current element of a context
    is
    begin
       if Index = Null_Index
@@ -299,9 +299,9 @@ is
          end if;
 
          if (Data (Data'First + Offset) = ASCII.HT or
-             Data (Data'First + Offset) = ASCII.LF or
-             Data (Data'First + Offset) = ASCII.CR or
-             Data (Data'First + Offset) = ASCII.FF or
+            Data (Data'First + Offset) = ASCII.LF or
+            Data (Data'First + Offset) = ASCII.CR or
+            Data (Data'First + Offset) = ASCII.FF or
              Data (Data'First + Offset) = ' ')
          then
             Offset := Offset + 1;
@@ -516,7 +516,7 @@ is
 
          Divisor := Divisor * 10;
 
-         -- At least one decimal place matched.
+         --  At least one decimal place matched.
          Match := Match_OK;
       end loop;
 
@@ -583,7 +583,7 @@ is
             return;
          end if;
 
-         -- Valid digit?
+         --  Valid digit?
          exit when
             Data (Data'First + Offset) < '0' or
             Data (Data'First + Offset) > '9' or
@@ -592,7 +592,7 @@ is
             Offset > Data'Length - 1 or
             Num_Matches >= Natural'Last;
 
-         -- Check for leading '0'
+         --  Check for leading '0'
          if Num_Matches = 0 and
             Data (Data'First + Offset) = '0'
          then
@@ -604,9 +604,9 @@ is
          pragma Loop_Invariant (Data (Data'First + Offset) >= '0');
          pragma Loop_Invariant (Data (Data'First + Offset) <= '9');
 
-         -- Check for overflow
+         --  Check for overflow
          if Num_Matches >= Natural'Last or
-            Result >= Integer_Type'Last/10
+            Result >= Integer_Type'Last / 10
          then
             Match := Match_Invalid;
             Offset := Old_Offset;
@@ -619,7 +619,7 @@ is
          Num_Matches := Num_Matches + 1;
       end loop;
 
-      -- No
+      --  No
       if Num_Matches = 0
       then
          Match  := Match_None;
@@ -627,7 +627,7 @@ is
          return;
       end if;
 
-      -- Leading zeros found
+      --  Leading zeros found
       if Check_Leading and
          ((Result > 0 and Leading_Zero) or
           (Result = 0 and Num_Matches > 1))
@@ -855,7 +855,7 @@ is
       Escaped      : Boolean := False;
       Old_Offset   : constant Natural := Offset;
    begin
-      -- Check for starting "
+      --  Check for starting "
       if not Match_Set ("""") then
          Match := Match_None;
          return;
@@ -950,7 +950,7 @@ is
          return;
       end if;
 
-      -- Check for starting {
+      --  Check for starting {
       if not Match_Set ("{") then
          Match := Match_None;
          return;
@@ -980,18 +980,18 @@ is
             return;
          end if;
 
-         -- Check for ending '}'
+         --  Check for ending '}'
          if Match_Set ("}")
          then
             Offset := Offset + 1;
             exit;
          end if;
 
-         -- Link previous element to this element
+         --  Link previous element to this element
          Context (Previous_Member).Next_Member := Context_Index;
          Previous_Member := Context_Index;
 
-         -- Parse member name
+         --  Parse member name
          Skip_Whitespace;
          Parse_String (Result);
          if Result /= Match_OK
@@ -1000,7 +1000,7 @@ is
             return;
          end if;
 
-         -- Check for name separator (:)
+         --  Check for name separator (:)
          Skip_Whitespace;
          if Offset >= Natural'Last or
             not Match_Set (":")
@@ -1010,7 +1010,7 @@ is
          end if;
          Offset := Offset + 1;
 
-         -- Parse member
+         --  Parse member
          Parse_Internal (Match_Member);
          if Match_Member /= Match_OK then
             Offset := Old_Offset;
@@ -1025,7 +1025,7 @@ is
             return;
          end if;
 
-         -- Check for value separator ','
+         --  Check for value separator ','
          if Match_Set (",") then
             Offset := Offset + 1;
          end if;
@@ -1059,7 +1059,7 @@ is
          return;
       end if;
 
-      -- Check for starting [
+      --  Check for starting [
       if not Match_Set ("[") then
          Match := Match_None;
          return;
@@ -1089,18 +1089,18 @@ is
             return;
          end if;
 
-         -- Check for ending ']'
+         --  Check for ending ']'
          if Match_Set ("]")
          then
             Offset := Offset + 1;
             exit;
          end if;
 
-         -- Link previous object to this element
+         --  Link previous object to this element
          Context (Previous_Element).Next_Value := Context_Index;
          Previous_Element := Context_Index;
 
-         -- Parse element
+         --  Parse element
          Parse_Internal (Match_Element);
          if Match_Element /= Match_OK then
             Offset := Old_Offset;
@@ -1115,7 +1115,7 @@ is
             return;
          end if;
 
-         -- Check for value separator ','
+         --  Check for value separator ','
          if Match_Set (",") then
             Offset := Offset + 1;
          end if;
@@ -1189,7 +1189,7 @@ is
          if Get_Kind (I) = Kind_String and then
             Get_String (I) = Name
          then
-            -- Value object are stored next to member names
+            --  Value object are stored next to member names
             return I + 1;
          end if;
       end loop;

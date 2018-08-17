@@ -1,14 +1,14 @@
 --
--- @author Alexander Senier
--- @date   2018-05-16
+--  @author Alexander Senier
+--  @date   2018-05-16
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
--- @summary JWS validation (RFC 7515)
+--  @summary JWS validation (RFC 7515)
 package JWX.JWS
 with
    SPARK_Mode
@@ -18,12 +18,12 @@ is
                        Error_Invalid_Key,
                        Error_OK,
                        Error_Fail);
-   -- Error type for signature operation
+   --  Error type for signature operation
    --
-   -- @value Error_Invalid      Data was malformed
-   -- @value Error_Invalid_Key  Key was invalid
-   -- @value Error_OK           Success
-   -- @value Error_Fail         Unknown error
+   --  @value Error_Invalid      Data was malformed
+   --  @value Error_Invalid_Key  Key was invalid
+   --  @value Error_OK           Success
+   --  @value Error_Fail         Unknown error
 
    type Result_Type (Error : Error_Type := Error_Invalid) is
    record
@@ -61,9 +61,9 @@ is
               Key_Data'Last < Natural'Last and
               Key_Data'First <= Key_Data'Last,
       Post => Valid_Result (Data, Validate_Compact'Result);
-   -- Validate a JSON web signature in compact serialization format
+   --  Validate a JSON web signature in compact serialization format
    --
-   -- @param Data      Input data to validate
-   -- @param Key_Data  JSON web key to use for validation
+   --  @param Data      Input data to validate
+   --  @param Key_Data  JSON web key to use for validation
 
 end JWX.JWS;

@@ -1,12 +1,12 @@
 --
--- @summary JWK decoding (RFC 7517)
--- @author  Alexander Senier
--- @date    2018-05-13
+--  @summary JWK decoding (RFC 7517)
+--  @author  Alexander Senier
+--  @date    2018-05-13
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
 with JWX.JSON;
@@ -148,10 +148,10 @@ is
          ------------------
 
          procedure Populate_RSA (Key_Index : Index_Type;
-                                 Key_N     : out Range_Type;
-                                 Key_E     : out Range_Type;
-                                 Key_D     : out Range_Type;
-                                 Valid     : out Boolean)
+                                 Key_N : out Range_Type;
+                                 Key_E : out Range_Type;
+                                 Key_D : out Range_Type;
+                                 Valid : out Boolean)
          is
             Index : Index_Type;
          begin
@@ -204,8 +204,8 @@ is
          ------------------
 
          procedure Populate_Oct (Key_Index : Index_Type;
-                                 Key_K     : out Range_Type;
-                                 Valid     : out Boolean)
+                                 Key_K : out Range_Type;
+                                 Valid : out Boolean)
          is
             Index : Index_Type;
          begin
@@ -296,7 +296,7 @@ is
             Result_Alg := Get_Range (Index);
          end if;
 
-         -- Retrieve curve
+         --  Retrieve curve
          case Result_Kind is
             when Kind_EC =>
                declare
@@ -316,13 +316,13 @@ is
                      return Invalid_Key;
                   end if;
                   return Key_Type'(Kind  => Kind_EC,
-                                   ID    => Result_ID,
-                                   Usage => Result_Usage,
-                                   Alg   => Result_Alg,
-                                   X     => Result_X,
-                                   Y     => Result_Y,
-                                   DE    => Result_D,
-                                   Curve => Result_Curve);
+                                   ID       => Result_ID,
+                                   Usage    => Result_Usage,
+                                   Alg      => Result_Alg,
+                                   X        => Result_X,
+                                   Y        => Result_Y,
+                                   DE       => Result_D,
+                                   Curve    => Result_Curve);
                end;
 
             when Kind_RSA =>
@@ -332,38 +332,38 @@ is
                   Result_D : Range_Type;
                begin
                   Populate_RSA (Key_Index => Key_Index,
-                                Key_N     => Result_N,
-                                Key_E     => Result_E,
-                                Key_D     => Result_D,
-                                Valid     => Valid);
+                                Key_N => Result_N,
+                                Key_E => Result_E,
+                                Key_D => Result_D,
+                                Valid => Valid);
                   if not Valid
                   then
                      return Invalid_Key;
                   end if;
                   return Key_Type'(Kind  => Kind_RSA,
-                                   ID    => Result_ID,
-                                   Usage => Result_Usage,
-                                   Alg   => Result_Alg,
-                                   DR    => Result_D,
-                                   N     => Result_N,
-                                   E     => Result_E);
+                                   ID       => Result_ID,
+                                   Usage    => Result_Usage,
+                                   Alg      => Result_Alg,
+                                   DR       => Result_D,
+                                   N        => Result_N,
+                                   E        => Result_E);
                end;
             when Kind_OCT =>
                declare
                   Result_K : Range_Type;
                begin
                   Populate_Oct (Key_Index => Key_Index,
-                                Key_K     => Result_K,
-                                Valid     => Valid);
+                                Key_K => Result_K,
+                                Valid => Valid);
                   if not Valid
                   then
                      return Invalid_Key;
                   end if;
                   return Key_Type'(Kind  => Kind_OCT,
-                                   ID    => Result_ID,
-                                   Usage => Result_Usage,
-                                   Alg   => Result_Alg,
-                                   K     => Result_K);
+                                   ID       => Result_ID,
+                                   Usage    => Result_Usage,
+                                   Alg      => Result_Alg,
+                                   K        => Result_K);
                end;
             when Kind_Invalid =>
                return Invalid_Key;

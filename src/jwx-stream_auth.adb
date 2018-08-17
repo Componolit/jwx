@@ -1,12 +1,12 @@
 --
--- @summary Text stream authentication checking
--- @author  Alexander Senier
--- @date    2018-06-07
+--  @summary Text stream authentication checking
+--  @author  Alexander Senier
+--  @date    2018-06-07
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
 with JWX.JWT;
@@ -27,13 +27,13 @@ is
       Result : JWX.JWT.Result_Type;
       use type JWT.Result_Type;
    begin
-      -- At least space for 'id_token=' must be available
+      --  At least space for 'id_token=' must be available
       if Buf'Length < 10
       then
          return Auth_Noent;
       end if;
 
-      -- Search ID token
+      --  Search ID token
       for I in Buf'First .. Buf'Last - 8
       loop
          if Buf (I .. I + 8) = "id_token="
@@ -51,7 +51,7 @@ is
          return Auth_Noent;
       end if;
 
-      -- Search end of ID token (next ampersand)
+      --  Search end of ID token (next ampersand)
       Found := False;
       for I in First .. Buf'Last
       loop

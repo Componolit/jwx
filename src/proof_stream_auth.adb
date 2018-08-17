@@ -1,12 +1,12 @@
 --
--- @summary Helper package for proving generic JWX.Stream_Auth
--- @author  Alexander Senier
--- @date    2018-06-07
+--  @summary Helper package for proving generic JWX.Stream_Auth
+--  @author  Alexander Senier
+--  @date    2018-06-07
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
 package body Proof_Stream_Auth

@@ -1,12 +1,12 @@
 --
--- @summary JOSE header decoding (RFC 7515, section 4)
--- @author  Alexander Senier
--- @date    2018-06-06
+--  @summary JOSE header decoding (RFC 7515, section 4)
+--  @author  Alexander Senier
+--  @date    2018-06-06
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
 with JWX.JSON;
@@ -45,7 +45,7 @@ is
          JOSE_Text   : String (1 .. JOSE_Data'Length + 2);
          JOSE_Length : Natural;
       begin
-         -- Decode JOSE header
+         --  Decode JOSE header
          Decode_Url (Encoded => Data,
                      Length  => JOSE_Length,
                      Result  => JOSE_Data);
@@ -54,7 +54,7 @@ is
             return;
          end if;
 
-         -- Parse JOSE header
+         --  Parse JOSE header
          Util.To_String (Data   => JOSE_Data (JOSE_Data'First .. JOSE_Data'First + JOSE_Length - 1),
                          Result => JOSE_Text);
 

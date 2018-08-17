@@ -1,12 +1,12 @@
 --
--- @summary JWS validation (RFC 7515)
--- @author  Alexander Senier
--- @date    2018-05-16
+--  @summary JWS validation (RFC 7515)
+--  @author  Alexander Senier
+--  @date    2018-05-16
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
 with JWX.Crypto;
@@ -25,7 +25,7 @@ is
    function Validate_Compact (Data     : String;
                               Key_Data : String) return Result_Type
    is
-      Valid  : Boolean;
+      Valid : Boolean;
       Result : Result_Type;
       package Token is new JWX.JWSCS (Data);
    begin

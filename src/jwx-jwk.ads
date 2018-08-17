@@ -1,14 +1,14 @@
 --
--- @author Alexander Senier
--- @date   2018-05-13
+--  @author Alexander Senier
+--  @date   2018-05-13
 --
--- Copyright (C) 2018 Componolit GmbH
+--  Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
--- GNU Affero General Public License version 3.
+--  This file is part of JWX, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
 --
 
--- @summary JWK decoding (RFC 7517)
+--  @summary JWK decoding (RFC 7517)
 generic
    Data : String;
 package JWX.JWK
@@ -53,7 +53,7 @@ is
    type Key_Array_Type is array (Natural range <>) of Key_Type;
    Empty_Key_Array : constant Key_Array_Type;
 
-   -- Parse keys
+   --  Parse keys
    function Parse_Keys return Key_Array_Type
    with
       Pre => Data'First >= 0 and
@@ -190,23 +190,23 @@ private
    --  Key
    --
    --  @field Kind   Cryptographic algorithm family use with this key ("kty")
-   --  @field ID     ID to match a specific key ("kid")
-   --  @field Usage  Intended use of the public key ("use")
-   --  @field Alg    Algorithm intended for use with this key ("alg")
-   --  @field X      EC x coordinate "x"
-   --  @field Y      EC y coordinate "y"
-   --  @field DE     EC private key "d"
-   --  @field Curve  EC curve "crv"
-   --  @field N      RSA modulus "n"
-   --  @field E      RSA exponent "e"
-   --  @field DR     RSA private exponent "d"
-   --  @field K      Secret key value
+   --  @field ID        ID to match a specific key ("kid")
+   --  @field Usage     Intended use of the public key ("use")
+   --  @field Alg       Algorithm intended for use with this key ("alg")
+   --  @field X         EC x coordinate "x"
+   --  @field Y         EC y coordinate "y"
+   --  @field DE        EC private key "d"
+   --  @field Curve     EC curve "crv"
+   --  @field N         RSA modulus "n"
+   --  @field E         RSA exponent "e"
+   --  @field DR        RSA private exponent "d"
+   --  @field K         Secret key value
 
    Invalid_Key : constant Key_Type :=
      Key_Type'(Kind  => Kind_Invalid,
-               ID    => Empty_Range,
-               Usage => Empty_Range,
-               Alg   => Empty_Range);
+               ID       => Empty_Range,
+               Usage    => Empty_Range,
+               Alg      => Empty_Range);
 
    Empty_Key_Array : constant Key_Array_Type := (1 .. 0 => Invalid_Key);
 
