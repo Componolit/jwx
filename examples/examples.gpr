@@ -6,4 +6,12 @@ project Examples is
    for Source_Dirs use (".", "../tests");
    for Main use ("b64.adb", "json.adb", "area.adb", "jwt.adb", "authproxy");
 
+   package Compiler is
+      for Default_Switches ("Ada") use ("-fcallgraph-info=su");
+   end Compiler;
+
+   package Stack is
+      for Switches use ("-a", "-p");
+   end Stack;
+
 end Examples;

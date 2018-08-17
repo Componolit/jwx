@@ -91,6 +91,7 @@ end JWT;
 
 The following known limitations exist in JWX:
 
+* While absence of runtime errors have been proven, no formal analysis for the stack usage exists
 * Generation of Base64, JSON, JWS, JWT etc. is not supported (only validation)
 * JWS and JWT only support HMAC-SHA256 (no other HMAC modes, RSA or ECDSA)
 * JWS JSON serialization is not supported (only JWS compact serialization)

@@ -17,6 +17,10 @@ clean:
 doc: JWX.gpr
 	@gnatdoc --no-subprojects -w --enable-build $(COMMON_OPTS) -PJWX
 
+stack: JWX.gpr
+	@gprbuild $(COMMON_OPTS) -PJWX
+	@gnatstack -PJWX
+
 test: JWX.gpr
 	@gprbuild $(COMMON_OPTS) -P tests/test.gpr -gnata -p
 	@obj/test

@@ -25,8 +25,6 @@ project JWX is
      ,"-gnatwt" -- turn on warnings for tracking deleted code
      ,"-gnatwu" -- turn on warnings for unordered enumeration
 
-     -- ,"-gnatwX" -- turn off warnings for non-local exception
-
      -- Style checks
      ,"-gnaty3"    -- Check indentation (3 spaces)
      ,"-gnatya"    -- check attribute casing
@@ -52,6 +50,9 @@ project JWX is
      ,"-gnatyt"    -- check token separation rules
      ,"-gnatyu"    -- check no unnecessary blank lines
      ,"-gnatyx"    -- check extra parentheses around conditionals
+
+     ,"-fcallgraph-info=su,da" -- generate call graph for stack checking
+     ,"-fstack-check"          -- dynamic stack checking
    );
 
    for Source_Dirs use ("src");
@@ -73,5 +74,9 @@ project JWX is
    package Compiler is
       for Default_Switches ("Ada") use Ada_Switches;
    end Compiler;
+
+   package Stack is
+      for Switches use ("-Wa", "-a", "-p");
+   end Stack;
 
 end JWX;
