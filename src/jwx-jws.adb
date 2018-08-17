@@ -59,9 +59,9 @@ is
          end if;
       end;
 
-      return Result_Type'(Error => Error_OK,
-                          First => Token.Payload_First,
-                          Last  => Token.Payload_Last);
+      return Result_Type'(Error   => Error_OK,
+                          Payload => Range_Type'(First => Token.Payload_First,
+                                                 Last  => Token.Payload_Last));
 
    end Validate_Compact;
 

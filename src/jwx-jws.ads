@@ -21,8 +21,7 @@ is
    record
       case Error is
          when Error_OK =>
-            First : Positive := Positive'Last;
-            Last  : Positive := 1;
+            Payload : Range_Type := Empty_Range;
          when others =>
             null;
       end case;
@@ -35,10 +34,8 @@ is
    function Valid_Result (Data   : String;
                           Result : Result_Type) return Boolean
    is
-      ((if Result.Error = Error_OK then
-           Result.First >= Data'First and
-           Result.Last  <= Data'Last and
-           Result.First <= Result.Last));
+      (if Result.Error = Error_OK then
+           In_Range (Result.Payload, Data));
 
    -- Validate signature
    function Validate_Compact (Data     : String;
