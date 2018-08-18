@@ -5,7 +5,7 @@ is implemented in the [SPARK](http://spark-2014.org) programming language and
 has been proven to contain no runtime errors. As a result, JWX is particularly
 suited for processing untrusted information.
 
-In the current version, parsing of Base64 (RFC 4648) data, JSON (RFC 8259)
+In version 0.5.0 of JWX, parsing of Base64 (RFC 4648) data, JSON (RFC 8259)
 documents, JSON Web Keys (JWK, RFC 7517) and limited support for JSON Web
 Signatures (JWS, RFC 7515) and JSON Web Tokens (JWT, RFC 7519) is implemented.
 In the future, JSON Web Encryption (JWE, RFC 7516) and potentially [JSON
@@ -95,6 +95,7 @@ The following known limitations exist in JWX:
 
 * While absence of runtime errors has been proven, no formal analysis for the stack usage exists
 * Generation of Base64, JSON, JWS, JWT etc. is not supported (only validation)
+* Unicode is not supported
 * JWS and JWT only support HMAC-SHA256 (no other HMAC modes, RSA or ECDSA)
 * JWS JSON serialization is not supported (only JWS compact serialization)
 * Only the registered claims `iss`, `exp` and `aud` are supported
@@ -119,7 +120,7 @@ $ make test
 
 # License
 
-AGPLv3, see `LICENSE` file for details.
+AGPLv3, see [LICENSE](LICENSE) file for details.
 
 # Contact
 
