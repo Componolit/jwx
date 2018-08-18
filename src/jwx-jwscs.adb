@@ -13,7 +13,6 @@ package body JWX.JWSCS
 is
    First       : Natural := 0;
    Second      : Natural := 0;
-   D           : constant String := Data;
 
    -----------
    -- Split --

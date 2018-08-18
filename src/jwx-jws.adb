@@ -26,7 +26,6 @@ is
                               Key_Data : String) return Result_Type
    is
       Valid : Boolean;
-      Result : Result_Type;
       package Token is new JWX.JWSCS (Data);
    begin
       Token.Split (Valid);
