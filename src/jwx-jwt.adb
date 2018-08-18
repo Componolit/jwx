@@ -27,7 +27,7 @@ is
       R : JWS.Result_Type;
    begin
       if Data'Length >= Integer'Last - 2 or
-        Data'Length <= 0
+        Data'Length = 0
       then
          return Result_Invalid;
       end if;
@@ -49,7 +49,7 @@ is
          Payload : constant String := Data (R.Payload.First .. R.Payload.Last);
       begin
 
-         if Payload'Length <= 0 or
+         if Payload'Length = 0 or
            Payload'Length >= Natural'Last / 9 or
            Payload'Last >= Natural'Last - 4
          then

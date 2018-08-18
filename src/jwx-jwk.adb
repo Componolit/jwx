@@ -471,7 +471,7 @@ is
                            Result  : out JWX.Byte_Array)
    is
    begin
-      if (Encoded'Length <= 0 or
+      if (Encoded'Length = 0 or
           Encoded'Length >= Natural'Last / 9 or
           Encoded'Last >= Natural'Last - 4 or
           Result'Length < 3 * ((Encoded'Length + 3) / 4)) or else

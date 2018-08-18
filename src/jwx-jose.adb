@@ -36,7 +36,7 @@ is
       use JWX.Base64;
    begin
 
-      if Data'Length <= 0 or
+      if Data'Length = 0 or
         Data'Length >= Natural'Last / 9 or
         Data'Last >= Natural'Last - 4
       then

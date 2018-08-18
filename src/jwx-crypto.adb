@@ -73,9 +73,9 @@ is
          K.K (Auth_Key, Key_Raw, Key_Length);
          if (Key_Length = 0 or
              Key_Raw'First >= Integer'Last - 4 * Key_LSC'Length or
-             Payload_Raw'Length <= 0 or
+             Payload_Raw'Length = 0 or
              Payload_LSC'Last <= Payload_LSC'First or
-             Auth'Length <= 0 or
+             Auth'Length = 0 or
              Auth'Length >= Natural'Last / 9 or
              Auth'Last >= Natural'Last - 4 or
              Payload_LSC'Length > LSC.SHA256.Message_Index (Integer'Last) / 64) or else
