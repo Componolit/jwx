@@ -37,7 +37,7 @@ is
 
       declare
          Valid           : Boolean;
-         Jose_Data       : constant String := Token.Jose_Data;
+         Jose_Data       : constant String := Token.JOSE_Data;
          Signature_Input : constant String := Token.Signature_Input;
          Signature       : constant String := Token.Signature;
 

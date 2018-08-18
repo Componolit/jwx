@@ -151,9 +151,9 @@ is
    ---------
 
    function Get (Index : Index_Type := Null_Index) return Context_Element_Type;
+   --  Return current element of a context
 
    function Get (Index : Index_Type := Null_Index) return Context_Element_Type
-   -- Return current element of a context
    is
    begin
       if Index = Null_Index
@@ -308,11 +308,11 @@ is
             return;
          end if;
 
-         if (Data (Data'First + Offset) = ASCII.HT or
+         if Data (Data'First + Offset) = ASCII.HT or
             Data (Data'First + Offset) = ASCII.LF or
             Data (Data'First + Offset) = ASCII.CR or
             Data (Data'First + Offset) = ASCII.FF or
-             Data (Data'First + Offset) = ' ')
+            Data (Data'First + Offset) = ' '
          then
             Offset := Offset + 1;
          else
@@ -587,7 +587,7 @@ is
 
       loop
 
-         if (Offset >= Data'Length)
+         if Offset >= Data'Length
          then
             exit;
          end if;
