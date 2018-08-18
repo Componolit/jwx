@@ -37,7 +37,11 @@ is
    procedure Valid_HMAC_SHA256 (Valid_MAC : out Boolean)
    is
       package K is new JWX.JWK (Key);
+      pragma Warnings (Off, """Keys"" is not modified, could be declared constant",
+                       Reason => "When making this constant, gnatprove cannot determine " &
+                                 "that K.Parse_Keys terminates.");
       Keys : K.Key_Array_Type := K.Parse_Keys;
+      pragma Warnings (On, """Keys"" is not modified, could be declared constant");
 
       Payload_Raw : JWX.Byte_Array (1 .. Payload'Length);
       Key_Raw     : JWX.Byte_Array (1 .. (Key'Length / 4 + 1) * 3);
