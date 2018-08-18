@@ -28,6 +28,9 @@ is
    -- Decode --
    ------------
 
+   procedure Decode;
+   --  Decode JOSE header
+
    procedure Decode
    is
       use JWX.Base64;

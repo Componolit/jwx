@@ -70,6 +70,11 @@ is
 
    function Mask_Mult (Data : UInt6;
                        Mask : Byte;
+                       Mult : Byte) return Byte;
+   --  Multiply and mask
+
+   function Mask_Mult (Data : UInt6;
+                       Mask : Byte;
                        Mult : Byte) return Byte
    is
    begin
@@ -84,7 +89,12 @@ is
                       Mask : Byte;
                       Div  : Byte) return Byte
    with
-      Pre => Div > 0
+      Pre => Div > 0;
+   --  Multiply and divide
+
+   function Mask_Div (Data : UInt6;
+                      Mask : Byte;
+                      Div  : Byte) return Byte
    is
    begin
       return (Byte (Data) and Mask) / Div;
@@ -93,6 +103,10 @@ is
    --------------------
    -- UInt6_To_Bytes --
    --------------------
+
+   function UInt6_To_Bytes (Data : UInt6_Block) return Byte_Array_Block;
+   --  Convert a block of 4 six byte numbers into a block of 3 eight byte
+   --  numbers
 
    function UInt6_To_Bytes (Data : UInt6_Block) return Byte_Array_Block
    is

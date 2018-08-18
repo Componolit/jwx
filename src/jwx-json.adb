@@ -181,8 +181,12 @@ is
    ---------
 
    procedure Set (Value : Context_Element_Type;
-                  Index : Index_Type := Null_Index)
+                  Index : Index_Type := Null_Index);
    --  Return current element of a context
+
+   procedure Set (Value : Context_Element_Type;
+
+                  Index : Index_Type := Null_Index)
    is
    begin
       if Index = Null_Index
@@ -196,6 +200,9 @@ is
    -----------
    -- Reset --
    -----------
+
+   procedure Reset;
+   --  Initialize context state
 
    procedure Reset
    is
@@ -289,6 +296,9 @@ is
    -- Skip_Whitespace --
    ----------------------
 
+   procedure Skip_Whitespace;
+   --  Skip all whitespace from current position
+
    procedure Skip_Whitespace
    is
    begin
@@ -314,6 +324,9 @@ is
    ----------------
    -- Parse_Null --
    ----------------
+
+   procedure Parse_Null (Match : out Match_Type);
+   --  Parse JSON "null" element
 
    procedure Parse_Null (Match : out Match_Type)
    is
@@ -347,6 +360,9 @@ is
    ----------------
    -- Parse_Bool --
    ----------------
+
+   procedure Parse_Bool (Match : out Match_Type);
+   --  Parse JSON boolean
 
    procedure Parse_Bool (Match : out Match_Type)
    is
