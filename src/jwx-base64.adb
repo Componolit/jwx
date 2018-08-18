@@ -112,7 +112,7 @@ is
       with function Is_Valid (Alpha : Character) return Boolean;
    procedure Decode_Gen
      (Encoded : String;
-      Length  :    out Natural;
+      Len     : out Natural;
       Result  : out JWX.Byte_Array)
    with
       Pre =>
@@ -121,11 +121,11 @@ is
          and Encoded'Last < Natural'Last - 4
          and Result'Length >= 3 * ((Encoded'Length + 3) / 4)))
          and then Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3,
-      Post => Length <= Result'Length;
+      Post => Len <= Result'Length;
 
    procedure Decode_Gen
      (Encoded : String;
-      Length  :    out Natural;
+      Len     : out Natural;
       Result  : out JWX.Byte_Array)
    is
       B0, B1, B2, B3 : UInt6;
@@ -137,7 +137,7 @@ is
       Num_Last_Block_Out_Bytes : Integer;
       Last_Block               : Byte_Array_Block;
    begin
-      Length := 0;
+      Len := 0;
       Result := (others => 0);
 
       --  Loop over all but the last block
@@ -225,7 +225,7 @@ is
 
       Result (Last_Output_Block_Start .. Last_Output_Block_Start + (Num_Last_Block_Out_Bytes - 1)) :=
          Last_Block (1 .. Num_Last_Block_Out_Bytes);
-      Length := (3 * Last_Input_Block_Offset) + Num_Last_Block_Out_Bytes;
+      Len := (3 * Last_Input_Block_Offset) + Num_Last_Block_Out_Bytes;
    end Decode_Gen;
 
    ------------
@@ -236,7 +236,7 @@ is
 
    procedure Decode
      (Encoded : String;
-      Length  :    out Natural;
+      Len     : out Natural;
       Result  : out JWX.Byte_Array) renames Decode_Default_Inst;
 
    ----------------
@@ -247,7 +247,7 @@ is
 
    procedure Decode_Url
      (Encoded :        String;
-      Length  :    out Natural;
+      Len     :    out Natural;
       Result  :    out JWX.Byte_Array) renames Decode_Url_Inst;
 
 end JWX.Base64;

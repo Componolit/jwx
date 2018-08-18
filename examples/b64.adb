@@ -8,7 +8,7 @@ procedure B64 is
    Bytes  : Byte_Array (1..50);
    Result : String (1..50);
 begin
-   Base64.Decode (Encoded => "Zm9vYmFy", Length => Len, Result => Bytes);
+   Base64.Decode (Encoded => "Zm9vYmFy", Len => Len, Result => Bytes);
    if Len > 0 then
       Util.To_String (Bytes, Result);
       Put_Line (Result (1 .. Len)); -- "foobar"

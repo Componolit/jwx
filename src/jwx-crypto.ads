@@ -17,7 +17,7 @@ package JWX.Crypto
 is
 
    procedure Valid (Alg           : Alg_Type;
-                    Valid : out Boolean)
+                    Valid_Payload : out Boolean)
    with
       Pre => Key'First >= 0 and
              Key'Last < Natural'Last and
@@ -25,6 +25,6 @@ is
    --  Validate authenticator
    --
    --  @param Alg            Algorithm to use
-   --  @param Valid  Validation result
+   --  @param Valid_Payload  Validation result
 
 end JWX.Crypto;

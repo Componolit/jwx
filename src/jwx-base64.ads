@@ -18,7 +18,7 @@ is
 
    procedure Decode
      (Encoded : String;
-      Length  :    out Natural;
+      Len     : out Natural;
       Result  : out JWX.Byte_Array)
    with
      Pre =>
@@ -27,15 +27,15 @@ is
         and Encoded'Last < Natural'Last - 4
         and Result'Length >= 3 * ((Encoded'Length + 3) / 4)))
         and then Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3,
-     Post => Length <= Result'Length;
+     Post => Len <= Result'Length;
    --  Decode Base64 encoded string into byte array
    --  @param Encoded Base64 encoded string
-   -- @param Length  Length of result array. Length is 0 to indicated an error.
+   --  @param Len     Length of result array. Length is 0 to indicated an error.
    --  @param Result  Decoded data
 
    procedure Decode_Url
      (Encoded : String;
-      Length  :    out Natural;
+      Len     : out Natural;
       Result  : out JWX.Byte_Array)
    with
       Pre =>
@@ -44,10 +44,10 @@ is
          and Encoded'Last < Natural'Last - 4
          and Result'Length >= 3 * ((Encoded'Length + 3) / 4)))
          and then Result'First < Natural'Last - 9 * Encoded'Length / 12 - 3,
-      Post => Length <= Result'Length;
+      Post => Len <= Result'Length;
    --  Decode Base64URL encoded string into byte array
    --  @param Encoded Base64URL encoded input string
-   -- @param Length  Length of result array. Length is 0 to indicated an error.
+   --  @param Len     Length of result array. Length is 0 to indicated an error.
    --  @param Result  Decoded data
 
 end JWX.Base64;

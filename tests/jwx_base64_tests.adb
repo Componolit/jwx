@@ -26,7 +26,7 @@ package body JWX_BASE64_Tests is
       R : Byte_Array (1 .. 3 * ((Input'Length + 3) / 4));
       S : String_Type;
    begin
-      Decode (Encoded => Input, Length => L, Result => R);
+      Decode (Encoded => Input, Len => L, Result => R);
       Util.To_String (R, S);
       Assert (L > 0, "Too short: " & L'Img);
       Assert (S(1..L) = Output, "Invalid result: " & S(1..L));
@@ -106,7 +106,7 @@ package body JWX_BASE64_Tests is
       R : Result_Type;
       S : String_Type;
    begin
-      Decode (Encoded => Input, Length => L, Result => R);
+      Decode (Encoded => Input, Len => L, Result => R);
       Util.To_String (R, S);
       Assert (L > 0, "Too short: " & L'Img);
       Assert (S(1..L) = Output, "Invalid result: " & S(1..L));
@@ -185,7 +185,7 @@ package body JWX_BASE64_Tests is
       R : Byte_Array (1 .. 3 * ((Input'Length + 3) / 4));
       S : String_Type;
    begin
-      Decode_Url (Encoded => Input, Length => L, Result => R);
+      Decode_Url (Encoded => Input, Len => L, Result => R);
       Util.To_String (R, S);
       Assert (L > 0, "Too short: " & L'Img);
       Assert (S(1..L) = Output, "Invalid result: " & S(1..L));

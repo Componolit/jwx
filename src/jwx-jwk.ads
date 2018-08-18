@@ -166,12 +166,12 @@ is
 
 private
 
-   type Key_Type (Kind : Kind_Type := Kind_Invalid) is
+   type Key_Type (Key_Kind : Kind_Type := Kind_Invalid) is
       record
          ID    : Range_Type;
          Usage : Range_Type;
          Alg   : Range_Type;
-         case Kind is
+         case Key_Kind is
          when Kind_EC =>
             X     : Range_Type;
             Y     : Range_Type;
@@ -181,7 +181,7 @@ private
             N     : Range_Type;
             E     : Range_Type;
             DR    : Range_Type;
-         when Kind_Oct =>
+         when Kind_OCT =>
             K     : Range_Type;
          when Kind_Invalid =>
             null;
@@ -189,7 +189,7 @@ private
       end record;
    --  Key
    --
-   --  @field Kind   Cryptographic algorithm family use with this key ("kty")
+   --  @field Key_Kind  Cryptographic algorithm family use with this key ("kty")
    --  @field ID        ID to match a specific key ("kid")
    --  @field Usage     Intended use of the public key ("use")
    --  @field Alg       Algorithm intended for use with this key ("alg")
@@ -203,7 +203,7 @@ private
    --  @field K         Secret key value
 
    Invalid_Key : constant Key_Type :=
-     Key_Type'(Kind  => Kind_Invalid,
+     Key_Type'(Key_Kind => Kind_Invalid,
                ID       => Empty_Range,
                Usage    => Empty_Range,
                Alg      => Empty_Range);

@@ -47,7 +47,7 @@ is
       begin
          --  Decode JOSE header
          Decode_Url (Encoded => Data,
-                     Length  => JOSE_Length,
+                     Len     => JOSE_Length,
                      Result  => JOSE_Data);
          if JOSE_Length = 0
          then

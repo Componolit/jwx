@@ -28,14 +28,25 @@ is
       -- Parse_Key --
       ---------------
 
-      function Parse_Key (Key_Index : Index_Type) return Key_Type
+      function Parse_Key (Key_Ind : Index_Type) return Key_Type;
+      --  Fill key object with info from JWK
+
+      function Parse_Key (Key_Ind : Index_Type) return Key_Type
       is
 
          -----------------
          -- Populate_EC --
          -----------------
 
-         procedure Populate_EC (Key_Index : Index_Type;
+         procedure Populate_EC (KI        : Index_Type;
+                                Key_Curve : out EC_Curve_Type;
+                                Key_X     : out Range_Type;
+                                Key_Y     : out Range_Type;
+                                Key_D     : out Range_Type;
+                                Valid     : out Boolean);
+         --  Fill in EC-specific key details
+
+         procedure Populate_EC (KI        : Index_Type;
                                 Key_Curve : out EC_Curve_Type;
                                 Key_X     : out Range_Type;
                                 Key_Y     : out Range_Type;
@@ -51,12 +62,12 @@ is
             Valid     := False;
 
             --  Retrieve curve type 'crv'
-            if Get_Kind (Key_Index) /= Kind_Object
+            if Get_Kind (KI) /= Kind_Object
             then
                return;
             end if;
 
-            Index := Query_Object ("crv", Key_Index);
+            Index := Query_Object ("crv", KI);
 
             if Get_Kind (Index) /= Kind_String
             then
@@ -77,7 +88,7 @@ is
             end if;
 
             --  Check for 'x'
-            Index := Query_Object ("x", Key_Index);
+            Index := Query_Object ("x", KI);
             if Index = End_Index or else
               Get_Kind (Index) /= Kind_String
             then
@@ -91,7 +102,7 @@ is
             end if;
 
             --  Check for 'y'
-            Index := Query_Object ("y", Key_Index);
+            Index := Query_Object ("y", KI);
             if Index = End_Index or else
               Get_Kind (Index) /= Kind_String
             then
@@ -105,7 +116,7 @@ is
             end if;
 
             --  Check for 'd' (optional)
-            Index := Query_Object ("d", Key_Index);
+            Index := Query_Object ("d", KI);
             if Index /= End_Index
             then
                if  Get_Kind (Index) /= Kind_String
@@ -147,7 +158,14 @@ is
          -- Populate_RSA --
          ------------------
 
-         procedure Populate_RSA (Key_Index : Index_Type;
+         procedure Populate_RSA (KI    : Index_Type;
+                                 Key_N : out Range_Type;
+                                 Key_E : out Range_Type;
+                                 Key_D : out Range_Type;
+                                 Valid : out Boolean);
+         --  Fill in RSA-specific key details
+
+         procedure Populate_RSA (KI    : Index_Type;
                                  Key_N : out Range_Type;
                                  Key_E : out Range_Type;
                                  Key_D : out Range_Type;
@@ -160,13 +178,13 @@ is
             Key_D := Empty_Range;
             Valid := False;
 
-            if Get_Kind (Key_Index) /= Kind_Object
+            if Get_Kind (KI) /= Kind_Object
             then
                return;
             end if;
 
             --  Check for 'n'
-            Index := Query_Object ("n", Key_Index);
+            Index := Query_Object ("n", KI);
             if Index = End_Index or else
               Get_Kind (Index) /= Kind_String
             then
@@ -175,7 +193,7 @@ is
             Key_N := Get_Range (Index);
 
             --  Check for 'e'
-            Index := Query_Object ("e", Key_Index);
+            Index := Query_Object ("e", KI);
             if Index = End_Index or else
               Get_Kind (Index) /= Kind_String
             then
@@ -184,7 +202,7 @@ is
             Key_E := Get_Range (Index);
 
             --  Check for 'd' (optional)
-            Index := Query_Object ("d", Key_Index);
+            Index := Query_Object ("d", KI);
             if Index /= End_Index
             then
                if Get_Kind (Index) /= Kind_String
@@ -203,7 +221,11 @@ is
          -- Populate_Oct --
          ------------------
 
-         procedure Populate_Oct (Key_Index : Index_Type;
+         procedure Populate_Oct (KI    : Index_Type;
+                                 Key_K : out Range_Type;
+                                 Valid : out Boolean);
+
+         procedure Populate_Oct (KI    : Index_Type;
                                  Key_K : out Range_Type;
                                  Valid : out Boolean)
          is
@@ -212,13 +234,13 @@ is
             Key_K := Empty_Range;
             Valid := False;
 
-            if Get_Kind (Key_Index) /= Kind_Object
+            if Get_Kind (KI) /= Kind_Object
             then
                return;
             end if;
 
             --  Check for 'k'
-            Index := Query_Object ("k", Key_Index);
+            Index := Query_Object ("k", KI);
             if Index = End_Index or else
               Get_Kind (Index) /= Kind_String
             then
@@ -237,13 +259,13 @@ is
          Result_Alg   : Range_Type := Empty_Range;
 
       begin
-         if Get_Kind (Key_Index) /= Kind_Object
+         if Get_Kind (Key_Ind) /= Kind_Object
          then
             return Invalid_Key;
          end if;
 
          --  Retrieve key id 'kid'
-         Index := Query_Object ("kid", Key_Index);
+         Index := Query_Object ("kid", Key_Ind);
          if Index /= End_Index
          then
             if Get_Kind (Index) /= Kind_String
@@ -254,7 +276,7 @@ is
          end if;
 
          --  Retrieve key type 'kty'
-         Index := Query_Object ("kty", Key_Index);
+         Index := Query_Object ("kty", Key_Ind);
          if Index = End_Index or else
            Get_Kind (Index) /= Kind_String
          then
@@ -275,7 +297,7 @@ is
          end if;
 
          --  Retrieve key usage 'use'
-         Index := Query_Object ("use", Key_Index);
+         Index := Query_Object ("use", Key_Ind);
          if Index /= End_Index
          then
             if Get_Kind (Index) /= Kind_String
@@ -286,7 +308,7 @@ is
          end if;
 
          --  Algortihm 'alg'
-         Index := Query_Object ("alg", Key_Index);
+         Index := Query_Object ("alg", Key_Ind);
          if Index /= End_Index
          then
             if Get_Kind (Index) /= Kind_String
@@ -305,7 +327,7 @@ is
                   Result_D     : Range_Type;
                   Result_Curve : EC_Curve_Type;
                begin
-                  Populate_EC (Key_Index => Key_Index,
+                  Populate_EC (KI        => Key_Ind,
                                Key_Curve => Result_Curve,
                                Key_X     => Result_X,
                                Key_Y     => Result_Y,
@@ -315,7 +337,7 @@ is
                   then
                      return Invalid_Key;
                   end if;
-                  return Key_Type'(Kind  => Kind_EC,
+                  return Key_Type'(Key_Kind => Kind_EC,
                                    ID       => Result_ID,
                                    Usage    => Result_Usage,
                                    Alg      => Result_Alg,
@@ -331,7 +353,7 @@ is
                   Result_E : Range_Type;
                   Result_D : Range_Type;
                begin
-                  Populate_RSA (Key_Index => Key_Index,
+                  Populate_RSA (KI    => Key_Ind,
                                 Key_N => Result_N,
                                 Key_E => Result_E,
                                 Key_D => Result_D,
@@ -340,7 +362,7 @@ is
                   then
                      return Invalid_Key;
                   end if;
-                  return Key_Type'(Kind  => Kind_RSA,
+                  return Key_Type'(Key_Kind => Kind_RSA,
                                    ID       => Result_ID,
                                    Usage    => Result_Usage,
                                    Alg      => Result_Alg,
@@ -352,14 +374,14 @@ is
                declare
                   Result_K : Range_Type;
                begin
-                  Populate_Oct (Key_Index => Key_Index,
+                  Populate_Oct (KI    => Key_Ind,
                                 Key_K => Result_K,
                                 Valid => Valid);
                   if not Valid
                   then
                      return Invalid_Key;
                   end if;
-                  return Key_Type'(Kind  => Kind_OCT,
+                  return Key_Type'(Key_Kind => Kind_OCT,
                                    ID       => Result_ID,
                                    Usage    => Result_Usage,
                                    Alg      => Result_Alg,
@@ -394,7 +416,7 @@ is
       Key_Array := Query_Object ("keys");
       if Key_Array = End_Index
       then
-         return Key_Array_Type'(1 => Parse_Key (Key_Index => Null_Index));
+         return Key_Array_Type'(1 => Parse_Key (Key_Ind => Null_Index));
       else
          if Get_Kind (Key_Array) /= Kind_Array
          then
@@ -417,7 +439,7 @@ is
    -- Kind --
    ----------
 
-   function Kind (Key : Key_Type) return Kind_Type is (Key.Kind);
+   function Kind (Key : Key_Type) return Kind_Type is (Key.Key_Kind);
 
    --------
    -- ID --
@@ -461,7 +483,7 @@ is
       end if;
 
       Base64.Decode_Url (Encoded => Encoded,
-                         Length  => Length,
+                         Len     => Length,
                          Result  => Result);
    end Decode_Field;
 
@@ -564,7 +586,7 @@ is
       use JWX;
       D : Range_Type;
    begin
-      case Key.Kind is
+      case Key.Key_Kind is
          when Kind_RSA => D := Key.DR;
          when Kind_EC  => D := Key.DE;
          when others   => D := Empty_Range;
@@ -612,7 +634,7 @@ is
    function Private_Key (Key : Key_Type) return Boolean
    is
    begin
-      case Key.Kind is
+      case Key.Key_Kind is
          when Kind_EC      => return Key.DE /= Empty_Range;
          when Kind_RSA     => return Key.DR /= Empty_Range;
          when Kind_OCT     => return True;

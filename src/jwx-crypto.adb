@@ -26,7 +26,7 @@ is
    -- Valid_HMAC_SHA256 --
    -----------------------
 
-   procedure Valid_HMAC_SHA256 (Valid : out Boolean)
+   procedure Valid_HMAC_SHA256 (Valid_MAC : out Boolean)
    with
       Pre => Key'First >= 0 and
              Key'Last < Natural'Last and
@@ -34,7 +34,7 @@ is
              Payload'Last < Natural'Last - 1 and
              Auth'Length <= Natural'Last - 3;
 
-   procedure Valid_HMAC_SHA256 (Valid : out Boolean)
+   procedure Valid_HMAC_SHA256 (Valid_MAC : out Boolean)
    is
       package K is new JWX.JWK (Key);
       Keys : K.Key_Array_Type := K.Parse_Keys;
@@ -54,7 +54,7 @@ is
       use LSC.Types;
       use type K.Kind_Type;
    begin
-      Valid := False;
+      Valid_MAC := False;
 
       if Keys'Length = 0
       then
@@ -62,15 +62,15 @@ is
       end if;
 
       declare
-         Key : K.Key_Type := Keys (Keys'First);
+         Auth_Key : constant K.Key_Type := Keys (Keys'First);
       begin
-         if (K.Algorithm (Key) /= Alg_HS256 or
-             K.Kind (Key) /= K.Kind_OCT)
+         if K.Algorithm (Auth_Key) /= Alg_HS256 or
+            K.Kind (Auth_Key) /= K.Kind_OCT
          then
             return;
          end if;
 
-         K.K (Key, Key_Raw, Key_Length);
+         K.K (Auth_Key, Key_Raw, Key_Length);
          if (Key_Length = 0 or
              Key_Raw'First >= Integer'Last - 4 * Key_LSC'Length or
              Payload_Raw'Length <= 0 or
@@ -99,7 +99,7 @@ is
 
          --  Decode authenticator
          Base64.Decode_Url (Encoded => Auth,
-                            Length  => Auth_Length,
+                            Len     => Auth_Length,
                             Result  => Auth_Raw);
          if Auth_Length /= 32
          then
@@ -124,7 +124,7 @@ is
 
       end;
 
-      Valid := True;
+      Valid_MAC := True;
    end Valid_HMAC_SHA256;
 
    -----------
@@ -132,10 +132,10 @@ is
    -----------
 
    procedure Valid (Alg           : Alg_Type;
-                    Valid : out Boolean)
+                    Valid_Payload : out Boolean)
    is
    begin
-      Valid := False;
+      Valid_Payload := False;
       if Payload'Last >= Natural'Last - 1 or
          Auth'Length > Natural'Last - 3
       then
@@ -143,7 +143,7 @@ is
       end if;
 
       case Alg is
-         when Alg_HS256 => Valid_HMAC_SHA256 (Valid);
+         when Alg_HS256 => Valid_HMAC_SHA256 (Valid_Payload);
          when others    => null;
       end case;
    end Valid;

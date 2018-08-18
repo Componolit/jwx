@@ -396,16 +396,16 @@ is
    -- Match_Set --
    ---------------
 
-   function Match_Set (Set : String) return Boolean
+   function Match_Set (S : String) return Boolean
    with
       Pre    => Data'First >= 0 and Data'Last < Natural'Last,
       Post   => (if Match_Set'Result then
-                    (for some E of Set => E = Data (Data'First + Offset)));
+                    (for some E of S => E = Data (Data'First + Offset)));
 
-   function Match_Set (Set : String) return Boolean
+   function Match_Set (S : String) return Boolean
    is
    begin
-      for Value of Set
+      for Value of S
       loop
          if Offset < Data'Length and then
             Data (Data'First + Offset) = Value
@@ -1047,7 +1047,7 @@ is
 
    procedure Parse_Array (Match : out Match_Type)
    is
-      Array_Index      : Index_Type;
+      AI               : Index_Type;
       Previous_Element : Index_Type;
       Match_Element    : Match_Type;
       Old_Offset       : constant Natural := Offset;
@@ -1065,10 +1065,10 @@ is
          return;
       end if;
 
-      Array_Index := Context_Index;
+      AI := Context_Index;
       Set (Array_Element);
       Context_Index := Context_Index + 1;
-      Previous_Element := Array_Index;
+      Previous_Element := AI;
 
       Match := Match_Invalid;
       if Offset >= Natural'Last
