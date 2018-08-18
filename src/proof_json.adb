@@ -9,6 +9,8 @@
 --  GNU Affero General Public License version 3.
 --
 
+with JWX.JSON;
+
 package body Proof_JSON
 is
    procedure Do_Parse (Data  :     String;

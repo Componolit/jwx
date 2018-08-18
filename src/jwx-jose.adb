@@ -64,8 +64,6 @@ is
             use J;
             Match_JOSE : Match_Type;
             JOSE_Alg   : Index_Type;
-            use type Match_Type;
-            use type Index_Type;
          begin
             pragma Warnings (Off, "unused assignment to ""Offset""");
             Parse (Match_JOSE);

@@ -8,8 +8,6 @@
 --  GNU Affero General Public License version 3.
 --
 
-with JWX.JSON;
-
 --  @private
 --  @summary Helper package for proving generic JWX.JSON
 package Proof_JSON

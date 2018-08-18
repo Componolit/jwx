@@ -8,8 +8,6 @@
 --  GNU Affero General Public License version 3.
 --
 
-with JWX.Stream_Auth;
-
 --  @private
 --  @summary Helper package for proving generic JWX.Stream_Auth
 package Proof_Stream_Auth

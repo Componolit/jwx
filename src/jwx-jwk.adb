@@ -495,7 +495,6 @@ is
                 Value  : out Byte_Array;
                 Length : out Natural)
    is
-      use JWX;
    begin
       if not In_Range (Key.X, Data)
       then
@@ -517,7 +516,6 @@ is
                 Value  : out Byte_Array;
                 Length : out Natural)
    is
-      use JWX;
    begin
       if not In_Range (Key.Y, Data)
       then
@@ -539,7 +537,6 @@ is
                 Value  : out Byte_Array;
                 Length : out Natural)
    is
-      use JWX;
    begin
       if not In_Range (Key.N, Data)
       then
@@ -561,7 +558,6 @@ is
                 Value  : out Byte_Array;
                 Length : out Natural)
    is
-      use JWX;
    begin
       if not In_Range (Key.E, Data)
       then
@@ -583,7 +579,6 @@ is
                 Value  : out Byte_Array;
                 Length : out Natural)
    is
-      use JWX;
       D : Range_Type;
    begin
       case Key.Key_Kind is
@@ -613,7 +608,6 @@ is
                 Value  : out Byte_Array;
                 Length : out Natural)
    is
-      use JWX;
    begin
       if not In_Range (Key.K, Data)
       then

@@ -9,6 +9,8 @@
 --  GNU Affero General Public License version 3.
 --
 
+with JWX.Stream_Auth;
+
 package body Proof_Stream_Auth
 with
    SPARK_Mode
