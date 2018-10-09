@@ -21,7 +21,8 @@ is
    with
       Pre => Key'First >= 0 and
              Key'Last < Natural'Last and
-             Key'First <= Key'Last;
+             Key'First <= Key'Last,
+      Global => (Payload, Auth, Key);
    --  Validate authenticator
    --
    --  @param Alg            Algorithm to use

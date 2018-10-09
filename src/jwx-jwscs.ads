@@ -12,6 +12,7 @@
 generic
    Data : String;
 package JWX.JWSCS
+  with Abstract_State => State
 is
    function Valid return Boolean
    with
@@ -21,7 +22,9 @@ is
    procedure Split (Token_Valid : out Boolean)
    with
       Pre  => Data'Length >= 5,
-      Post => (if Token_Valid then Valid);
+      Post => (if Token_Valid then Valid),
+      Global => (Input  => Data,
+                 In_Out => State);
    --  Split the JOSE header
    --
    --  @param Token_Valid Head was valid

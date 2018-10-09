@@ -14,6 +14,7 @@ with JWX.Base64;
 with JWX.Util;
 
 package body JWX.JOSE
+  with Refined_State => (State => (JOSE_Valid, Alg))
 is
    JOSE_Valid  : Boolean      := False;
    Alg         : JWX.Alg_Type := JWX.Alg_Invalid;

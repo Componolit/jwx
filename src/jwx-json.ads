@@ -11,18 +11,13 @@
 --  @summary JSON decoding (RFC 7159)
 generic
 
-   Input_Data   : String;
-   Context_Size : Natural := Input_Data'Length / 3 + 2;
+   Data         : String;
+   Context_Size : Natural := Data'Length / 3 + 2;
    Depth_Max    : Natural := 100;
 
 package JWX.JSON
+  with Abstract_State => State
 is
-
-   --  @private
-   --  This is a workaround for a bug in GNAT prior to Community 2018, where a
-   --  generic formal parameter is not considered a legal component of refined
-   --  state.
-   Data : constant String := Input_Data;
 
    type Kind_Type is (Kind_Invalid,
                       Kind_Null,
@@ -66,7 +61,9 @@ is
    with
       Pre => Data'First >= 0 and
              Data'Last < Natural'Last and
-             Data'First <= Data'Last;
+             Data'First <= Data'Last,
+      Global => (Input  => (Data, Context_Size, End_Index),
+                 In_Out => State);
    --  Parse a JSON file
    --
    --  @param Match  Result of parsing
@@ -138,7 +135,8 @@ is
    function Query_Object (Name  : String;
                           Index : Index_Type := Null_Index) return Index_Type
    with
-      Pre => Get_Kind (Index) = Kind_Object;
+       Pre => Get_Kind (Index) = Kind_Object,
+       Global => (State, Data, End_Index);
    --  Query object element
    --
    --  @param Name   Name of object element to query

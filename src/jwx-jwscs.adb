@@ -10,9 +10,10 @@
 --
 
 package body JWX.JWSCS
+  with Refined_State => (State => (First, Second))
 is
-   First       : Natural := 0;
-   Second      : Natural := 0;
+   First  : Natural := 0;
+   Second : Natural := 0;
 
    -----------
    -- Split --

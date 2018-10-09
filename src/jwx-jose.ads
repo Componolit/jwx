@@ -14,6 +14,7 @@ with JWX;
 generic
    Data : String;
 package JWX.JOSE
+  with Abstract_State => State
 is
    --  Valid JOSE header
    function Valid return Boolean;
@@ -21,6 +22,7 @@ is
    --  Algorithm defined in JOSE header
    function Algorithm return JWX.Alg_Type
    with
-      Pre => Valid;
+      Pre => Valid,
+      Global => State;
 
 end JWX.JOSE;

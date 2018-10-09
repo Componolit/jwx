@@ -157,7 +157,8 @@ is
                 Length : out Natural)
    with
       Pre  => Kind (Key) = Kind_OCT,
-      Post => Length <= Value'Length;
+      Post => Length <= Value'Length,
+      Global => Data;
    --  Return K value of a plain secret key
    --
    --  @param Key     Key

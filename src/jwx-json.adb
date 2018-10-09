@@ -10,6 +10,7 @@
 --
 
 package body JWX.JSON
+  with Refined_State => (State => (Context, Context_Index, Offset))
 is
 
    type Context_Element_Type (Kind : Kind_Type := Kind_Invalid) is
@@ -39,7 +40,9 @@ is
                              Depth : Natural)
    with
       Pre => Data'First >= 0 and
-             Data'Last < Natural'Last;
+             Data'Last < Natural'Last,
+      Global => (Input  => (Data, Context_Size, End_Index),
+                 In_Out => (Context, Context_Index, Offset));
 
    ---------------------
    -- Invalid_Element --
