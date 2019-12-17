@@ -1199,6 +1199,15 @@ is
    procedure Parse (Match : out Match_Type)
    is
    begin
+      if
+         Data'First < 0
+         or Data'Last >= Natural'Last
+         or Data'First > Data'Last
+      then
+         Match := Match_None;
+         return;
+      end if;
+
       Parse_Internal (Match => Match,
                       Depth => 0);
       if Context_Index > Context'First

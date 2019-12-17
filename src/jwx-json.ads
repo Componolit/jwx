@@ -62,11 +62,7 @@ is
    Null_Index : constant Index_Type := Index_Type'First;
    End_Index  : constant Index_Type := Index_Type'Last;
 
-   procedure Parse (Match : out Match_Type)
-   with
-      Pre => Data'First >= 0 and
-             Data'Last < Natural'Last and
-             Data'First <= Data'Last;
+   procedure Parse (Match : out Match_Type);
    --  Parse a JSON file
    --
    --  @param Match  Result of parsing

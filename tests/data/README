@@ -4,3 +4,5 @@ country.json:
    Part of countries.json
 JWK_*.json:
    All generated using https://mkjwk.org
+{y_|n_|i_}*.json:
+   https://github.com/nst/JSONTestSuite

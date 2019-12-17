@@ -9,6 +9,7 @@
 -- GNU Affero General Public License version 3.
 --
 
+with Ada.Text_IO;
 with AUnit.Assertions; use AUnit.Assertions;
 with JWX.JSON;
 with JWX_Test_Utils; use JWX_Test_Utils;
@@ -964,8 +965,38 @@ package body JWX_JSON_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_File (T : in out Test_Cases.Test_Case'Class)
+   is
+      File : constant String := T.Routine_Name.all;
+      Tag  : constant String := File (File'First .. File'First + 1);
+      Data : String := Read_File ("tests/data/" & File);
+      package J is new JWX.JSON (Data);
+      use J;
+      Match : Match_Type;
+   begin
+		Assert (Tag = "y_" or Tag = "n_" or Tag = "i_",
+              "Invalid test file tag");
+
+      Parse (Match);
+      if Tag = "y_" then
+		   Assert (Match = Match_OK,
+                 "Valid document expected, got " & Match'Img);
+      elsif Tag = "n_" then
+		   Assert (Match = Match_Invalid or Match = Match_None,
+                 "Invalid document expected, got " & Match'Img);
+      else
+		   Assert (Match = Match_Invalid or Match = Match_OK or Match = Match_None,
+                 "Valid or Invalid document expected, got " & Match'Img);
+      end if;
+
+	end Test_File;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
+      use Ada.Text_IO;
+      File : File_Type;
    begin
       Register_Routine (T, Test_Parse_True'Access, "Parse true");
       Register_Routine (T, Test_Parse_False'Access, "Parse false");
@@ -1018,6 +1049,12 @@ package body JWX_JSON_Tests is
       Register_Routine (T, Test_Complex_Two_Countries'Access, "Parse two countries");
       Register_Routine (T, Test_Complex_Countries'Access, "Parse many countries");
       Register_Routine (T, Test_Iterate_Object'Access, "Iterate object");
+
+      Open (File, In_File, "tests/data/minefield_tests.txt");
+      while not End_Of_File (File)
+      loop
+         Register_Routine (T, Test_File'Access, Get_Line (File));
+      end loop;
    end Register_Tests;
 
    ---------------------------------------------------------------------------
