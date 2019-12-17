@@ -261,7 +261,7 @@ begin
           Socket  => Client_Socket,
           Address => Client_Address);
       Put (".");
-      P := new Proxy; 
+      P := new Proxy;
       P.Setup (Client_Socket);
    end loop;
 end Authproxy;
