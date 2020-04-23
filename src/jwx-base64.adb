@@ -112,9 +112,9 @@ is
    is
    begin
       return
-         (0 => Mask_Mult (Data (1), 16#3f#,  4) or Mask_Div (Data (2), 16#30#, 16),
-          1 => Mask_Mult (Data (2), 16#0f#, 16) or Mask_Div (Data (3), 16#3C#,  4),
-          2 => Mask_Mult (Data (3), 16#03#, 64) or Mask_Div (Data (4), 16#ff#,  1));
+         (1 => Mask_Mult (Data (1), 16#3f#,  4) or Mask_Div (Data (2), 16#30#, 16),
+          2 => Mask_Mult (Data (2), 16#0f#, 16) or Mask_Div (Data (3), 16#3C#,  4),
+          3 => Mask_Mult (Data (3), 16#03#, 64) or Mask_Div (Data (4), 16#ff#,  1));
    end UInt6_To_Bytes;
 
    ----------------
