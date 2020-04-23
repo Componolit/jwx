@@ -12,7 +12,7 @@
 generic
 
    Input_Data   : String;
-   Context_Size : Natural := Input_Data'Length / 3 + 2;
+   Context_Size : Natural := 1000;
    Depth_Max    : Natural := 100;
 
 package JWX.JSON
