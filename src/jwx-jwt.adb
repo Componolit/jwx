@@ -74,57 +74,62 @@ is
             declare
                Input : constant String := JSON_Input;
                package Token is new JWX.JSON (Input);
-               use Token;
-               Match : Match_Type;
-               Value : Index_Type;
+               use type Token.Match_Type;
+               use type Token.Kind_Type;
+               use type Token.Index_Type;
+               Match : Token.Match_Type;
+               Value : Token.Index_Type;
             begin
                pragma Warnings (Off, "unused assignment to ""Offset""");
-               Parse (Match);
+               Token.Parse (Match);
                pragma Warnings (On, "unused assignment to ""Offset""");
-               if Match /= Match_OK
+               if Match /= Token.Match_OK
                then
                   return Result_Invalid;
                end if;
-               if Get_Kind /= Kind_Object
+               if Token.Get_Kind /= Token.Kind_Object
                then
                   return Result_Invalid_Object;
                end if;
 
                --  Check issuer
-               Value := Query_Object ("iss");
+               Value := Token.Query_Object ("iss");
                if Value = Token.End_Index
                then
                   return Result_Invalid_Issuer;
                end if;
 
-               if Get_Kind (Value) /= Kind_String or else
-                 Get_String (Value) /= Issuer
+               if
+                  Token.Get_Kind (Value) /= Token.Kind_String
+                  or else Token.Get_String (Value) /= Issuer
                then
                   return Result_Invalid_Issuer;
                end if;
 
                --  Check audience
-               Value := Query_Object ("aud");
+               Value := Token.Query_Object ("aud");
                if Value = Token.End_Index
                then
                   return Result_Invalid_Audience;
                end if;
 
-               if Get_Kind (Value) /= Kind_String or else
-                 Get_String (Value) /= Audience
+               if
+                  Token.Get_Kind (Value) /= Token.Kind_String
+                  or else Token.Get_String (Value) /= Audience
                then
                   return Result_Invalid_Audience;
                end if;
 
                --  Check expiration
-               Value := Query_Object ("exp");
+               Value := Token.Query_Object ("exp");
                if Value = Token.End_Index
                then
                   return Result_Expired;
                end if;
 
-               if Get_Kind (Value) /= Kind_Integer or else
-                 Long_Integer (Get_Integer (Value)) < Now
+               if
+                  Token.Get_Kind (Value) /= Token.Kind_Integer
+                  or else Long_Integer (Token.Get_Integer (Value)) < Now
                then
                   return Result_Expired;
                end if;

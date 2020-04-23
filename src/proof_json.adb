@@ -17,19 +17,20 @@ is
                        Match : out Boolean)
    is
       package P is new JWX.JSON (Data);
+      use type P.Kind_Type;
+      use type P.Match_Type;
       M : P.Match_Type;
-      use P;
    begin
       Match := False;
       pragma Warnings (Off, "unused assignment to ""Offset""");
-      Parse (M);
+      P.Parse (M);
       pragma Warnings (On, "unused assignment to ""Offset""");
-      if M /= Match_OK
+      if M /= P.Match_OK
       then
          return;
       end if;
 
-      if Get_Kind = Kind_Object
+      if P.Get_Kind = P.Kind_Object
       then
          Match := True;
       end if;
