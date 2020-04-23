@@ -824,6 +824,9 @@ is
                end if;
             end if;
             if Negative then
+               if Tmp >= Real_Type'Last then
+                  return;
+               end if;
                Tmp := -Tmp;
             end if;
             Set (Real_Element (Tmp));
