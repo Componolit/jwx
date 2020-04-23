@@ -19,9 +19,10 @@ is
    procedure Valid (Alg           : Alg_Type;
                     Valid_Payload : out Boolean)
    with
-      Pre => Key'First >= 0 and
-             Key'Last < Natural'Last and
-             Key'First <= Key'Last;
+      Pre    => Key'First >= 0 and
+                Key'Last < Natural'Last and
+                Key'First <= Key'Last,
+      Global => (Payload, Auth, Key);
    --  Validate authenticator
    --
    --  @param Alg            Algorithm to use
