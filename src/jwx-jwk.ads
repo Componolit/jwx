@@ -156,8 +156,9 @@ is
                 Value  : out Byte_Array;
                 Length : out Natural)
    with
-      Pre  => Kind (Key) = Kind_OCT,
-      Post => Length <= Value'Length;
+      Pre    => Kind (Key) = Kind_OCT,
+      Post   => Length <= Value'Length,
+      Global => Data;
    --  Return K value of a plain secret key
    --
    --  @param Key     Key

@@ -1,4 +1,4 @@
-GNATPROVE_OPTS = --prover=z3,cvc4 -j2 --codepeer=off --output-header --no-inlining --proof=progressive --steps=100
+GNATPROVE_OPTS = -j0 --output-header
 COMMON_OPTS = -Xlibtype=dynamic
 
 EXAMPLES = b64 json area jwt authproxy

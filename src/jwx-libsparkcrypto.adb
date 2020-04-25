@@ -28,7 +28,6 @@ is
       use LSC.Types;
       Value : Byte_Array32_Type;
    begin
-      Output := (others => 0);
       for O in Output'Range
       loop
          Value := (others => 0);
@@ -58,7 +57,6 @@ is
       use LSC;
       use LSC.SHA256;
    begin
-      Output := (others => (others => 0));
       for O in Output'First .. Output'Last
       loop
          JWX_Byte_Array_To_LSC_Word32_Array

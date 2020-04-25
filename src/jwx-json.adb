@@ -723,7 +723,6 @@ is
          return;
       end if;
 
-      Result := 1;
       for I in 1 .. Scale
       loop
          pragma Loop_Invariant (Result > 0);
@@ -810,13 +809,13 @@ is
          declare
             Tmp : Real_Type := Real_Type (Integer_Component) + Fractional_Component;
          begin
-            if Match_Exponent = Match_OK
+            if Match_Exponent = Match_OK and Tmp >= 1.0
             then
                if Scale_Negative
                then
                   Tmp := Tmp / Real_Type (Scale);
                else
-                  if Tmp >= Real_Type'Last / Real_Type (Scale)
+                  if Real_Type (Scale) >= Real_Type'Last / Tmp
                   then
                      return;
                   end if;
@@ -824,6 +823,9 @@ is
                end if;
             end if;
             if Negative then
+               if Tmp >= Real_Type'Last then
+                  return;
+               end if;
                Tmp := -Tmp;
             end if;
             Set (Real_Element (Tmp));

@@ -9,7 +9,8 @@
 --  GNU Affero General Public License version 3.
 --
 
-package body JWX.JWSCS
+package body JWX.JWSCS with
+   Refined_State => (State => (First, Second))
 is
    First       : Natural := 0;
    Second      : Natural := 0;

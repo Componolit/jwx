@@ -844,7 +844,7 @@ package body JWX_JSON_Tests is
    procedure Test_Complex_Countries (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := Read_File ("tests/data/countries.json");
-      package J is new JWX.JSON (Data);
+      package J is new JWX.JSON (Data, 100000);
       use J;
       Result : Index_Type;
       Match : Match_Type;
