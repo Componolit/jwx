@@ -14,4 +14,17 @@ project Examples is
       for Switches use ("-a", "-p");
    end Stack;
 
+   package Prove is
+      for Proof_Switches ("Ada") use
+      (
+         "-j0",
+         "--prover=z3,cvc4,altergo",
+         "--steps=1000",
+         "--timeout=60",
+         "--memlimit=1000",
+         "--checks-as-errors",
+         "--warnings=error"
+      );
+   end Prove;
+
 end Examples;

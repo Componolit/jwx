@@ -16,3 +16,4 @@ examples/authproxy
 examples/gnatprove
 undefined.ciu
 graph.vcg
+*.ci

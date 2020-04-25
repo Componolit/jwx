@@ -5,9 +5,7 @@ EXAMPLES = b64 json area jwt authproxy
 CALLGRAPH = none
 
 all: JWX.gpr
-	@time gnatprove $(COMMON_OPTS) -PJWX $(GNATPROVE_OPTS) | tee proof.log.tmp
-	@egrep -v -q '\(medium\|warning\|error\):' proof.log.tmp
-	@mv proof.log.tmp proof.log
+	@gnatprove $(COMMON_OPTS) -PJWX $(GNATPROVE_OPTS)
 
 clean: JWX.gpr
 	@make -C contrib/libsparkcrypto clean
@@ -36,7 +34,7 @@ examples:: $(addprefix obj/,$(EXAMPLES))
 
 $(addprefix obj/,$(EXAMPLES)): obj/lsc/libsparkcrypto.gpr examples/*.ad?
 	@gprbuild $(COMMON_OPTS) -P examples/examples.gpr
-	@gnatprove $(COMMON_OPTS) -P examples/examples.gpr $(GNATPROVE_OPTS)
+	@gnatprove $(COMMON_OPTS) -P examples/examples.gpr
 
 JWX.gpr: obj/lsc/libsparkcrypto.gpr
 

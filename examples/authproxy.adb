@@ -248,6 +248,7 @@ begin
    Create_Socket (Socket => Server_Socket);
    Set_Socket_Option
       (Socket => Server_Socket,
+       Level  => Socket_Level,
        Option => (Name => Reuse_Address, Enabled => True));
    Bind_Socket
       (Socket  => Server_Socket,
