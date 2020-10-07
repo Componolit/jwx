@@ -146,6 +146,16 @@ is
    --  @return An index pointing to object element with name "Name", End_Index
    --         if element was not found
 
+   generic
+      with procedure Process (Name  : String;
+                              Value : Index_Type);
+   procedure Iterate (Index : Index_Type := Null_Index)
+   with
+      Pre => Get_Kind (Index) = Kind_Object;
+   --  Iterate over all elements of an object
+   --
+   --  @param Index  Index of element, current element by default
+
    function Elements (Index : Index_Type := Null_Index) return Natural
    with
       Pre => Get_Kind (Index) = Kind_Object;

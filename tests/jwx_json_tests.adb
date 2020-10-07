@@ -911,6 +911,59 @@ package body JWX_JSON_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Iterate_Object (T : in out Test_Cases.Test_Case'Class)
+   is
+      Data : String := " { ""precision"": ""zip"", ""Latitude"":  37.7668, ""Longitude"": -122.3959, ""Address"":   """", ""City"":      ""SAN FRANCISCO"" }";
+      package J is new JWX.JSON (Data);
+      use J;
+      Match : Match_Type;
+      E1_Checked : Boolean := False;
+      E2_Checked : Boolean := False;
+      E3_Checked : Boolean := False;
+      E4_Checked : Boolean := False;
+      E5_Checked : Boolean := False;
+
+      procedure Check (Name : String; Element : Index_Type)
+      is
+      begin
+         if Name = "precision" then
+            Assert (Get_Kind (Element) = Kind_String, "Invalid kind");
+            Assert (Get_String (Element) = "zip", "Invalid value");
+            E1_Checked := True;
+         elsif Name = "Latitude" then
+            Assert (Get_Kind (Element) = Kind_Real, "Invalid kind");
+            Assert (Get_Real (Element) = 37.7668, "Invalid value");
+            E2_Checked := True;
+         elsif Name = "Longitude" then
+            Assert (Get_Kind (Element) = Kind_Real, "Invalid kind");
+            Assert (Get_Real (Element) = -122.3959, "Invalid value");
+            E3_Checked := True;
+         elsif Name = "Address" then
+            Assert (Get_Kind (Element) = Kind_String, "Invalid kind");
+            Assert (Get_String (Element) = "", "Invalid value");
+            E4_Checked := True;
+         elsif Name = "City" then
+            Assert (Get_Kind (Element) = Kind_String, "Invalid kind");
+            Assert (Get_String (Element) = "SAN FRANCISCO", "Invalid value");
+            E5_Checked := True;
+         end if;
+      end Check;
+
+      procedure Check_All is new Iterate (Check);
+   begin
+      Parse (Match);
+      Assert (Match = Match_OK, "No match: " & Match'Img);
+      Assert (Get_Kind = Kind_Object, "Invalid kind: " & Get_Kind'Img);
+      Check_All;
+      Assert (E1_Checked, "Element 1 not checked");
+      Assert (E2_Checked, "Element 2 not checked");
+      Assert (E3_Checked, "Element 3 not checked");
+      Assert (E4_Checked, "Element 4 not checked");
+      Assert (E5_Checked, "Element 5 not checked");
+   end Test_Iterate_Object;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -964,6 +1017,7 @@ package body JWX_JSON_Tests is
       Register_Routine (T, Test_Mixed_Objects'Access, "Parse mixed object");
       Register_Routine (T, Test_Complex_Two_Countries'Access, "Parse two countries");
       Register_Routine (T, Test_Complex_Countries'Access, "Parse many countries");
+      Register_Routine (T, Test_Iterate_Object'Access, "Iterate object");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

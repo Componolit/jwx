@@ -1230,6 +1230,25 @@ is
       return End_Index;
    end Query_Object;
 
+   -------------
+   -- Iterate --
+   -------------
+
+   procedure Iterate (Index : Index_Type := Null_Index)
+   is
+      I : Index_Type := Index;
+   begin
+      loop
+         I := Get (I).Next_Member;
+         exit when I = End_Index;
+
+         if Get_Kind (I) = Kind_String
+         then
+            Process (Get_String (I), I + 1);
+         end if;
+      end loop;
+   end Iterate;
+
    --------------
    -- Elements --
    --------------
