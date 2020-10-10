@@ -1,0 +1,21 @@
+name: tests
+
+on:
+  push:
+  schedule:
+    - cron:  '0 2 * * *'
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        git submodule update --init --recursive --depth=1
+    - name: Test
+      run: |
+        docker run -v $PWD:/app -w /app componolit/ci:gnat-community-2020 /bin/sh -c "make"
