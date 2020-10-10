@@ -14,6 +14,7 @@ is
 
    type Context_Element_Type (Kind : Kind_Type := Kind_Invalid) is
    record
+      Offset      : Natural    := 0;
       Next_Member : Index_Type := Null_Index;
       Next_Value  : Index_Type := Null_Index;
       case Kind is
@@ -45,9 +46,10 @@ is
    -- Invalid_Element --
    ---------------------
 
-   Invalid_Element : constant Context_Element_Type :=
+   function Invalid_Element (Off : Natural := 0) return Context_Element_Type is
    --  Construct invalid element
       (Kind        => Kind_Invalid,
+       Offset      => Off,
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
 
@@ -59,9 +61,10 @@ is
    -- Null_Element --
    ------------------
 
-   Null_Element : constant Context_Element_Type :=
+   function Null_Element (Off : Natural) return Context_Element_Type is
    --  Construct null element
       (Kind        => Kind_Null,
+       Offset      => Off,
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
 
@@ -69,9 +72,10 @@ is
    -- Boolean_Element --
    ---------------------
 
-   function Boolean_Element (Value : Boolean) return Context_Element_Type is
+   function Boolean_Element (Value : Boolean; Off : Natural) return Context_Element_Type is
    --  Construct boolean element
       (Kind          => Kind_Boolean,
+       Offset        => Off,
        Boolean_Value => Value,
        Next_Member   => Null_Index,
        Next_Value    => Null_Index);
@@ -80,9 +84,10 @@ is
    -- Real_Element --
    -------------------
 
-   function Real_Element (Value : Real_Type) return Context_Element_Type is
+   function Real_Element (Value : Real_Type; Off : Natural) return Context_Element_Type is
    --  Construct real element
       (Kind        => Kind_Real,
+       Offset      => Off,
        Real_Value  => Value,
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
@@ -91,9 +96,10 @@ is
    -- Integer_Element --
    ---------------------
 
-   function Integer_Element (Value : Integer_Type) return Context_Element_Type is
+   function Integer_Element (Value : Integer_Type; Off : Natural) return Context_Element_Type is
    --  Construct integer element
       (Kind          => Kind_Integer,
+       Offset        => Off,
        Integer_Value => Value,
        Next_Member   => Null_Index,
        Next_Value    => Null_Index);
@@ -102,9 +108,12 @@ is
    -- String_Element --
    --------------------
 
-   function String_Element (String_Start, String_End : Integer) return Context_Element_Type is
+   function String_Element (String_Start : Integer;
+                            String_End   : Integer;
+                            Off          : Natural) return Context_Element_Type is
    --  Construct string element
       (Kind         => Kind_String,
+       Offset       => Off,
        String_Start => String_Start,
        String_End   => String_End,
        Next_Member  => Null_Index,
@@ -114,9 +123,10 @@ is
    -- Object_Element --
    --------------------
 
-   Object_Element : constant Context_Element_Type :=
+   function Object_Element (Off : Natural) return Context_Element_Type is
    --  Construct object element
       (Kind        => Kind_Object,
+       Offset      => Off,
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
 
@@ -124,9 +134,10 @@ is
    -- Array_Element --
    -------------------
 
-   Array_Element : constant Context_Element_Type :=
+   function Array_Element (Off : Natural) return Context_Element_Type is
    --  Construct array element
       (Kind        => Kind_Array,
+       Offset      => Off,
        Next_Member => Null_Index,
        Next_Value  => Null_Index);
 
@@ -350,7 +361,7 @@ is
       Base := Data'First + Offset;
       if Data (Base .. Base + 3) = "null"
       then
-         Set (Null_Element);
+         Set (Null_Element (Offset));
          Context_Index := Context_Index + 1;
          Offset := Offset + 4;
          Match := Match_OK;
@@ -386,7 +397,7 @@ is
       Base := Data'First + Offset;
       if Data (Base .. Base + 3) = "true"
       then
-         Set (Boolean_Element (True));
+         Set (Boolean_Element (True, Offset));
          Context_Index := Context_Index + 1;
          Offset := Offset + 4;
          Match := Match_OK;
@@ -401,7 +412,7 @@ is
 
       if Data (Base .. Base + 4) = "false"
       then
-         Set (Boolean_Element (False));
+         Set (Boolean_Element (False, Offset));
          Context_Index := Context_Index + 1;
          Offset := Offset + 5;
          Match := Match_OK;
@@ -828,7 +839,7 @@ is
                end if;
                Tmp := -Tmp;
             end if;
-            Set (Real_Element (Tmp));
+            Set (Real_Element (Tmp, Offset));
          end;
       else
          if Match_Exponent = Match_OK
@@ -850,7 +861,7 @@ is
          if Negative then
             Integer_Component := -Integer_Component;
          end if;
-         Set (Integer_Element (Integer_Component));
+         Set (Integer_Element (Integer_Component, Offset));
       end if;
 
       Context_Index := Context_Index + 1;
@@ -939,7 +950,7 @@ is
 
       String_End := Data'First + (Offset - 2);
 
-      Set (String_Element (String_Start, String_End));
+      Set (String_Element (String_Start, String_End, Old_Offset));
       Context_Index := Context_Index + 1;
       Match := Match_OK;
 
@@ -979,7 +990,7 @@ is
       end if;
 
       Object_Index := Context_Index;
-      Set (Object_Element);
+      Set (Object_Element (Old_Offset));
       Context_Index := Context_Index + 1;
       Previous_Member := Object_Index;
 
@@ -1091,7 +1102,7 @@ is
       end if;
 
       AI := Context_Index;
-      Set (Array_Element);
+      Set (Array_Element (Old_Offset));
       Context_Index := Context_Index + 1;
       Previous_Element := AI;
 
@@ -1319,5 +1330,11 @@ is
       end loop;
       return Last_Index;
    end Pos;
+
+   ----------------
+   -- Get_Offset --
+   ----------------
+
+   function Get_Offset (Index : Index_Type := Null_Index) return Natural is (Get (Index).Offset);
 
 end JWX.JSON;

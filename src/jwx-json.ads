@@ -181,4 +181,9 @@ is
    --  @param Index  Index of array element, current element by default
    --  @return Index to object at Position, End_Index if out of bounds
 
+   function Get_Offset (Index : Index_Type := Null_Index) return Natural;
+   --  Return offset of an element
+   --
+   --  @return Offset into input string
+
 end JWX.JSON;
